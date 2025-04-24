@@ -1,0 +1,266 @@
+/*
+ Theme Name:   A.I. Style
+ Theme URI:    https://example.com/artificial-intelligence-theme/
+ Description:  A WordPress theme designed to create an AI chat interface based on the Chat-GPT UI
+ Author:       johndee
+ Author URI:   https://example.com
+ Template:     twentysixteen
+ Version:      1.0.0
+ License:      GNU General Public License v2 or later
+ License URI:  http://www.gnu.org/licenses/gpl-2.0.html
+ Text Domain:  artificial-intelligence
+*/
+/* Chat UI Layout */
+/*
+ * Base styles with adjustments for WordPress admin bar
+ * When the page is loaded within WordPress, the body will have the 'admin-bar' class
+ * and the #wpadminbar will be present at the top of the page.
+ */
+body {
+    background-color: #343541;
+    color: #fff;
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* WordPress Admin Bar Adjustments */
+body.admin-bar {
+    /* Account for the WordPress admin bar height (32px desktop, 46px mobile) */
+    height: calc(100vh - 32px);
+    margin-top: 32px; /* Push content below the admin bar */
+}
+
+@media screen and (max-width: 782px) {
+    body.admin-bar {
+        /* Adjust for taller admin bar on mobile */
+        height: calc(100vh - 46px);
+        margin-top: 46px;
+    }
+}
+
+#chat-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    max-width: 100%; /* Take up full width */
+    min-height: 500px;
+    background: #343541;
+    border: none; /* Remove border */
+    box-sizing: border-box;
+    margin: 0; /* Remove auto margins */
+    padding: 0; /* Ensure no padding */
+    flex: 1;
+    height: 100vh; /* Fill the entire viewport height */
+    position: absolute; /* Position absolutely to cover entire viewport */
+    left: 0;
+    right: 0;
+    top: 0; /* Start from the top of the viewport */
+}
+
+/* Adjust chat container for WordPress admin bar */
+body.admin-bar #chat-container {
+    height: calc(100vh - 32px); /* Account for admin bar height on desktop */
+    top: 32px; /* Position right below the admin bar */
+}
+
+@media screen and (max-width: 782px) {
+    body.admin-bar #chat-container {
+        height: calc(100vh - 46px); /* Account for taller admin bar on mobile */
+        top: 46px; /* Position right below the taller admin bar on mobile */
+    }
+}
+
+#chat-sidebar {
+    width: 250px;
+    min-width: 180px;
+    max-width: 300px;
+    background: #202123;
+    border-right: 1px solid #444654;
+    padding: 16px;
+    box-sizing: border-box;
+    color: #ececf1;
+}
+
+#chat-main {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    min-width: 0;
+    background: #343541;
+    overflow-y: auto; /* Enable vertical scrolling */
+    height: 100%; /* Take full height of container */
+}
+
+/* Make sidebar independently scrollable */
+#chat-sidebar {
+    overflow-y: auto; /* Enable vertical scrolling */
+    height: 100%; /* Take full height of container */
+}
+
+#chat-messages {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 16px;
+    min-height: 200px;
+    color: #ececf1;
+}
+
+/* Main prompt title */
+#what-are-you-working-on {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 24px;
+    padding: 0 16px;
+}
+
+#chat-input {
+    flex: 0 0 auto;
+    padding: 16px;
+    background: #343541;
+    border-top: 1px solid #444654;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (max-width: 700px) {
+    #chat-container {
+        flex-direction: column;
+    }
+    #chat-sidebar {
+        width: 100%;
+        max-width: none;
+        border-right: none;
+        border-bottom: 1px solid #ccc;
+        height: 30vh; /* Fixed height for sidebar on mobile */
+        overflow-y: auto;
+    }
+    #chat-main {
+        width: 100%;
+        height: 70vh; /* Remaining height for main content */
+        overflow-y: auto;
+    }
+}
+
+/* WordPress Comment Form - ChatGPT Style */
+#chat-input {
+    padding: 0;
+    background-color: #343541;
+    border-top: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.comment-respond {
+    margin: 0;
+    padding: 16px;
+    width: 100%;
+    max-width: 768px;
+}
+
+/* Hide elements that don't appear in ChatGPT interface */
+.comment-reply-title,
+.logged-in-as,
+.required-field-message,
+.comment-form-comment label {
+    display: none;
+}
+
+#commentform {
+    background-color: #40414f;
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    margin: 0;
+    max-width: 768px;
+    width: 100%;
+}
+
+.comment-form-comment {
+    margin: 0;
+    padding: 0;
+    flex: 1;
+}
+
+#comment {
+    width: 100%;
+    background-color: transparent;
+    border: none;
+    color: #fff;
+    font-size: 16px;
+    padding: 12px 45px 12px 12px;
+    resize: none;
+    min-height: 24px;
+    line-height: 1.5;
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+}
+
+#comment:focus {
+    outline: none;
+}
+
+#comment::placeholder {
+    color: #8e8ea0;
+    content: "What are you working on?";
+}
+
+.form-submit {
+    margin: 0;
+    position: absolute;
+    right: 16px;
+    bottom: 14px;
+}
+
+/* Submit button uses default browser styling */
+
+/* Add action buttons (similar to the + button, search, etc.) */
+/* Plus button */
+#commentform::before {
+    content: "";
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    background-color: #40414f;
+    border-radius: 50%;
+    margin-right: 8px;
+    position: relative;
+    cursor: pointer;
+    flex-shrink: 0;
+    
+    /* Plus icon */
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='12' y1='5' x2='12' y2='19'%3E%3C/line%3E%3Cline x1='5' y1='12' x2='19' y2='12'%3E%3C/line%3E%3C/svg%3E");
+    mask-size: 16px;
+    mask-position: center;
+    mask-repeat: no-repeat;
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='12' y1='5' x2='12' y2='19'%3E%3C/line%3E%3Cline x1='5' y1='12' x2='19' y2='12'%3E%3C/line%3E%3C/svg%3E");
+    -webkit-mask-size: 16px;
+    -webkit-mask-position: center;
+    -webkit-mask-repeat: no-repeat;
+}
+
+/* Search button - removed */
+
+/* Microphone button - removed */
+
+/* Responsive adjustments */
+@media (max-width: 700px) {
+    #commentform {
+        padding: 10px 12px;
+    }
+    
+    #comment {
+        font-size: 14px;
+    }
+}

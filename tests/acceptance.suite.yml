@@ -1,0 +1,49 @@
+class_name: AcceptanceTester
+bootstrap: _bootstrap.php
+modules:
+  enabled:
+    - \Helper\Acceptance
+    - Asserts
+    - WPWebDriver
+    - WPLoader
+  config:
+    WPWebDriver:
+      url: 'http://localhost'
+      url2: 'http://localhost'
+      remoteRoute: 'wp/v2/posts'
+      testPostUrl: '/testpost'
+      numberOfCalls: 2
+      localhostMode: false
+      window_size: 1920x1080
+      #window_size: maximize
+      adminUsername: 'Codeception'
+      adminPassword: 'password'
+      clear_cookies: false
+      adminPath: /wp-admin
+      port: 4444 #9515
+      #to launch in visual mode: chromedriver --url-base=/wd/hub
+      #browser: phantomjs #./phantomjs --webdriver=4444
+      #nohup xvfb-run java -Dwebdriver.chrome.driver=/var/www/html/wp-content/plugins/WPbdd/chromedriver -jar selenium.jar &>/dev/null &
+      ## ^^ requires the corect versions of chromedriver and chrome
+      ##
+      browser: chrome
+      capabilities:
+        chromeOptions:
+          args:
+            - "--disable-blink-features=AutomationControlled"
+            - "--disable-infobars"
+            - "--disable-extensions"
+            - "--incognito"
+            - "--disable-popup-blocking"
+            - "--disable-default-apps"
+            - "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
+          excludeSwitches:
+            - enable-automation
+          useAutomationExtension: false
+    WPLoader:
+      wpRootFolder: '/var/www/html'
+      dbName: 'wordpress_unit_test'                      # Test database name
+      dbHost: '127.0.0.1'                       # Database host
+      dbUser: 'wordpressuser'                            # Datbase user
+      dbPassword: 'password'                            # Database password
+      tablePrefix: 'wp_'
