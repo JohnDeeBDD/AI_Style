@@ -4,7 +4,6 @@
  Description:  A WordPress theme designed to create an AI chat interface based on the Chat-GPT UI
  Author:       johndee
  Author URI:   https://example.com
- Template:     twentysixteen
  Version:      1.0.0
  License:      GNU General Public License v2 or later
  License URI:  http://www.gnu.org/licenses/gpl-2.0.html
@@ -112,7 +111,7 @@ body.admin-bar #chat-container {
 }
 
 /* Main prompt title */
-#what-are-you-working-on {
+.main-call-to-action {
     text-align: center;
     font-size: 2rem;
     font-weight: 700;

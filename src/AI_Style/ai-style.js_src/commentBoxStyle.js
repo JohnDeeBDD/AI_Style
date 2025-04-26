@@ -8,7 +8,11 @@ export default function commentBoxStyle() {
     // Set the placeholder text to "Ask anything"
     const commentTextarea = document.getElementById('comment');
     if (commentTextarea) {
-        commentTextarea.placeholder = 'Ask anything';
+        //commentTextarea.placeholder = 'Ask anything';
+        
+        // Set initial height to one row
+        commentTextarea.rows = 1;
+        commentTextarea.style.height = 'auto';
         
         // Auto-resize the textarea as the user types
         commentTextarea.addEventListener('input', function() {
