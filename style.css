@@ -106,8 +106,14 @@ body.admin-bar #chat-container {
     flex: 1 1 auto;
     overflow-y: auto;
     padding: 16px;
-    min-height: 200px;
+    min-height: 788px; /* Match the height of #respond */
+    height: 788px; /* Explicitly set height to match #respond */
     color: #ececf1;
+    width: 100%;
+    box-sizing: border-box;
+    /* Ensure same dimensions as #respond */
+    max-width: 768px;
+    margin: 0 auto;
 }
 
 /* Main prompt title */
@@ -164,6 +170,53 @@ body.admin-bar #chat-container {
     padding: 16px;
     width: 100%;
     max-width: 768px;
+    height: 788px; /* Explicitly set height to match #chat-messages */
+    box-sizing: border-box;
+}
+
+/* Message styling for ChatGPT-style UI */
+.message {
+    margin-bottom: 24px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* AI message styling (respondent) */
+.respondent-message {
+    width: 100%;
+    background-color: #343541;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    box-sizing: border-box;
+    border: none;
+}
+
+/* User message styling (interlocutor) */
+.interlocutor-message {
+    width: 70%;
+    max-width: 70%;
+    background-color: #444654;
+    padding: 16px;
+    border-radius: 20px;
+    margin-bottom: 24px;
+    margin-left: auto; /* Push to the right */
+    box-sizing: border-box;
+    border: 1px solid #565869;
+}
+
+/* Message content styling */
+.message-content {
+    color: #ececf1;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+/* Container for messages to enable right alignment */
+#chat-messages {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
 /* Hide elements that don't appear in ChatGPT interface */
@@ -262,4 +315,24 @@ body.admin-bar #chat-container {
     #comment {
         font-size: 14px;
     }
+}
+
+/* Post content styling */
+.post-content {
+    width: 100%;
+    max-width: 100%;
+    padding: 16px;
+    margin-bottom: 24px;
+    box-sizing: border-box;
+    color: #ececf1;
+    font-size: 16px;
+    line-height: 1.5;
+    background: none;
+    border: none;
+}
+
+/* Ensure post content expands to the size of #chat-main */
+.post-content {
+    display: block;
+    margin: 0 auto;
 }

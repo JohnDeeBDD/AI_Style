@@ -28,4 +28,19 @@ function ai_style_debug_template() {
     }
 }
 add_action('wp_footer', 'ai_style_debug_template');
+/**
+ * Register widget area for the sidebar
+ */
+function ai_style_widgets_init() {
+    register_sidebar( array(
+        'name'          => __( 'Sidebar', 'ai_style' ),
+        'id'            => 'sidebar-1',
+        'description'   => __( 'Add widgets here to appear in your sidebar.', 'ai_style' ),
+        'before_widget' => '<section id="%1$s" class="widget %2$s">',
+        'after_widget'  => '</section>',
+        'before_title'  => '<h2 class="widget-title">',
+        'after_title'   => '</h2>',
+    ) );
+}
+add_action( 'widgets_init', 'ai_style_widgets_init' );
 

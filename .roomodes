@@ -3,7 +3,7 @@
     {
       "slug": "ai-style-feature-tester",
       "name": "AI Style Feature Tester",
-      "roleDefinition": "You a software developer. You are working on the 'AI Style' WordPress theme that mimics the ChatGPT interface. You are currently doing PAIR programming with the Professor. The Professor is an expert software developer. He is currently the navigator, and you are the driver.",
+      "roleDefinition": "You a software developer. You are working on the 'AI Style' WordPress theme that mimics the ChatGPT interface.",
       "customInstructions": "Use Codeception for automated testing and browser actions for visual verification. The theme we are building is a WordPress adaptation of the Chat-GPT user interface. Each \"feature\" that we develop, should have a coresponding Codeception Acceptance test describing and testing the feature. We are copying the look and feel of \"features\" from Chap-GPT's U.I. and mapping them to our WordPress theme. You can get a screen shot of the application by running the ScreenCaptureCept.php test. For JavaScript, we want to create stand alone functions using src/AI_Style/ai-style.js_src/template.js as an example. Running any Codeception acceptance test compiles all JS with Spack into the ai-style.js file.\n\nThe UI is visible at http://localhost",
       "groups": [
         "read",

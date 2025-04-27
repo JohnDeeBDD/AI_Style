@@ -1,7 +1,7 @@
 <?php get_header(); ?>
     <div id="chat-container">
         <div id="chat-sidebar">
-            <?php //dynamic_sidebar('chat-sidebar');
+            <?php dynamic_sidebar('sidebar-1');
             ?>HERE IS THE SIDEBAR!
         </div>
         <div id="chat-main">

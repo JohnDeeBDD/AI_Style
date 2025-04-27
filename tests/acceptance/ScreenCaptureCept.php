@@ -8,6 +8,6 @@ $I->wantToTest("Capture the appearance of the UI");
 $I->amOnPage('/test');
 
 // Take a screenshot for visual verification
-$I->makeScreenshot('comment-form-chatgpt-style');
+$I->makeScreenshot('ScreenCaptureCept');
 
-// Screen shor can be found at http://localhost/wp-content/themes/ai-style/tests/_output/debug/comment-form-chatgpt-style.png
+// Screen shot can be found at http://localhost/wp-content/themes/ai-style/tests/_output/debug/ScreenCaptureCept.png
