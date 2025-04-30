@@ -1,13 +1,5 @@
 /*
  Theme Name:   A.I. Style
- Theme URI:    https://example.com/artificial-intelligence-theme/
- Description:  A WordPress theme designed to create an AI chat interface based on the Chat-GPT UI
- Author:       johndee
- Author URI:   https://example.com
- Version:      1.0.0
- License:      GNU General Public License v2 or later
- License URI:  http://www.gnu.org/licenses/gpl-2.0.html
- Text Domain:  artificial-intelligence
 */
 /* Chat UI Layout */
 /*
@@ -25,6 +17,7 @@ body {
     display: flex;
     flex-direction: column;
     height: 100vh;
+    overflow: hidden; /* Suppress browser's default scrollbar */
 }
 
 /* WordPress Admin Bar Adjustments */
@@ -83,6 +76,8 @@ body.admin-bar #chat-container {
     padding: 16px;
     box-sizing: border-box;
     color: #ececf1;
+    height: 100% !important; /* Force height to be 100% */
+    overflow-y: auto;
 }
 
 #chat-main {
@@ -92,26 +87,29 @@ body.admin-bar #chat-container {
     padding: 0;
     min-width: 0;
     background: #343541;
-    overflow-y: auto; /* Enable vertical scrolling */
     height: 100%; /* Take full height of container */
+    position: relative; /* For proper positioning of fixed elements */
 }
 
 /* Make sidebar independently scrollable */
-#chat-sidebar {
-    overflow-y: auto; /* Enable vertical scrolling */
-    height: 100%; /* Take full height of container */
+/* Styles moved to main #chat-sidebar definition */
+
+/* Create a scrollable container for both post content and chat messages */
+.scrollable-content {
+    overflow-y: auto; /* Single scrollbar for all content */
+    height: calc(100% - 80px); /* Leave space for the fixed comment form */
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center; /* Center the children horizontally */
 }
 
 #chat-messages {
     flex: 1 1 auto;
-    overflow-y: auto;
     padding: 16px;
-    min-height: 788px; /* Match the height of #respond */
-    height: 788px; /* Explicitly set height to match #respond */
     color: #ececf1;
     width: 100%;
     box-sizing: border-box;
-    /* Ensure same dimensions as #respond */
     max-width: 768px;
     margin: 0 auto;
 }
@@ -134,6 +132,9 @@ body.admin-bar #chat-container {
     display: flex;
     align-items: center;
     justify-content: center;
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
 }
 
 @media (max-width: 700px) {
@@ -163,6 +164,9 @@ body.admin-bar #chat-container {
     display: flex;
     align-items: center;
     justify-content: center;
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
 }
 
 .comment-respond {
@@ -170,7 +174,7 @@ body.admin-bar #chat-container {
     padding: 16px;
     width: 100%;
     max-width: 768px;
-    height: 788px; /* Explicitly set height to match #chat-messages */
+    /* Removed fixed height to allow it to size based on content */
     box-sizing: border-box;
 }
 
@@ -217,6 +221,36 @@ body.admin-bar #chat-container {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+}
+
+/* Floating items group positioning */
+#floating-items-group {
+    position: sticky;
+    bottom: 0;
+    width: 100%;
+    max-width: 768px;
+    margin: 0 auto;
+    padding: 16px;
+    box-sizing: border-box;
+    z-index: 5;
+    background-color: #343541; /* Match the background */
+}
+
+/* When chat-messages is empty, center the floating-items-group vertically */
+#chat-messages:empty ~ #floating-items-group {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* When chat-messages has content, keep floating-items-group at the bottom */
+#chat-messages:not(:empty) ~ #floating-items-group {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    transform: none;
+    width: 100%;
 }
 
 /* Hide elements that don't appear in ChatGPT interface */
@@ -320,9 +354,8 @@ body.admin-bar #chat-container {
 /* Post content styling */
 .post-content {
     width: 100%;
-    max-width: 100%;
     padding: 16px;
-    margin-bottom: 24px;
+    margin: 0 0 24px 0;
     box-sizing: border-box;
     color: #ececf1;
     font-size: 16px;
@@ -331,8 +364,58 @@ body.admin-bar #chat-container {
     border: none;
 }
 
-/* Ensure post content expands to the size of #chat-main */
-.post-content {
-    display: block;
+/* Create a scrollable container for both post content and chat messages */
+#post-content-1 {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 16px;
+}
+
+#chat-messages {
+    max-width: 768px; /* Match floating-items-group max-width */
     margin: 0 auto;
+    width: 100%;
+}
+
+/* Make the content area scrollable as one unit */
+#chat-main {
+    overflow: hidden; /* Prevent double scrollbars */
+}
+
+/* Footer styling - ChatGPT style */
+.site-footer {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    max-width: 80%;
+    background-color: #343541;
+    color: #acacbe;
+    text-align: center;
+    padding: 6px 12px;
+    font-size: 12px;
+    border-top: 1px solid #444654;
+    border-left: 1px solid #444654;
+    border-right: 1px solid #444654;
+    border-radius: 6px 6px 0 0;
+    z-index: 100; /* Ensure it appears above other elements */
+    box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1);
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    letter-spacing: 0.2px;
+}
+
+/* Adjust for WordPress admin bar */
+body.admin-bar .site-footer {
+    bottom: 0; /* Keep at bottom */
+}
+
+/* Add padding to the bottom of chat-main to prevent content from being hidden behind the footer */
+#chat-main {
+    padding-bottom: 30px; /* Reduced padding to account for thinner footer */
+}
+
+/* Ensure the input area is above the footer */
+#chat-input {
+    z-index: 101;
 }

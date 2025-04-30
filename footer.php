@@ -9,14 +9,12 @@
  */
 
 ?>
-
-
-
 		<footer id="colophon" class="site-footer">
+		Aions can make mistakes. Check important info.
 		</footer><!-- .site-footer -->
-
 </div><!-- .site -->
 
 <?php wp_footer(); ?>
+
 </body>
 </html>

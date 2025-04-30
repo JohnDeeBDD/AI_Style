@@ -1,13 +1,8 @@
 <?php
 
 $I = new AcceptanceTester($scenario);
-$I->loginAsAdmin();
-
 $I->wantToTest("Capture the appearance of the UI");
-
-$I->amOnPage('/test');
-
-// Take a screenshot for visual verification
+$I->amOnPage('http://localhost/test');
 $I->makeScreenshot('ScreenCaptureCept');
 
-// Screen shot can be found at http://localhost/wp-content/themes/ai-style/tests/_output/debug/ScreenCaptureCept.png
+// Screen shot can be found at http://localhost/wp-content/themes/ai_style/tests/_output/debug/ScreenCaptureCept.png

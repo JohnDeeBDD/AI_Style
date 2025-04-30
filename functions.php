@@ -2,6 +2,12 @@
 
 include_once("/var/www/html/wp-content/themes/ai_style/src/AI_Style/autoloader.php");
 
+
+
+add_action('wp_enqueue_scripts', function() {
+    wp_enqueue_style('ai_style', get_stylesheet_uri());
+});
+
 function enqueue_chat_scripts() {
     wp_enqueue_script( 'wp-api' );
     // Enqueue Dashicons for front-end use
@@ -18,16 +24,7 @@ function ai_style_comment_form_defaults($defaults) {
     return $defaults;
 }
 add_filter('comment_form_defaults', 'ai_style_comment_form_defaults');
-/**
- * Display the current template file being used
- */
-function ai_style_debug_template() {
-    global $template;
-    if (is_user_logged_in()) {
-        echo '<!-- Current template file: ' . basename($template) . ' -->';
-    }
-}
-add_action('wp_footer', 'ai_style_debug_template');
+
 /**
  * Register widget area for the sidebar
  */

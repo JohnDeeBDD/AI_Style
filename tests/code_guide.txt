@@ -1,18 +1,15 @@
-For every JS feature, we should create an atomic file like:
+We are building a WordPress theme that replicates the Chat-GPT user interface.
+
+Our development process follows Test Driven Development (TDD).
+For each new feature, we begin by creating a Codeception acceptance test. Example:
+/var/www/html/wp-content/themes/ai_style/tests/acceptance/ScreenCaptureCept.php
+
+The ScreenCaptureCept.php test is also useful for capturing a visual snapshot of the UI during development.
+
+For every new JavaScript feature, we should create a small, atomic file in:
 /var/www/html/wp-content/themes/ai_style/src/AI_Style/ai-style.js_src/template.js
 
-That newly created function should be included and called from:
+Each new function must be imported and called from:
 /var/www/html/wp-content/themes/ai_style/src/AI_Style/ai-style.js_src/ai-style.js
 
-When any Codeception acceptance test is run, the JS files are automatically compiled with Spack.
-You are currently looking at 
-
-
-Or you can compile manually with:
-npx spack entry=/src/AI_Style/ai-style.js_src/ai-style.js output=/src/AI_Style
-
-One useful command line test to capture the local UI's appearance is:
-bin/codecept run acceptance ScreenCaptureCept.php -vvv
-which produces output here:
-http://localhost/wp-content/themes/ai_style/tests/_output/debug/ScreenCaptureCept.png
-
+When any Codeception acceptance test is executed, the JavaScript files are automatically compiled using Spack.

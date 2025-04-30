@@ -37,20 +37,6 @@ class Acceptance extends \Codeception\Module{
         echo "\n";
     }
 
-    public function getSiteUrls(){
-        return json_decode(file_get_contents('/var/www/html/wp-content/plugins/cacbot/servers.json'), true);
-    }
-
-    /**
-     * Helper function to execute remote commands via SSH
-     */
-    public function executeRemoteCommandAsUbuntu($serverIP, $command) {
-        $sshCommand = "ssh -o StrictHostKeyChecking=no -i /home/johndee/ozempic.pem ubuntu@$serverIP $command";
-        $result = shell_exec($sshCommand);
-        echo($result);
-        return $result;
-    }
-
     public function get_config(){
         return $this->getModule('WPWebDriver')->_getConfig();
     }

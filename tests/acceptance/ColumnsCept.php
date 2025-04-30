@@ -3,8 +3,9 @@
 $I = new AcceptanceTester($scenario);
 $I->loginAsAdmin();
 
-$I->wantToTest("UI columns functionality for ChatGPT-style interface");
+$I->wantToTest("Test the basic functional columns, which are the main");
 
 $I->amOnPage('/columns-test');
 
-$I->makeScreenshot('ai_style');
+// Take a screenshot for visual verification
+$I->makeScreenshot('comment-form-chatgpt-style');
