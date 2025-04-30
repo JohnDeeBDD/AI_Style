@@ -18,6 +18,10 @@ body {
     flex-direction: column;
     height: 100vh;
     overflow: hidden; /* Suppress browser's default scrollbar */
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 /* WordPress Admin Bar Adjustments */
@@ -68,8 +72,8 @@ body.admin-bar #chat-container {
 }
 
 #chat-sidebar {
-    width: 250px;
-    min-width: 180px;
+    width: 260px;
+    min-width: 260px;
     max-width: 300px;
     background: #202123;
     border-right: 1px solid #444654;
@@ -80,13 +84,40 @@ body.admin-bar #chat-container {
     overflow-y: auto;
 }
 
+#chat-sidebar h2 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #ececf1;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #444654;
+}
+
+#chat-sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#chat-sidebar li {
+    padding: 8px 12px;
+    margin-bottom: 4px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+#chat-sidebar li:hover {
+    background-color: #343541;
+}
+
 #chat-main {
     flex: 1 1 0;
     display: flex;
     flex-direction: column;
     padding: 0;
     min-width: 0;
-    background: #343541;
+    background: #202123;
     height: 100%; /* Take full height of container */
     position: relative; /* For proper positioning of fixed elements */
 }
@@ -102,11 +133,12 @@ body.admin-bar #chat-container {
     flex-direction: column;
     width: 100%;
     align-items: center; /* Center the children horizontally */
+    padding-bottom: 40px; /* Add padding at the bottom for better spacing */
 }
 
 #chat-messages {
     flex: 1 1 auto;
-    padding: 16px;
+    padding: 24px 16px; /* Increased top/bottom padding */
     color: #ececf1;
     width: 100%;
     box-sizing: border-box;
@@ -127,7 +159,7 @@ body.admin-bar #chat-container {
 #chat-input {
     flex: 0 0 auto;
     padding: 16px;
-    background: #343541;
+    background: #202123;
     border-top: 1px solid #444654;
     display: flex;
     align-items: center;
@@ -159,7 +191,7 @@ body.admin-bar #chat-container {
 /* WordPress Comment Form - ChatGPT Style */
 #chat-input {
     padding: 0;
-    background-color: #343541;
+    background-color: #202123;
     border-top: none;
     display: flex;
     align-items: center;
@@ -180,7 +212,7 @@ body.admin-bar #chat-container {
 
 /* Message styling for ChatGPT-style UI */
 .message {
-    margin-bottom: 24px;
+    margin-bottom: 28px;
     width: 100%;
     box-sizing: border-box;
 }
@@ -188,12 +220,14 @@ body.admin-bar #chat-container {
 /* AI message styling (respondent) */
 .respondent-message {
     width: 100%;
-    background-color: #343541;
-    padding: 16px;
-    border-radius: 8px;
-    margin-bottom: 24px;
+    background-color: #202123;
+    padding: 16px 16px 16px 20px; /* Increased left padding */
+    border-radius: 0;
+    margin-bottom: 16px;
     box-sizing: border-box;
     border: none;
+    border-left: 3px solid #10a37f; /* ChatGPT green accent */
+    position: relative;
 }
 
 /* User message styling (interlocutor) */
@@ -203,17 +237,41 @@ body.admin-bar #chat-container {
     background-color: #444654;
     padding: 16px;
     border-radius: 20px;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
     margin-left: auto; /* Push to the right */
     box-sizing: border-box;
-    border: 1px solid #565869;
+    border: none;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Add a subtle hover effect to messages */
+.respondent-message:hover {
+    background-color: #2a2b32;
+}
+
+.interlocutor-message:hover {
+    background-color: #4d4f5e;
 }
 
 /* Message content styling */
 .message-content {
     color: #ececf1;
     font-size: 16px;
-    line-height: 1.5;
+    line-height: 1.6;
+    letter-spacing: 0.2px;
+}
+
+/* Message actions (copy, like, dislike) */
+.message-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.respondent-message:hover .message-actions {
+    opacity: 1;
 }
 
 /* Container for messages to enable right alignment */
@@ -233,7 +291,7 @@ body.admin-bar #chat-container {
     padding: 16px;
     box-sizing: border-box;
     z-index: 5;
-    background-color: #343541; /* Match the background */
+    background-color: #202123; /* Match the main chat area background */
 }
 
 /* When chat-messages is empty, center the floating-items-group vertically */
@@ -268,10 +326,15 @@ body.admin-bar #chat-container {
     display: flex;
     align-items: center;
     position: relative;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
     margin: 0;
     max-width: 768px;
     width: 100%;
+    transition: box-shadow 0.2s ease;
+}
+
+#commentform:focus-within {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
 .comment-form-comment {
@@ -309,7 +372,38 @@ body.admin-bar #chat-container {
     bottom: 14px;
 }
 
-/* Submit button uses default browser styling */
+/* Replace text submit button with icon */
+.form-submit input[type="submit"] {
+    background-color: #10a37f; /* ChatGPT green */
+    border: none;
+    font-size: 0; /* Hide text content */
+    color: transparent; /* Hide text content */
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    border-radius: 4px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FFFFFF'%3E%3Cpath d='M2.01 21L23 12 2.01 3 2 10l15 2-15 2z'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 16px;
+    opacity: 1;
+    transition: background-color 0.2s ease;
+    text-indent: -9999px; /* Hide text content */
+    overflow: hidden; /* Hide text content */
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.form-submit input[type="submit"]:hover {
+    background-color: #0f8e6c; /* Darker green on hover */
+}
+
+.form-submit input[type="submit"]:hover {
+    opacity: 1;
+}
 
 /* Add action buttons (similar to the + button, search, etc.) */
 /* Plus button */
@@ -386,23 +480,30 @@ body.admin-bar #chat-container {
 .site-footer {
     position: fixed;
     bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: auto;
-    max-width: 80%;
-    background-color: #343541;
+    left: 0;
+    width: 100%;
+    background-color: #202123;
     color: #acacbe;
     text-align: center;
-    padding: 6px 12px;
+    padding: 8px 0;
     font-size: 12px;
     border-top: 1px solid #444654;
-    border-left: 1px solid #444654;
-    border-right: 1px solid #444654;
-    border-radius: 6px 6px 0 0;
     z-index: 100; /* Ensure it appears above other elements */
     box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1);
     font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
     letter-spacing: 0.2px;
+}
+
+/* Add margin to the floating-items-group to prevent overlap with footer */
+#floating-items-group {
+    margin-bottom: 40px; /* Increased space for the footer */
+    padding-bottom: 10px; /* Additional padding at the bottom */
+}
+
+/* Adjust the scrollable-content to account for the footer */
+.scrollable-content {
+    height: calc(100% - 120px); /* Further adjusted to account for footer height */
+    padding-bottom: 20px; /* Add more padding at the bottom */
 }
 
 /* Adjust for WordPress admin bar */

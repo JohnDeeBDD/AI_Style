@@ -19,6 +19,32 @@ function e() {
         e && (e.style.display = 'none');
     }
 }
+function e1() {
+    console.log("Applying right justification to one-liner comments"), document.querySelectorAll('.interlocutor-message').forEach(function(e) {
+        var t = e.querySelector('.message-content');
+        if (t) {
+            var n = t.textContent.trim(), i = !n.includes('\n'), s = !t.innerHTML.includes('<br');
+            i && s && n.length > 0 && (e.style.marginLeft = 'auto', e.style.marginRight = '0', e.style.width = 'auto', e.style.maxWidth = '70%', e.style.display = 'inline-block', e.style.paddingLeft = '20px', e.style.paddingRight = '20px', e.classList.add('one-liner'));
+        }
+    });
+    var e = document.getElementById('chat-messages');
+    e && new MutationObserver(function(e) {
+        e.forEach(function(e) {
+            e.addedNodes.length && e.addedNodes.forEach(function(e) {
+                if (e.classList && e.classList.contains('interlocutor-message')) {
+                    var t = e.querySelector('.message-content');
+                    if (t) {
+                        var n = t.textContent.trim(), i = !n.includes('\n'), s = !t.innerHTML.includes('<br');
+                        i && s && n.length > 0 && (e.style.marginLeft = 'auto', e.style.marginRight = '0', e.style.width = 'auto', e.style.maxWidth = '70%', e.style.display = 'inline-block', e.style.paddingLeft = '20px', e.style.paddingRight = '20px', e.classList.add('one-liner'));
+                    }
+                }
+            });
+        });
+    }).observe(e, {
+        childList: !0,
+        subtree: !0
+    });
+}
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('ai-style.js is loaded!'), t(), e(), console.log(cacbot_data), console.log(cacbot_data);
+    console.log('ai-style.js is loaded!'), t(), e(), e1();
 });
