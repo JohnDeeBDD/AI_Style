@@ -5,13 +5,9 @@ function t() {
         this.style.height = 'auto', this.style.height = this.scrollHeight + 'px';
     }));
     var e = document.getElementById('commentform');
-    if (e) {
-        e.addEventListener('click', function(o) {
-            o.target === e && t.focus();
-        });
-        var o = document.querySelector('.form-submit input[type="submit"]');
-        o && (o.value = 'SUBMIT');
-    }
+    e && e.addEventListener('click', function(n) {
+        n.target === e && t.focus();
+    });
 }
 function e() {
     if (document.querySelectorAll('#chat-messages .message').length > 0) {
@@ -45,6 +41,30 @@ function e1() {
         subtree: !0
     });
 }
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('ai-style.js is loaded!'), t(), e(), e1();
+function addInterlocutorMessage(n) {
+    var t = document.getElementById('chat-messages');
+    if (!t) return void console.error('Chat messages container not found');
+    var s = 'message-' + Date.now(), a = document.createElement('div');
+    a.className = 'message interlocutor-message', a.id = s;
+    var o = document.createElement('div');
+    o.className = 'message-content', o.id = 'message-content-' + s, o.innerHTML = n, a.appendChild(o), t.appendChild(a), e2();
+}
+function addRespondentMessage(n) {
+    var t = document.getElementById('chat-messages');
+    if (!t) return void console.error('Chat messages container not found');
+    var s = 'message-' + Date.now(), a = document.createElement('div');
+    a.className = 'message respondent-message', a.id = s;
+    var o = document.createElement('div');
+    o.className = 'message-content', o.id = 'message-content-' + s, o.innerHTML = n, a.appendChild(o), t.appendChild(a), e2();
+}
+function e2() {
+    var e = document.querySelector('.scrollable-content');
+    e && (e.scrollTop = e.scrollHeight);
+}
+const __default = {
+    addInterlocutorMessage: addInterlocutorMessage,
+    addRespondentMessage: addRespondentMessage
+};
+window.addInterlocutorMessage = __default.addInterlocutorMessage, window.addRespondentMessage = __default.addRespondentMessage, document.addEventListener('DOMContentLoaded', function() {
+    console.log('ai-style.js is loaded!'), t(), e(), e1(), console.log(cacbot_data), console.log('Chat message functions are available globally:'), console.log('- addInterlocutorMessage(message)'), console.log('- addRespondentMessage(message)');
 });

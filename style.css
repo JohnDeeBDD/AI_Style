@@ -226,7 +226,7 @@ body.admin-bar #chat-container {
     margin-bottom: 16px;
     box-sizing: border-box;
     border: none;
-    border-left: 3px solid #10a37f; /* ChatGPT green accent */
+    border-left: none; /* Removed green accent */
     position: relative;
 }
 
@@ -362,7 +362,6 @@ body.admin-bar #chat-container {
 
 #comment::placeholder {
     color: #8e8ea0;
-    content: "What are you working on?";
 }
 
 .form-submit {
@@ -374,7 +373,7 @@ body.admin-bar #chat-container {
 
 /* Replace text submit button with icon */
 .form-submit input[type="submit"] {
-    background-color: #10a37f; /* ChatGPT green */
+    background-color: #444654; /* Changed from green to match chat background */
     border: none;
     font-size: 0; /* Hide text content */
     color: transparent; /* Hide text content */
@@ -398,7 +397,7 @@ body.admin-bar #chat-container {
 }
 
 .form-submit input[type="submit"]:hover {
-    background-color: #0f8e6c; /* Darker green on hover */
+    background-color: #4d4f5e; /* Darker shade on hover */
 }
 
 .form-submit input[type="submit"]:hover {
