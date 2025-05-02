@@ -41,3 +41,58 @@ function ai_style_widgets_init() {
 }
 add_action( 'widgets_init', 'ai_style_widgets_init' );
 
+/**
+ * Register REST API endpoint for creating cacbot-conversation posts
+ */
+add_action('rest_api_init', function() {
+    // Check if the custom post type exists
+    if (post_type_exists('cacbot-conversation')) {
+        register_rest_route('ai-style', '/cacbot-conversation', array(
+            'methods' => 'POST',
+            'callback' => 'ai_style_create_cacbot_conversation',
+            'permission_callback' => function() {
+                return current_user_can('edit_posts');
+            }
+        ));
+    }
+});
+
+/**
+ * Callback function to create a new cacbot-conversation post
+ *
+ * @param WP_REST_Request $request The request object
+ * @return WP_REST_Response The response object
+ */
+function ai_style_create_cacbot_conversation($request) {
+    // Generate a random 20 character alphanumeric string for the title
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $title = '';
+    for ($i = 0; $i < 20; $i++) {
+        $title .= $characters[rand(0, strlen($characters) - 1)];
+    }
+    
+    // Create the post
+    $post_id = wp_insert_post(array(
+        'post_title'    => $title,
+        'post_content'  => '&nbsp;',
+        'post_status'   => 'publish',
+        'post_type'     => 'cacbot-conversation',
+    ));
+    
+    if (is_wp_error($post_id)) {
+        return new WP_REST_Response(array(
+            'success' => false,
+            'message' => $post_id->get_error_message()
+        ), 500);
+    }
+    
+    // Add custom post meta data
+    add_post_meta($post_id, '_cacbot_conversation', '1', true);
+    
+    return new WP_REST_Response(array(
+        'success' => true,
+        'post_id' => $post_id,
+        'title'   => $title
+    ), 201);
+}
+

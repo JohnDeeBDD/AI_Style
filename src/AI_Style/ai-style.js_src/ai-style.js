@@ -5,10 +5,12 @@ import commentBoxStyle from "./commentBoxStyle";
 import mainCallToAction from "./mainCallToAction";
 import justifyOneLiner from "./justifyOneLiner";
 import chatMessages from "./chatMessages";
+import enableCreateCacbotConversationFromUI from "./enableCreateCacbotConversationFromUI";
 
 // Make the chat message functions available globally
 window.addInterlocutorMessage = chatMessages.addInterlocutorMessage;
 window.addRespondentMessage = chatMessages.addRespondentMessage;
+
 
 document.addEventListener('DOMContentLoaded', function() {
   console.log('ai-style.js is loaded!');
@@ -16,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
   mainCallToAction();
   justifyOneLiner();
   console.log(cacbot_data);
+  enableCreateCacbotConversationFromUI();
   
   // Log that the chat message functions are available
   console.log('Chat message functions are available globally:');

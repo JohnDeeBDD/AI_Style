@@ -15,7 +15,6 @@
                 <?php
                 $respondent_user_id = 0;
                 $post_id = get_the_ID();
-                $respondent_user_id = get_post_meta($post_id, "_cacbot_respondent_user_id", true);
                 if(get_post_meta($post_id, "_cacbot_anchor_post", true) === "1"){
                     // Check for Cacbot Anchor Post status
                     if(
@@ -27,6 +26,7 @@
                         $post_id = \Cacbot\AnchorPost::filter_for_linked_post_id($post_id, $current_user_id);
                     }
                 }
+                $respondent_user_id = get_post_meta($post_id, "_cacbot_respondent_user_id", true);
                 $comments = get_comments(array('post_id' => $post_id, 'status' => 'approve'));
                 $comments = array_reverse($comments); // Reverse the order of comments
                 foreach ($comments as $comment) {

@@ -322,15 +322,23 @@ body.admin-bar #chat-container {
 #commentform {
     background-color: #40414f;
     border-radius: 12px;
-    padding: 14px 16px;
+    padding: 8px 12px;
     display: flex;
-    align-items: center;
+    flex-direction: column;
     position: relative;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
     margin: 0;
     max-width: 768px;
     width: 100%;
     transition: box-shadow 0.2s ease;
+}
+
+/* Comment form input row */
+.comment-form-comment {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    position: relative;
 }
 
 #commentform:focus-within {
@@ -341,6 +349,7 @@ body.admin-bar #chat-container {
     margin: 0;
     padding: 0;
     flex: 1;
+    width: 100%;
 }
 
 #comment {
@@ -354,6 +363,8 @@ body.admin-bar #chat-container {
     min-height: 24px;
     line-height: 1.5;
     font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    margin-right: 32px; /* Make space for the submit button */
+    outline: none !important;
 }
 
 #comment:focus {
@@ -362,31 +373,35 @@ body.admin-bar #chat-container {
 
 #comment::placeholder {
     color: #8e8ea0;
+    font-size: 16px;
+    font-weight: 400;
 }
 
 .form-submit {
     margin: 0;
     position: absolute;
-    right: 16px;
-    bottom: 14px;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
 }
 
 /* Replace text submit button with icon */
 .form-submit input[type="submit"] {
-    background-color: #444654; /* Changed from green to match chat background */
+    background-color: #444654; /* Changed from green to gray to match theme */
     border: none;
     font-size: 0; /* Hide text content */
     color: transparent; /* Hide text content */
     width: 32px;
     height: 32px;
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: 50%; /* Make it circular like commercial implementations */
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FFFFFF'%3E%3Cpath d='M2.01 21L23 12 2.01 3 2 10l15 2-15 2z'%3E%3C/path%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: center;
     background-size: 16px;
     opacity: 1;
-    transition: background-color 0.2s ease;
+    transition: background-color 0.2s ease, transform 0.2s ease;
     text-indent: -9999px; /* Hide text content */
     overflow: hidden; /* Hide text content */
     padding: 0;
@@ -394,14 +409,16 @@ body.admin-bar #chat-container {
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .form-submit input[type="submit"]:hover {
-    background-color: #4d4f5e; /* Darker shade on hover */
+    background-color: #565869; /* Darker gray on hover */
+    transform: scale(1.05); /* Slight scale effect on hover */
 }
 
-.form-submit input[type="submit"]:hover {
-    opacity: 1;
+.form-submit input[type="submit"]:active {
+    transform: scale(0.95); /* Slight press effect */
 }
 
 /* Add action buttons (similar to the + button, search, etc.) */
@@ -441,6 +458,91 @@ body.admin-bar #chat-container {
     
     #comment {
         font-size: 14px;
+    }
+}
+
+/* Action buttons container */
+.action-buttons-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 6px 0 4px;
+    width: 100%;
+    align-items: center;
+    margin-top: 2px;
+    justify-content: flex-start;
+}
+
+/* Action bubble/button styling */
+.action-bubble {
+    display: inline-flex;
+    align-items: center;
+    background-color: transparent;
+    border: 1px solid #565869;
+    border-radius: 20px;
+    padding: 5px 10px;
+    color: #ececf1;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-right: 4px;
+    margin-bottom: 2px;
+    height: 28px;
+}
+
+.action-bubble:hover {
+    background-color: #4d4f5e;
+    border-color: #6c6d80;
+}
+
+.action-bubble .dashicons {
+    font-size: 15px;
+    width: 15px;
+    height: 15px;
+    margin-right: 4px;
+    color: #acacbe;
+}
+
+/* Special styling for the first action button (plus icon) */
+.action-bubble:first-child {
+    padding: 5px;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+}
+
+.action-bubble:first-child .dashicons {
+    margin-right: 0;
+}
+
+/* Add a subtle hover effect to the action buttons */
+.action-bubble:hover .dashicons {
+    color: #fff;
+}
+
+.action-bubble-text {
+    margin-left: 4px;
+}
+
+/* Responsive adjustments for action bubbles */
+@media (max-width: 700px) {
+    .action-bubble {
+        padding: 4px 8px;
+        font-size: 12px;
+    }
+    
+    .action-bubble .dashicons {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
+    }
+    
+    .action-bubble-text {
+        margin-left: 2px;
     }
 }
 
