@@ -4,7 +4,8 @@ $I = new AcceptanceTester($scenario);
 
 $I->wantToTest("That main divisions of the UI interface exist");
 $I->amOnUrl("http://localhost");
-$I->amOnPage('/test');
+$I->loginAsAdmin();
+$I->amOnPage('/testpost');
 
 // Check for main UI divisions
 $I->seeElement('#chat-container'); //Everything below the adminbar

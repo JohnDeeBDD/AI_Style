@@ -6,6 +6,6 @@ echo $output;
 global $Assistant_rap;
 global $Assistant_pw;
 global $Assistant_un;
-$Assistant_rap = "2IE7WGkZlT9vwSSTxwNGLZ2F";
+$Assistant_rap = "";
 $Assistant_pw = "password";
 $Assistant_un = "Assistant";

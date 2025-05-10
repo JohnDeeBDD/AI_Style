@@ -72,30 +72,71 @@ function e2() {
         subtree: !0
     });
 }
-function addInterlocutorMessage(n) {
+function addInterlocutorMessage(s) {
     var t = document.getElementById('chat-messages');
     if (!t) return void console.error('Chat messages container not found');
-    var s = 'message-' + Date.now(), a = document.createElement('div');
-    a.className = 'message interlocutor-message', a.id = s;
+    var n = 'message-' + Date.now(), a = document.createElement('div');
+    a.className = 'message interlocutor-message', a.id = n;
     var o = document.createElement('div');
-    o.className = 'message-content', o.id = 'message-content-' + s, o.innerHTML = n, a.appendChild(o), t.appendChild(a), e3();
+    o.className = 'message-content', o.id = 'message-content-' + n, o.innerHTML = s, a.appendChild(o), t.appendChild(a), e3();
 }
-function addRespondentMessage(n) {
+function addRespondentMessage(s) {
     var t = document.getElementById('chat-messages');
     if (!t) return void console.error('Chat messages container not found');
-    var s = 'message-' + Date.now(), a = document.createElement('div');
-    a.className = 'message respondent-message', a.id = s;
+    var n = 'message-' + Date.now(), a = document.createElement('div');
+    a.className = 'message respondent-message', a.id = n;
     var o = document.createElement('div');
-    o.className = 'message-content', o.id = 'message-content-' + s, o.innerHTML = n, a.appendChild(o), t.appendChild(a), e3();
+    o.className = 'message-content', o.id = 'message-content-' + n, o.innerHTML = s, a.appendChild(o), t.appendChild(a), e3();
 }
 function e3() {
     var e = document.querySelector('.scrollable-content');
     e && (e.scrollTop = e.scrollHeight);
 }
+function clearMessages() {
+    var e = document.getElementById('chat-messages');
+    if (!e) return void console.error('Chat messages container not found');
+    for(; e.firstChild;)e.removeChild(e.firstChild);
+}
 const __default = {
     addInterlocutorMessage: addInterlocutorMessage,
-    addRespondentMessage: addRespondentMessage
+    addRespondentMessage: addRespondentMessage,
+    clearMessages: clearMessages
 };
+function o() {
+    console.log("enableCreateCacbotConversationFromUI function loaded!");
+    var o = document.querySelector('#wp-admin-bar-new-cacbot-conversation a');
+    if (!o) return void console.warn('Cacbot Conversation link not found in admin bar');
+    o.addEventListener('click', function(o) {
+        o.preventDefault(), console.log('Creating new Cacbot Conversation via AJAX...'), jQuery.ajax({
+            url: '/wp-json/ai-style/cacbot-conversation',
+            method: 'POST',
+            beforeSend: function(o) {
+                window.cacbot_data && window.cacbot_data.nonce && o.setRequestHeader('X-WP-Nonce', window.cacbot_data.nonce);
+            },
+            success: function(o) {
+                console.log('Cacbot Conversation created successfully:', o), o.success && o.post_id ? window.location.href = "/wp-admin/post.php?post=".concat(o.post_id, "&action=edit") : (console.error('Invalid response from server:', o), alert('Error creating Cacbot Conversation. Please try again.'));
+            },
+            error: function(o, n, e) {
+                console.error('Error creating Cacbot Conversation:', e), alert('Error creating Cacbot Conversation. Please try again.');
+            }
+        });
+    });
+}
+function t1() {}
+function n() {
+    if (!document.body.classList.contains('wp-admin')) {
+        console.log('Customizing admin bar "New" button behavior');
+        var n, e, t, o = document.getElementById('wp-admin-bar-new-content');
+        if (!o) return void console.warn('Admin bar "New" button not found');
+        e = (n = o).cloneNode(!0), n.parentNode.replaceChild(e, n), (t = document.createElement('style')).textContent = "\n    #wp-admin-bar-new-content .ab-sub-wrapper {\n      display: none !important;\n    }\n    #wp-admin-bar-new-content:hover .ab-sub-wrapper {\n      display: none !important;\n    }\n  ", document.head.appendChild(t), function(n) {
+            var e = n.querySelector('a.ab-item');
+            if (!e) return console.warn('Admin bar "New" button link not found');
+            e.addEventListener('click', function(n) {
+                n.preventDefault(), console.log('New button clicked');
+            });
+        }(o);
+    }
+}
 window.addInterlocutorMessage = __default.addInterlocutorMessage, window.addRespondentMessage = __default.addRespondentMessage, document.addEventListener('DOMContentLoaded', function() {
-    console.log('ai-style.js is loaded!'), t(), e1(), e2(), console.log(cacbot_data), console.log('Chat message functions are available globally:'), console.log('- addInterlocutorMessage(message)'), console.log('- addRespondentMessage(message)');
+    console.log('ai-style.js is loaded!'), t(), e1(), e2(), console.log("Cacbot data:"), console.log(cacbot_data), o(), console.log('Chat message functions are available globally:'), console.log('- addInterlocutorMessage(message)'), console.log('- addRespondentMessage(message)'), t1(), n();
 });

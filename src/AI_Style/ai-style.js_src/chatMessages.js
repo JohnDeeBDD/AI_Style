@@ -82,8 +82,25 @@ function scrollToBottom() {
     }
 }
 
-// Export both functions as a default object for easier importing
+/**
+ * Clears all messages from the chat UI
+ */
+export function clearMessages() {
+    const chatMessages = document.getElementById('chat-messages');
+    if (!chatMessages) {
+        console.error('Chat messages container not found');
+        return;
+    }
+    
+    // Remove all child elements (messages) from the container
+    while (chatMessages.firstChild) {
+        chatMessages.removeChild(chatMessages.firstChild);
+    }
+}
+
+// Export functions as a default object for easier importing
 export default {
     addInterlocutorMessage,
-    addRespondentMessage
+    addRespondentMessage,
+    clearMessages
 };
