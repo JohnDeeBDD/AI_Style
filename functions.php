@@ -110,20 +110,19 @@ function ai_style_create_cacbot_conversation($request) {
  * - Edit Post button
  * - Howdy user menu
  */
-function ai_style_customize_admin_bar($wp_admin_bar) {
-    // Remove WordPress logo
-    $wp_admin_bar->remove_node('wp-logo');
-    
-    // Remove Customize button
-    $wp_admin_bar->remove_node('customize');
-    
-    // Remove Comments indicator
-    $wp_admin_bar->remove_node('comments');
-    
-    // Remove Search icon
-    $wp_admin_bar->remove_node('search');
-}
 
-// Hook into the admin bar with a high priority to ensure it runs after WordPress has added all default nodes
-add_action('admin_bar_menu', 'ai_style_customize_admin_bar', 999);
 
+add_action('admin_bar_menu', function($wp_admin_bar) {
+    if (!is_admin()) {
+        $wp_admin_bar->remove_node('wp-logo');
+    
+        // Remove Customize button
+        $wp_admin_bar->remove_node('customize');
+        
+        // Remove Comments indicator
+        $wp_admin_bar->remove_node('comments');
+        
+        // Remove Search icon
+      //  $wp_admin_bar->remove_node('search');
+    }
+}, 999);

@@ -8,9 +8,8 @@ import commentBoxStyle from "./commentBoxStyle";
 import mainCallToAction from "./mainCallToAction";
 import justifyOneLiner from "./justifyOneLiner";
 import chatMessages from "./chatMessages";
-import enableCreateCacbotConversationFromUI from "./enableCreateCacbotConversationFromUI";
-import newConversationControl from "./newConversationControl";
 import adminBarCustomization from "./adminBarCustomization";
+import cacbotData from "./cacbotData";
 
 // Make the chat message functions available globally
 window.addInterlocutorMessage = chatMessages.addInterlocutorMessage;
@@ -22,31 +21,20 @@ document.addEventListener('DOMContentLoaded', function() {
   commentBoxStyle();
   mainCallToAction();
   justifyOneLiner();
-  console.log("Cacbot data:")
-  console.log(cacbot_data);
-  /*
-  Cacbot data contains:
-  action_enabled_archive
-  action_enabled_fetch_image
-  anchor_post_id
-  can_create_conversation
-  comment_count
-  nonce
-    :
-  "7cffeec2dc"
-  post_id
-    : 
-  "NONE"
-  user_id
-    :
-  "1"
-*/
-  enableCreateCacbotConversationFromUI();
+  
+  console.log("PHP cacbot_data:");
+  console.log(window.cacbot_data);
+  // Initialize cacbotData with the global cacbot_data object
+  try {
+    cacbotData.initialize(window.cacbot_data || {});
+    console.log(cacbotData.getAll());
+  } catch (error) {
+    console.error("Failed to initialize cacbotData:", error);
+  }
   
   // Log that the chat message functions are available
   console.log('Chat message functions are available globally:');
   console.log('- addInterlocutorMessage(message)');
   console.log('- addRespondentMessage(message)');
-  newConversationControl();
   adminBarCustomization();
 });

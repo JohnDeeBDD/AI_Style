@@ -621,3 +621,6 @@ body.admin-bar .site-footer {
 #chat-input {
     z-index: 101;
 }
+#cacbot-archive-button{
+    display:none !important;
+}

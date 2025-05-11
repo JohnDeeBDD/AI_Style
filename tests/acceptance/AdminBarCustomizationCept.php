@@ -69,15 +69,32 @@ $I->dontSeeElement('#wp-admin-bar-new-content .ab-sub-wrapper:not([style*="displ
 // Test click behavior
 // Note: We can't directly verify console logs in Codeception
 
-$I->comment('Note: JavaScript click behavior override should be verified manually');
-$I->comment('Expected behavior: Clicking "New" button should log "New button clicked" to console');
-$I->comment('and should not navigate to post-new.php');
+$I->comment('Verifying that clicking the "New" button does not navigate away from the page');
 
-// Take a screenshot to show the "New" button for manual verification
-$I->makeScreenshot('admin-bar-new-button');
+// Store the current URL before clicking
+$currentUrl = $I->grabFromCurrentUrl();
+$I->comment("Current URL before clicking: $currentUrl");
 
-// Take a final screenshot
+// Take a screenshot before clicking
+$I->makeScreenshot('admin-bar-before-click');
+
+// Click the "New" button
+$I->click('#wp-admin-bar-new-content a.ab-item');
+
+// Wait a moment to ensure any navigation would have occurred
+$I->wait(2);
+
+// Verify we're still on the same page by checking the URL hasn't changed
+$afterClickUrl = $I->grabFromCurrentUrl();
+$I->comment("URL after clicking: $afterClickUrl");
+$I->assertEquals($currentUrl, $afterClickUrl, 'URL should not change after clicking the "New" button');
+
+// Take a screenshot after clicking to show we're still on the same page
 $I->makeScreenshot('admin-bar-after-click');
+
+// Verify we can still see elements that would be gone if we navigated away
+$I->seeElement('#wp-admin-bar-new-content');
+$I->seeElement('#wp-admin-bar-edit');
 
 // Add a comment to explain console log verification limitation
 $I->comment('Note: Console log verification ("New button clicked") requires manual inspection or browser extension');

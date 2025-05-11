@@ -1,3 +1,54 @@
+function _class_call_check(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+        throw new TypeError("Cannot call a class as a function");
+    }
+}
+function _defineProperties(target, props) {
+    for(var i = 0; i < props.length; i++){
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        if ("value" in descriptor) descriptor.writable = true;
+        Object.defineProperty(target, descriptor.key, descriptor);
+    }
+}
+function _create_class(Constructor, protoProps, staticProps) {
+    if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) _defineProperties(Constructor, staticProps);
+    return Constructor;
+}
+function _define_property(obj, key, value) {
+    if (key in obj) {
+        Object.defineProperty(obj, key, {
+            value: value,
+            enumerable: true,
+            configurable: true,
+            writable: true
+        });
+    } else {
+        obj[key] = value;
+    }
+    return obj;
+}
+function _object_spread(target) {
+    for(var i = 1; i < arguments.length; i++){
+        var source = arguments[i] != null ? arguments[i] : {};
+        var ownKeys = Object.keys(source);
+        if (typeof Object.getOwnPropertySymbols === "function") {
+            ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function(sym) {
+                return Object.getOwnPropertyDescriptor(source, sym).enumerable;
+            }));
+        }
+        ownKeys.forEach(function(key) {
+            _define_property(target, key, source[key]);
+        });
+    }
+    return target;
+}
+function _type_of(obj) {
+    "@swc/helpers - typeof";
+    return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj;
+}
 function t() {
     console.log("Applying modern LLM-style to comment form");
     var t = document.getElementById('comment');
@@ -102,41 +153,98 @@ const __default = {
     addRespondentMessage: addRespondentMessage,
     clearMessages: clearMessages
 };
-function o() {
-    console.log("enableCreateCacbotConversationFromUI function loaded!");
-    var o = document.querySelector('#wp-admin-bar-new-cacbot-conversation a');
-    if (!o) return void console.warn('Cacbot Conversation link not found in admin bar');
-    o.addEventListener('click', function(o) {
-        o.preventDefault(), console.log('Creating new Cacbot Conversation via AJAX...'), jQuery.ajax({
-            url: '/wp-json/ai-style/cacbot-conversation',
-            method: 'POST',
-            beforeSend: function(o) {
-                window.cacbot_data && window.cacbot_data.nonce && o.setRequestHeader('X-WP-Nonce', window.cacbot_data.nonce);
-            },
-            success: function(o) {
-                console.log('Cacbot Conversation created successfully:', o), o.success && o.post_id ? window.location.href = "/wp-admin/post.php?post=".concat(o.post_id, "&action=edit") : (console.error('Invalid response from server:', o), alert('Error creating Cacbot Conversation. Please try again.'));
-            },
-            error: function(o, n, e) {
-                console.error('Error creating Cacbot Conversation:', e), alert('Error creating Cacbot Conversation. Please try again.');
-            }
-        });
-    });
-}
-function t1() {}
-function n() {
+function e4() {
     if (!document.body.classList.contains('wp-admin')) {
         console.log('Customizing admin bar "New" button behavior');
-        var n, e, t, o = document.getElementById('wp-admin-bar-new-content');
-        if (!o) return void console.warn('Admin bar "New" button not found');
-        e = (n = o).cloneNode(!0), n.parentNode.replaceChild(e, n), (t = document.createElement('style')).textContent = "\n    #wp-admin-bar-new-content .ab-sub-wrapper {\n      display: none !important;\n    }\n    #wp-admin-bar-new-content:hover .ab-sub-wrapper {\n      display: none !important;\n    }\n  ", document.head.appendChild(t), function(n) {
-            var e = n.querySelector('a.ab-item');
-            if (!e) return console.warn('Admin bar "New" button link not found');
-            e.addEventListener('click', function(n) {
-                n.preventDefault(), console.log('New button clicked');
+        var e, t, o, a = document.getElementById('wp-admin-bar-new-content');
+        if (!a) return void console.warn('Admin bar "New" button not found');
+        !function(e) {
+            var t = e.querySelector('a.ab-item');
+            if (!t) return console.warn('Admin bar "New" button link not found');
+            t.addEventListener('click', function(e) {
+                e.preventDefault(), e.stopPropagation(), console.log('New button clicked'), clearMessages();
             });
-        }(o);
+        }((t = (e = a).cloneNode(!0), e.parentNode.replaceChild(t, e), (o = document.createElement('style')).textContent = "\n    #wp-admin-bar-new-content .ab-sub-wrapper {\n      display: none !important;\n    }\n    #wp-admin-bar-new-content:hover .ab-sub-wrapper {\n      display: none !important;\n    }\n  ", document.head.appendChild(o), t));
     }
 }
+var t1 = new (/*#__PURE__*/ function() {
+    function t() {
+        _class_call_check(this, t), this.data = {};
+    }
+    return _create_class(t, [
+        {
+            key: "initialize",
+            value: function(t) {
+                if (!t || (void 0 === t ? "undefined" : _type_of(t)) !== 'object') throw Error('Invalid data: rawData must be a non-null object');
+                var e = [
+                    'nonce'
+                ].filter(function(e) {
+                    return !t.hasOwnProperty(e);
+                });
+                if (e.length > 0) throw Error("Missing required fields: ".concat(e.join(', ')));
+                this.data = _object_spread({}, t), console.log('CacbotData initialized successfully');
+            }
+        },
+        {
+            key: "get",
+            value: function(t) {
+                return this.data[t];
+            }
+        },
+        {
+            key: "has",
+            value: function(t) {
+                return Object.prototype.hasOwnProperty.call(this.data, t);
+            }
+        },
+        {
+            key: "getAll",
+            value: function() {
+                return _object_spread({}, this.data);
+            }
+        },
+        {
+            key: "getNonce",
+            value: function() {
+                if (!this.has('nonce')) throw Error('Nonce is not available');
+                return this.get('nonce');
+            }
+        },
+        {
+            key: "getPostId",
+            value: function() {
+                return this.get('post_id');
+            }
+        },
+        {
+            key: "getUserId",
+            value: function() {
+                return this.get('user_id');
+            }
+        },
+        {
+            key: "canCreateConversation",
+            value: function() {
+                var t = this.get('can_create_conversation');
+                return '1' === t || !0 === t;
+            }
+        },
+        {
+            key: "isActionEnabled",
+            value: function(t) {
+                if (!t || 'string' != typeof t) return !1;
+                var e = this.get("action_enabled_".concat(t));
+                return '1' === e || !0 === e;
+            }
+        }
+    ]), t;
+}())();
 window.addInterlocutorMessage = __default.addInterlocutorMessage, window.addRespondentMessage = __default.addRespondentMessage, document.addEventListener('DOMContentLoaded', function() {
-    console.log('ai-style.js is loaded!'), t(), e1(), e2(), console.log("Cacbot data:"), console.log(cacbot_data), o(), console.log('Chat message functions are available globally:'), console.log('- addInterlocutorMessage(message)'), console.log('- addRespondentMessage(message)'), t1(), n();
+    console.log('ai-style.js is loaded!'), t(), e1(), e2(), console.log("PHP cacbot_data:"), console.log(window.cacbot_data);
+    try {
+        t1.initialize(window.cacbot_data || {}), console.log(t1.getAll());
+    } catch (o) {
+        console.error("Failed to initialize cacbotData:", o);
+    }
+    console.log('Chat message functions are available globally:'), console.log('- addInterlocutorMessage(message)'), console.log('- addRespondentMessage(message)'), e4();
 });

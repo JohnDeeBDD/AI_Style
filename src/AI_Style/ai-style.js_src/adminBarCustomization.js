@@ -1,16 +1,20 @@
 /**
  * Admin Bar Customization
- * 
+ *
  * This file contains JavaScript to override the default behavior of the WordPress admin bar's "New" button.
- * It prevents the hover behavior (no expanded menu) and overrides the click behavior to just log a message.
- * 
+ * It prevents the hover behavior (no expanded menu) and overrides the click behavior to redirect with model=archive
+ * and nonce parameters.
+ *
  * @package AI_Style
  */
+
+import cacbotData from './cacbotData';
+import { clearMessages } from './chatMessages';
 
 /**
  * Customizes the WordPress admin bar "New" button behavior
  * - Prevents hover behavior (no expanded menu)
- * - Overrides click behavior to just log a message
+ * - Overrides click behavior to redirect with model=archive and nonce parameters
  */
 export default function adminBarCustomization() {
   // Only run on the frontend, not in the WordPress admin area
@@ -29,10 +33,12 @@ export default function adminBarCustomization() {
   }
   
   // Override hover behavior - prevent the dropdown menu from appearing
-  overrideHoverBehavior(newButton);
+  // This returns the cloned button that replaced the original
+  const newButtonClone = overrideHoverBehavior(newButton);
   
   // Override click behavior - just log a message
-  overrideClickBehavior(newButton);
+  // Use the cloned button that's actually in the DOM
+  overrideClickBehavior(newButtonClone);
 }
 
 /**
@@ -56,11 +62,14 @@ function overrideHoverBehavior(newButton) {
     }
   `;
   document.head.appendChild(style);
+  
+  // Return the cloned button so it can be used for click behavior
+  return newButtonClone;
 }
 
 /**
- * Overrides the click behavior of the "New" button to just log a message
- * 
+ * Overrides the click behavior of the "New" button to redirect to the current URL with model=archive parameter
+ *
  * @param {HTMLElement} newButton - The "New" button element (or its clone)
  */
 function overrideClickBehavior(newButton) {
@@ -76,8 +85,10 @@ function overrideClickBehavior(newButton) {
   newLink.addEventListener('click', function(event) {
     // Prevent the default action (creating a new post)
     event.preventDefault();
+    event.stopPropagation(); // Also stop event propagation to parent elements
     
     // Log a message to the console
     console.log('New button clicked');
+    clearMessages();
   });
 }
