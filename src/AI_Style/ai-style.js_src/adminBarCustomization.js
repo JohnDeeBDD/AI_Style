@@ -10,6 +10,7 @@
 
 import cacbotData from './cacbotData';
 import { clearMessages } from './chatMessages';
+import fetchCacbotLinkAPI from './fetchCacbotLinkAPI';
 
 /**
  * Customizes the WordPress admin bar "New" button behavior
@@ -22,6 +23,7 @@ export default function adminBarCustomization() {
     return;
   }
 
+  console.log(AIStyleSettings);
   console.log('Customizing admin bar "New" button behavior');
   
   // Get the "New" button in the admin bar
@@ -90,5 +92,33 @@ function overrideClickBehavior(newButton) {
     // Log a message to the console
     console.log('New button clicked');
     clearMessages();
+    
+    // Make API call to archive the conversation
+    const postId = cacbotData.getPostId();
+    const nonce = AIStyleSettings.nonce;
+    console.log("nonce:", nonce);
+    
+    if (postId && nonce) {
+      // Prepare the request data
+      const formData = new FormData();
+      formData.append('post_id', postId);
+      formData.append('nonce', nonce);
+
+      const endpoint = "/wp-json/cacbot/v1/unlink-conversation";
+      
+      // Use the abstracted function to make the API call
+      fetchCacbotLinkAPI(postId, formData, endpoint)
+        .then(data => {
+          console.log('Archive conversation response:', data);
+          // Reload the page to show the changes
+          window.location.reload();
+        })
+        .catch(error => {
+          console.error('Error archiving conversation:', error);
+        });
+    } else {
+      console.warn('Cannot archive conversation: Missing post_id or nonce');
+    }
+
   });
 }

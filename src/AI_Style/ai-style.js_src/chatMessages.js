@@ -76,7 +76,7 @@ export function addRespondentMessage(message) {
  * Helper function to scroll to the bottom of the chat
  */
 function scrollToBottom() {
-    const scrollableContent = document.querySelector('.scrollable-content');
+    const scrollableContent = document.querySelector('#scrollable-content');
     if (scrollableContent) {
         scrollableContent.scrollTop = scrollableContent.scrollHeight;
     }

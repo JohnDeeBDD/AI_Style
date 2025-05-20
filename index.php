@@ -5,7 +5,7 @@
         </div> <!-- end: #chat-sidebar -->
         <div id="chat-main">
             <?php if (is_singular()) : ?>
-            <div class="scrollable-content">
+            <div id="scrollable-content">
                 <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
                     <div class="post-content" id="post-content-1">
                         <?php the_content(); ?>
@@ -45,19 +45,16 @@
                 }
                 ?>
                 </div> <!-- end: #chat-messages -->
-            </div> <!-- end: .scrollable-content -->
+            </div> <!-- end: #scrollable-content -->
 
             <?php else : ?>
                 NOT SINGULAR
             <?php endif; ?>
-            <div id="floating-items-group">
-                <div class="main-call-to-action" id="main-call-to-action-1">
-                    What are you working on?
-                </div> <!-- end: #main-call-to-action-1 -->
+            <div id="fixed-comment-box">
                 <div id="chat-input">
                     <?php comment_form(); ?>
                 </div> <!-- end: #chat-input -->
-            </div> <!-- end: #floating-items-group -->
+            </div> <!-- end: #fixed-comment-box -->
         </div> <!-- end: #chat-main -->
     </div> <!-- end: #chat-container -->
 <?php get_footer(); ?>

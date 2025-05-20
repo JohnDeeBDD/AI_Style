@@ -1,0 +1,1 @@
+When using our theme, the user should be able to navigate to other posts without refreshing the browser, using only JS in the background. In our theme, on each post there is only two data areas: the post content, and the comments associated with the post.

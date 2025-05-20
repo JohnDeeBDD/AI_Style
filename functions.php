@@ -10,11 +10,16 @@ add_action('wp_enqueue_scripts', function() {
 
 function enqueue_chat_scripts() {
     wp_enqueue_script( 'wp-api' );
-    // Enqueue Dashicons for front-end use
     wp_enqueue_style('dashicons');
-    wp_enqueue_script('ai-style', get_stylesheet_directory_uri() . '/src/AI_Style/ai-style.js', array('jquery'), null, true);
+    wp_enqueue_script('ai-style', get_stylesheet_directory_uri() . '/src/AI_Style/ai-style.js', ['jquery', 'wp-api'], null, true);
+    wp_localize_script( 'ai-style', 'AIStyleSettings', array(
+        'root' => esc_url_raw( rest_url() ),
+        'nonce' => wp_create_nonce( 'wp_rest' )
+    ) );
 }
 add_action('wp_enqueue_scripts', 'enqueue_chat_scripts');
+
+
 
 /**
  * Modify the comment form textarea to be 1 row vertically
@@ -42,20 +47,13 @@ function ai_style_widgets_init() {
 add_action( 'widgets_init', 'ai_style_widgets_init' );
 
 /**
- * Register REST API endpoint for creating cacbot-conversation posts
+ * Register the AI Style Sidebar Widget
  */
-add_action('rest_api_init', function() {
-    // Check if the custom post type exists
-    if (post_type_exists('cacbot-conversation')) {
-        register_rest_route('ai-style', '/cacbot-conversation', array(
-            'methods' => 'POST',
-            'callback' => 'ai_style_create_cacbot_conversation',
-            'permission_callback' => function() {
-                return current_user_can('edit_posts');
-            }
-        ));
-    }
-});
+function ai_style_register_widgets() {
+    register_widget('AI_Style\AnchorPostWidget');
+}
+add_action('widgets_init', 'ai_style_register_widgets');
+
 
 /**
  * Callback function to create a new cacbot-conversation post
