@@ -9,28 +9,7 @@ import { createActionButtonsContainer } from './CommentFormButtons.js';
  * Main function to apply modern LLM-style to the comment form
  */
 export default function commentBoxStyle() {
-    console.log("Applying modern LLM-style to comment form");
-    
-    const commentTextarea = document.getElementById('comment');
-    if (commentTextarea) {
-        // Set initial height to one row
-        commentTextarea.rows = 1;
-        commentTextarea.style.height = 'auto';
-        
-        // Set placeholder text
-        if (commentTextarea.getAttribute('placeholder') === '') {
-            commentTextarea.setAttribute('placeholder', 'Ask anything');
-        }
-        
-        // Auto-resize the textarea as the user types
-        commentTextarea.addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = (this.scrollHeight) + 'px';
-        });
-        
-        // Trigger initial resize
-        commentTextarea.style.height = (commentTextarea.scrollHeight) + 'px';
-    }
+
     
     // Add action buttons (similar to modern LLM interfaces)
     const commentForm = document.getElementById('commentform');

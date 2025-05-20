@@ -120,15 +120,10 @@ function addActionBubble(t, e, n) {
     }), n.appendChild(c), c;
 }
 function e() {
-    console.log("Applying modern LLM-style to comment form");
-    var e = document.getElementById('comment');
-    e && (e.rows = 1, e.style.height = 'auto', '' === e.getAttribute('placeholder') && e.setAttribute('placeholder', 'Ask anything'), e.addEventListener('input', function() {
-        this.style.height = 'auto', this.style.height = this.scrollHeight + 'px';
-    }), e.style.height = e.scrollHeight + 'px');
-    var o = document.getElementById('commentform');
-    o && (o.addEventListener('click', function(t) {
-        t.target === o && e.focus();
-    }), createActionButtonsContainer(o), function() {
+    var e = document.getElementById('commentform');
+    e && (e.addEventListener('click', function(t) {
+        t.target === e && commentTextarea.focus();
+    }), createActionButtonsContainer(e), function() {
         var t = document.querySelector('.form-submit input[type="submit"]'), e = document.getElementById('comment');
         if (t && e) {
             var o = document.querySelector('.form-submit');
