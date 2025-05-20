@@ -294,19 +294,19 @@ body.admin-bar #chat-container {
 #fixed-comment-box {
     position: fixed !important;
     bottom: 0 !important;
-    width: 100%;
-    max-width: 768px;
-    margin: 0 auto;
+    width: 768px; /* Same width as chat messages */
     padding: 16px;
     box-sizing: border-box;
     z-index: 9999 !important; /* Very high z-index to stay above all content */
     background-color: #202123; /* Match the main chat area background */
-    left: 50%;
-    transform: translateX(-50%);
     display: flex;
     justify-content: center; /* Center the comment form horizontally */
     align-items: center; /* Center vertically */
     border-top: 1px solid #444654; /* Add a subtle border for separation */
+    /* Position at the exact same left position as chat messages */
+    left: 757px;
+    transform: translateX(0);
+    margin-left: 0;
 }
 
 /* Hide elements that don't appear in ChatGPT interface */
@@ -611,21 +611,7 @@ body.admin-bar #chat-container {
 }
 
 /* Position the fixed-comment-box to prevent overlap with footer */
-#fixed-comment-box {
-    bottom: 0; /* Position at the bottom */
-    margin-bottom: 45px;
-    padding: 10px 0px 5px 5px; /* Additional padding at the bottom */
-    display: flex;
-    justify-content: center; /* Ensure centering is consistent */
-    width: 100%;
-    max-width: 768px;
-    left: 50%; /* Center in the viewport */
-    transform: translateX(-50%); /* Center properly */
-    position: absolute; /* Keep it fixed to viewport */
-    z-index: 100; /* Ensure it stays above scrollable content */
-    background-color: #202123; /* Match the main chat area background */
-    border-top: 1px solid #444654; /* Add a subtle border for separation */
-}
+/* This section is overridden by the previous definition */
 
 /* Adjust the scrollable-content to account for the fixed comment box and footer */
 #scrollable-content {

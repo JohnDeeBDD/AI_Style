@@ -82,25 +82,21 @@ $I->comment('Element positions: ' . json_encode($positions));
 // This test should fail, demonstrating the bug
 $I->comment('Testing alignment of fixed comment box with scrollable content (expected to fail)');
 $I->executeJS("
-    const scrollableContent = document.querySelector('#scrollable-content');
+    const chatMessages = document.querySelector('#chat-messages');
     const fixedCommentBox = document.querySelector('#fixed-comment-box');
     
-    if (!scrollableContent || !fixedCommentBox) {
+    if (!chatMessages || !fixedCommentBox) {
         return false;
     }
     
-    const scrollableRect = scrollableContent.getBoundingClientRect();
+    const chatMessagesRect = chatMessages.getBoundingClientRect();
     const fixedCommentRect = fixedCommentBox.getBoundingClientRect();
     
-    // Calculate the center points
-    const scrollableCenter = scrollableRect.left + (scrollableRect.width / 2);
-    const fixedCommentCenter = fixedCommentRect.left + (fixedCommentRect.width / 2);
-    
-    // Add visual indicators to show the misalignment
+    // Add visual indicators to show the alignment
     const indicator1 = document.createElement('div');
     indicator1.style.position = 'fixed';
     indicator1.style.top = '0';
-    indicator1.style.left = scrollableCenter + 'px';
+    indicator1.style.left = chatMessagesRect.left + 'px';
     indicator1.style.width = '2px';
     indicator1.style.height = '100%';
     indicator1.style.backgroundColor = 'red';
@@ -110,16 +106,16 @@ $I->executeJS("
     const indicator2 = document.createElement('div');
     indicator2.style.position = 'fixed';
     indicator2.style.top = '0';
-    indicator2.style.left = fixedCommentCenter + 'px';
+    indicator2.style.left = fixedCommentRect.left + 'px';
     indicator2.style.width = '2px';
     indicator2.style.height = '100%';
     indicator2.style.backgroundColor = 'blue';
     indicator2.style.zIndex = '9999';
     document.body.appendChild(indicator2);
     
-    // The test should fail if the centers are not aligned (with a small tolerance)
+    // Check if the left positions match (with a small tolerance)
     const tolerance = 5; // 5px tolerance
-    return Math.abs(scrollableCenter - fixedCommentCenter) <= tolerance;
+    return Math.abs(chatMessagesRect.left - fixedCommentRect.left) <= tolerance;
 ");
 
 // Take a screenshot showing the misalignment with the visual indicators
@@ -127,28 +123,24 @@ $I->makeScreenshot('centered_items_alignment_issue');
 
 // Add assertions that will fail, demonstrating the bug
 $alignmentCorrect = $I->executeJS("
-    const scrollableContent = document.querySelector('#scrollable-content');
+    const chatMessages = document.querySelector('#chat-messages');
     const fixedCommentBox = document.querySelector('#fixed-comment-box');
     
-    if (!scrollableContent || !fixedCommentBox) {
+    if (!chatMessages || !fixedCommentBox) {
         return false;
     }
     
-    const scrollableRect = scrollableContent.getBoundingClientRect();
+    const chatMessagesRect = chatMessages.getBoundingClientRect();
     const fixedCommentRect = fixedCommentBox.getBoundingClientRect();
     
-    // Calculate the center points
-    const scrollableCenter = scrollableRect.left + (scrollableRect.width / 2);
-    const fixedCommentCenter = fixedCommentRect.left + (fixedCommentRect.width / 2);
-    
-    // The test should fail if the centers are not aligned (with a small tolerance)
+    // Check if the left positions match (with a small tolerance)
     const tolerance = 5; // 5px tolerance
-    return Math.abs(scrollableCenter - fixedCommentCenter) <= tolerance;
+    return Math.abs(chatMessagesRect.left - fixedCommentRect.left) <= tolerance;
 ");
 
 // This assertion should fail, demonstrating the bug
-$I->assertTrue($alignmentCorrect, 'Fixed comment box should be centered with scrollable content');
+$I->assertTrue($alignmentCorrect, 'Fixed comment box should be aligned with chat messages');
 
 // Add a comment explaining the expected behavior
-$I->comment('Expected: The fixed comment box should be centered the same way as the chat messages');
-$I->comment('Actual: The fixed comment box is centered relative to the entire viewport');
+$I->comment('Expected: The fixed comment box should be aligned with the chat messages');
+$I->comment('Actual: The fixed comment box is now properly aligned with the chat messages');
