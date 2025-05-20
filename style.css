@@ -137,7 +137,7 @@ body.admin-bar #chat-container {
     width: 100%;
     align-items: center; /* Center the children horizontally */
     padding-bottom: 120px; /* Add padding at the bottom for better spacing */
-    max-width: 768px; /* Match the width of other elements */
+    max-width: 100%; /* Take full width to ensure scrollbar is at viewport edge */
     position: relative;
     z-index: 10;
     margin-bottom: 80px; /* Add space for the fixed comment box */
@@ -621,7 +621,7 @@ body.admin-bar #chat-container {
     max-width: 768px;
     left: 50%; /* Center in the viewport */
     transform: translateX(-50%); /* Center properly */
-    position: fixed; /* Keep it fixed to viewport */
+    position: absolute; /* Keep it fixed to viewport */
     z-index: 100; /* Ensure it stays above scrollable content */
     background-color: #202123; /* Match the main chat area background */
     border-top: 1px solid #444654; /* Add a subtle border for separation */
@@ -636,7 +636,7 @@ body.admin-bar #chat-container {
     position: relative;
     z-index: 10;
     width: 100%;
-    max-width: 768px;
+    max-width: 100%; /* Take full width to ensure scrollbar is at viewport edge */
     display: flex;
     flex-direction: column;
     align-items: center;
