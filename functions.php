@@ -1,8 +1,6 @@
 <?php
 
-include_once("/var/www/html/wp-content/themes/ai_style/src/AI_Style/autoloader.php");
-
-
+include_once(get_stylesheet_directory() . "/src/AI_Style/autoloader.php");
 
 add_action('wp_enqueue_scripts', function() {
     wp_enqueue_style('ai_style', get_stylesheet_uri());
@@ -10,6 +8,7 @@ add_action('wp_enqueue_scripts', function() {
 
 function enqueue_chat_scripts() {
     wp_enqueue_script( 'wp-api' );
+    // Force load dashicons on frontend
     wp_enqueue_style('dashicons');
     wp_enqueue_script('ai-style', get_stylesheet_directory_uri() . '/src/AI_Style/ai-style.js', ['jquery', 'wp-api'], null, true);
     wp_localize_script( 'ai-style', 'AIStyleSettings', array(
@@ -124,3 +123,47 @@ add_action('admin_bar_menu', function($wp_admin_bar) {
       //  $wp_admin_bar->remove_node('search');
     }
 }, 999);
+
+require_once(plugin_dir_path(__FILE__) . 'src/plugin-update-checker/plugin-update-checker.php');
+use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
+PucFactory::buildUpdateChecker(    'https://cacbot.com/wp-content/uploads/ai_style_details.json',__FILE__,'ai_style');
+
+/**
+ * Check if the Markup Markdown (mmd) plugin is available
+ *
+ * @return bool True if the mmd plugin is loaded and available
+ */
+function ai_style_is_mmd_available() {
+    // Check if the mmd function exists (primary method for Markup Markdown plugin)
+    if (function_exists('mmd')) {
+        return true;
+    }
+    
+    // Alternative check for class-based implementation
+    if (class_exists('MarkupMarkdown')) {
+        return true;
+    }
+    
+    // Check if plugin is active using WordPress plugin detection
+    if (function_exists('is_plugin_active')) {
+        return is_plugin_active('markup-markdown/markup-markdown.php');
+    }
+    
+    return false;
+}
+
+/**
+ * Process markdown content safely using the mmd plugin
+ *
+ * @param string $content The content to process
+ * @return string The processed content (markdown converted to HTML) or original content if plugin unavailable
+ */
+function ai_style_process_markdown($content) {
+    if (  class_exists( 'Markup_Markdown' ) ) {
+        return mmd()->markdown2html( $content);
+     }else{
+        return $content;
+    }
+
+    
+}

@@ -1,12 +1,21 @@
 <?php
-
+/**
+ * MainFeaturesCept.php
+ *
+ * Acceptance test for verifying that all main UI elements exist and are properly displayed.
+ *
+ * This test checks:
+ * 1. Presence of all main UI divisions
+ * 2. Chat message display functionality
+ * 3. Comment form elements
+ */
 
 $I = new AcceptanceTester($scenario);
 
 $I->wantToTest("That main divisions of the UI interface exist");
-$I->amOnUrl("http://localhost");
+$I->amOnUrl(AcceptanceConfig::BASE_URL);
 $I->loginAsAdmin();
-$I->amOnPage('/testpost');
+$I->amOnPage(AcceptanceConfig::TEST_POST_PAGE);
 
 
 $I->executeJS("clearMessages()");
@@ -27,17 +36,24 @@ $I->executeJS("addInterlocutorMessage('Lorum ipsum Lorum ipsum Lorum ipsum Lorum
 $I->executeJS("addRespondentMessage('This is a message from the respondent. This is a message from the respondent. This is a message from the respondent. This is a message from the respondent. This is a message from the respondent. This is a message from the respondent. ')");
 
 // Check for main UI divisions
-$I->seeElement('#chat-container'); //Everything below the adminbar
-$I->seeElement('#chat-sidebar'); //to the left
-$I->seeElement('#chat-main'); //to the right
-$I->seeElement('.post-content'); //The WordPress content. There is no corelation to Chat-GPT for this part
-$I->seeElement('#chat-messages'); //The WordPress comments, corolates to the chat area of Chat-GPT
-$I->seeElement('#chat-input'); //Contains the actual .comment-form
-$I->seeElement('.interlocutor-message'); //Coresponds to Chat-GPT user chat messaages
-$I->seeElement('.respondent-message'); //Corresponds to Chat-GPT ai messages
-$I->seeElement('.site-footer'); //Corresponds to Chat-GPT footer found in footer.php
+$I->seeElement(AcceptanceConfig::CHAT_CONTAINER); // Everything below the adminbar
+$I->seeElement(AcceptanceConfig::CHAT_SIDEBAR); // to the left
+$I->seeElement(AcceptanceConfig::CHAT_MAIN); // to the right
+$I->seeElement(AcceptanceConfig::POST_CONTENT); // The WordPress content
+$I->seeElement(AcceptanceConfig::CHAT_MESSAGES); // The WordPress comments, correlates to the chat area
+$I->seeElement(AcceptanceConfig::CHAT_INPUT); // Contains the actual comment form
+$I->seeElement(AcceptanceConfig::INTERLOCUTOR_MESSAGE); // Corresponds to user chat messages
+$I->seeElement(AcceptanceConfig::RESPONDENT_MESSAGE); // Corresponds to AI messages
+$I->seeElement(AcceptanceConfig::SITE_FOOTER); // Corresponds to footer found in footer.php
 
 // Check for the submit button in the comment form (WordPress outputs input[type=submit] or button[type=submit])
-$I->seeElement('input[type=submit], button[type=submit]');
+$I->seeElement(AcceptanceConfig::SUBMIT_BUTTON);
+
+// Take a screenshot of the final state
+$I->makeScreenshot('main-features');
+$I->comment("Screen shot <a href = 'http://localhost/wp-content/themes/ai_style/tests/_output/debug/main-features.png' target = '_blank'>available here</a>");
+
+// Run this test with the command: "bin/codecept run acceptance MainFeaturesCept.php -vvv --html"
 
 $I->makeScreenshot('testpost');
+$I->comment("Screen shot <a href = 'http://localhost/wp-content/themes/ai_style/tests/_output/debug/testpost.png' target = '_blank'>available here</a>");

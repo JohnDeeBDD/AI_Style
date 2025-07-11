@@ -27,6 +27,41 @@ class Acceptance extends \Codeception\Module{
 
     public function _beforeSuite($settings = []){
         $this->hostname = shell_exec("hostname");
+        
+    }
+
+    public function switchBetweenLinkedAnchorPosts($I){
+        // Get the current linked post ID from CacbotData
+        $currentLinkedPostId = $I->executeJS('return cacbotData.get("linked_post_id")');
+        
+        // Find all sidebar links with data-post-id attributes
+        $sidebarLinks = $I->executeJS('
+            const links = document.querySelectorAll(".anchor-post-list li[data-post-id]");
+            return Array.from(links).map(link => {
+                return {
+                    id: link.getAttribute("data-post-id"),
+                    element: link
+                };
+            });
+        ');
+        
+        // Find a link with a different post ID than the current one
+        $I->executeJS("
+            const currentId = '$currentLinkedPostId';
+            const links = document.querySelectorAll('.anchor-post-list li[data-post-id]');
+            
+            for (const link of links) {
+                const linkId = link.getAttribute('data-post-id');
+                if (linkId !== currentId) {
+                    // Click the link with a different post ID
+                    link.querySelector('a').click();
+                    return true;
+                }
+            }
+            
+            return false;
+        ");
+
     }
 
     public function pauseInTerminal(){

@@ -21,6 +21,11 @@ class AnchorPostWidget extends \WP_Widget {
      * @param array $instance Saved values from database
      */
     public function widget($args, $instance) {
+        // Early return if user is not logged in or if not on a singular page
+        if (!is_user_logged_in() || !is_singular()) {
+            return;
+        }
+        
         echo $args['before_widget'];
         if (!empty($instance['title'])) {
             echo $args['before_title'] . apply_filters('widget_title', $instance['title']) . $args['after_title'];
@@ -62,7 +67,7 @@ class AnchorPostWidget extends \WP_Widget {
             }
             echo '</ul>';
         } else {
-            echo '<p>No archived conversations found!</p>';
+
         }
         
         echo $args['after_widget'];

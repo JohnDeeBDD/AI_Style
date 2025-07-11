@@ -1,12 +1,19 @@
 /*
  Theme Name:   A.I. Style
+ Description:  A WordPress theme inspired by commercial LLMs like Chat-GPT, Gemini, and Grok
+ Version:      25.0.0.0
+ Author:       General Chicken
+ Author URI:   https://generalchicken.guru
+ Tags:         ai
+ Text Domain:       ai-style
+ Domain Path:       /assets/lang
+ Tested up to:      6.4
+ Requires at least: 6.2
+ Requires PHP:      7.4
+ License:           GNU General Public License v2.0 or later
+License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 */
-/* Chat UI Layout */
-/*
- * Base styles with adjustments for WordPress admin bar
- * When the page is loaded within WordPress, the body will have the 'admin-bar' class
- * and the #wpadminbar will be present at the top of the page.
- */
+
 body {
     background-color: #343541;
     color: #fff;
@@ -101,14 +108,41 @@ body.admin-bar #chat-container {
 }
 
 #chat-sidebar li {
-    padding: 8px 12px;
+    padding: 0; /* Remove padding from li, let anchor handle it */
     margin-bottom: 4px;
     border-radius: 6px;
     cursor: pointer;
+    color: #808080; /* Gray color for regular text in sidebar */
+}
+
+/* Sidebar anchor styling */
+#chat-sidebar li a {
+    display: block;
+    padding: 8px 12px;
+    color: #ffffff !important; /* White color for sidebar anchors */
+    text-decoration: none !important; /* Remove underlines */
+    border-radius: 6px; /* Rounded corners */
     transition: background-color 0.2s ease;
 }
 
+/* Hover effect - faint gray roundbox */
+#chat-sidebar li a:hover {
+    background-color: rgba(128, 128, 128, 0.2) !important; /* Faint gray background on hover */
+}
+
+/* Active/clicked state - darker gray box */
+#chat-sidebar li a:active,
+#chat-sidebar li a:focus {
+    background-color: rgba(128, 128, 128, 0.4) !important; /* Darker gray background on click */
+}
+
+/* Remove hover effect from li when anchor is present */
 #chat-sidebar li:hover {
+    background-color: transparent;
+}
+
+/* Keep hover effect for li without anchors */
+#chat-sidebar li:not(:has(a)):hover {
     background-color: #343541;
 }
 
@@ -130,7 +164,7 @@ body.admin-bar #chat-container {
 
 /* Create a container for both post content and chat messages */
 #scrollable-content {
-    overflow-y: scroll !important; /* Force scrollbar to this container */
+    overflow-y: auto !important; /* Only show scrollbar when content requires scrolling */
     height: calc(100vh - 200px) !important; /* Use viewport height for better calculation */
     display: flex;
     flex-direction: column;
@@ -186,6 +220,135 @@ body.admin-bar #chat-container {
         height: 70vh; /* Remaining height for main content */
         overflow-y: auto;
     }
+}
+
+/* Sidebar Toggle Functionality */
+/* Additional styles for sidebar toggle animations and admin bar integration */
+#chat-sidebar.sidebar-transitioning {
+    transition: width 300ms ease-in-out,
+                min-width 300ms ease-in-out,
+                padding-left 300ms ease-in-out,
+                padding-right 300ms ease-in-out;
+}
+
+#chat-sidebar.sidebar-hidden {
+    width: 0 !important;
+    min-width: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    overflow: hidden !important;
+    border-right: none !important;
+}
+
+/* Ensure main content expands when sidebar is hidden */
+#chat-sidebar.sidebar-hidden + #chat-main {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* Admin Bar Sidebar Toggle Button Styles */
+#wp-admin-bar-sidebar-toggle .ab-item {
+    display: flex !important;
+    align-items: center;
+    gap: 4px;
+    padding: 0 8px !important;
+    text-decoration: none;
+    color: #a7aaad !important;
+    font-size: 13px;
+    line-height: 32px;
+    height: 32px;
+}
+
+#wp-admin-bar-sidebar-toggle .ab-item:hover {
+    color: #00a0d2 !important;
+    background-color: #32373c !important;
+}
+
+#wp-admin-bar-sidebar-toggle .ab-item .dashicons {
+    font-family: dashicons;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    line-height: 1;
+    margin-top: 6px;
+    display: inline-block;
+    text-decoration: inherit;
+    font-weight: normal;
+    font-style: normal;
+    vertical-align: top;
+    text-align: center;
+    -webkit-transition: color .1s ease-in;
+    transition: color .1s ease-in;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+#wp-admin-bar-sidebar-toggle .ab-item .ab-label {
+    font-size: 13px;
+    font-weight: 400;
+}
+
+/* Hide label text at high zoom levels (200%+) following WordPress patterns */
+/* Use JavaScript-based zoom detection since CSS media queries don't reliably detect browser zoom */
+/* This will be handled by JavaScript that detects zoom level and applies appropriate classes */
+
+/* Base state - label visible */
+#wp-admin-bar-sidebar-toggle .ab-item .ab-label {
+    display: inline-block;
+}
+
+/* Hide label when zoom is 200% or higher */
+body.zoom-200-plus #wp-admin-bar-sidebar-toggle .ab-item .ab-label,
+body.zoom-250-plus #wp-admin-bar-sidebar-toggle .ab-item .ab-label {
+    display: none !important;
+}
+
+/* Ensure icon remains visible at all zoom levels */
+body.zoom-200-plus #wp-admin-bar-sidebar-toggle .ab-item .dashicons,
+body.zoom-250-plus #wp-admin-bar-sidebar-toggle .ab-item .dashicons {
+    display: inline-block !important;
+}
+
+/* Ensure dashicon remains visible at all zoom levels */
+#wp-admin-bar-sidebar-toggle .ab-item .dashicons {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Mobile responsive behavior for toggle button */
+@media screen and (max-width: 782px) {
+    #wp-admin-bar-sidebar-toggle .ab-item {
+        line-height: 46px;
+        height: 46px;
+    }
+    
+    #wp-admin-bar-sidebar-toggle .ab-item .dashicons {
+        font-family: dashicons;
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        line-height: 1;
+        margin-top: 13px;
+        display: inline-block;
+        text-decoration: inherit;
+        font-weight: normal;
+        font-style: normal;
+        vertical-align: top;
+        text-align: center;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    /* Always hide label on mobile */
+    #wp-admin-bar-sidebar-toggle .ab-item .ab-label {
+        display: none;
+    }
+}
+
+/* Ensure smooth transitions for main content area when sidebar toggles */
+#chat-main {
+    transition: width 300ms ease-in-out, max-width 300ms ease-in-out;
 }
 
 /* WordPress Comment Form - ChatGPT Style */
@@ -292,21 +455,21 @@ body.admin-bar #chat-container {
 
 /* Fixed comment box positioning */
 #fixed-comment-box {
-    position: fixed !important;
+    position: absolute !important;
     bottom: 0 !important;
-    width: 768px; /* Same width as chat messages */
-    padding: 16px;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 768px;
     box-sizing: border-box;
+    padding: 16px;
     z-index: 9999 !important; /* Very high z-index to stay above all content */
     background-color: #202123; /* Match the main chat area background */
     display: flex;
     justify-content: center; /* Center the comment form horizontally */
     align-items: center; /* Center vertically */
-    border-top: 1px solid #444654; /* Add a subtle border for separation */
-    /* Position at the exact same left position as chat messages */
-    left: 757px;
-    transform: translateX(0);
-    margin-left: 0;
+    border-top: none; /* Removed border that was causing the white line */
+    margin: 0 auto; /* Center within chat-main area */
 }
 
 /* Hide elements that don't appear in ChatGPT interface */
@@ -548,6 +711,117 @@ body.admin-bar #chat-container {
         margin-left: 2px;
     }
 }
+/* ChatGPT-style two-row comment box structure */
+.comment-input-row {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.comment-tools-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 8px 12px;
+    background-color: #40414f;
+    border-radius: 0 0 12px 12px;
+    margin-top: -8px; /* Overlap slightly with input row */
+}
+
+.tools-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.tools-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Tool buttons styling */
+.plus-icon,
+.tools-button,
+.microphone-button,
+.submit-arrow {
+    background: none;
+    border: none;
+    color: #8e8ea0;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.plus-icon:hover,
+.tools-button:hover,
+.microphone-button:hover {
+    background-color: #565869;
+    color: #ececf1;
+}
+
+.submit-arrow {
+    background-color: #19c37d;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.submit-arrow:hover {
+    background-color: #16a66b;
+}
+
+.submit-arrow:disabled {
+    background-color: #565869;
+    color: #8e8ea0;
+    cursor: not-allowed;
+}
+
+/* Adjust the comment form to fit the new structure */
+#commentform {
+    border-radius: 12px 12px 0 0; /* Only round top corners */
+    margin-bottom: 0;
+}
+
+/* Responsive adjustments for two-row layout */
+@media (max-width: 700px) {
+    .comment-tools-row {
+        padding: 6px 10px;
+    }
+    
+    .tools-left {
+        gap: 8px;
+    }
+    
+    .tools-right {
+        gap: 6px;
+    }
+    
+    .plus-icon,
+    .tools-button,
+    .microphone-button {
+        padding: 4px;
+        font-size: 12px;
+    }
+    
+    .submit-arrow {
+        width: 28px;
+        height: 28px;
+        font-size: 14px;
+    }
+}
+
 
 /* Post content styling */
 .post-content {
@@ -601,6 +875,7 @@ body.admin-bar #chat-container {
     font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
     letter-spacing: 0.2px;
     height: 30px; /* Set explicit height for calculations */
+    z-index: 10000; /* Ensure footer is above fixed-comment-box (z-index: 9999) */
 }
 
 /* Responsive adjustment for footer */
@@ -618,7 +893,7 @@ body.admin-bar #chat-container {
     height: calc(100vh - 150px) !important; /* Use viewport height for better calculation */
     padding-bottom: 100px; /* Increased padding to prevent content from being hidden */
     margin-bottom: 80px; /* Add space for the fixed comment box */
-    overflow-y: scroll !important; /* Force enable scrolling */
+    overflow-y: auto !important; /* Show scrollbar when content requires scrolling */
     position: relative;
     z-index: 10;
     width: 100%;
@@ -662,4 +937,295 @@ body.admin-bar .site-footer {
 }
 #cacbot-archive-button{
     display:none !important;
+}
+
+/* Blog Roll Styles */
+.blog-roll-container {
+    max-width: 768px;
+    margin: 0 auto;
+    padding: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.blog-roll-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+    width: 100%;
+}
+
+.blog-roll-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.blog-roll-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.blog-roll-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    height: 100%;
+}
+
+.blog-roll-image-container {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.03);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.blog-roll-thumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.blog-roll-item:hover .blog-roll-thumbnail {
+    transform: scale(1.05);
+}
+
+.blog-roll-placeholder {
+    font-size: 48px;
+    color: rgba(255, 255, 255, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.blog-roll-content {
+    padding: 20px;
+}
+
+.blog-roll-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 12px 0;
+    color: #ececf1;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.blog-roll-meta {
+    margin-bottom: 12px;
+}
+
+.blog-roll-date {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 400;
+}
+
+.blog-roll-excerpt {
+    font-size: 14px;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.8);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.blog-roll-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+    .blog-roll-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .blog-roll-container {
+        padding: 12px;
+    }
+    
+    .blog-roll-image-container {
+        height: 180px;
+    }
+    
+    .blog-roll-content {
+        padding: 16px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .blog-roll-image-container {
+        height: 160px;
+    }
+    
+    .blog-roll-title {
+        font-size: 16px;
+    }
+    
+    .blog-roll-excerpt {
+        font-size: 13px;
+    }
+}
+
+/* Blog Roll Pagination Styles */
+.blog-roll-pagination {
+    margin: 32px 0 120px 0; /* Add significant bottom margin to prevent overlap with comment form */
+    padding: 16px 0;
+    text-align: center;
+    width: 100%;
+    max-width: 768px;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    z-index: 100; /* Ensure pagination is above other content but below comment form */
+    clear: both; /* Ensure it clears any floated elements */
+}
+
+.pagination-list {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex-wrap: wrap;
+}
+
+.pagination-list li {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+}
+
+.pagination-list a {
+    display: inline-block;
+    padding: 8px 12px;
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #ececf1;
+    text-decoration: none;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease;
+    font-size: 14px;
+    font-weight: 500;
+    min-width: 40px;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.pagination-list a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.pagination-list .current-page {
+    display: inline-block;
+    padding: 8px 12px;
+    background-color: #40414f;
+    color: #fff;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 14px;
+    font-weight: 600;
+    min-width: 40px;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.pagination-list .prev-page a,
+.pagination-list .next-page a {
+    padding: 8px 16px;
+    font-weight: 500;
+}
+
+.pagination-list .prev-page a:hover,
+.pagination-list .next-page a:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Responsive pagination adjustments */
+@media screen and (max-width: 768px) {
+    .blog-roll-pagination {
+        margin: 24px 0 100px 0;
+        padding: 12px 0;
+    }
+    
+    .pagination-list {
+        gap: 6px;
+    }
+    
+    .pagination-list a,
+    .pagination-list .current-page {
+        padding: 6px 10px;
+        font-size: 13px;
+        min-width: 36px;
+    }
+    
+    .pagination-list .prev-page a,
+    .pagination-list .next-page a {
+        padding: 6px 12px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .blog-roll-pagination {
+        margin: 20px 0 80px 0;
+    }
+    
+    .pagination-list {
+        gap: 4px;
+    }
+    
+    .pagination-list a,
+    .pagination-list .current-page {
+        padding: 6px 8px;
+        font-size: 12px;
+        min-width: 32px;
+    }
+    
+    .pagination-list .prev-page a,
+    .pagination-list .next-page a {
+        padding: 6px 10px;
+    }
+}
+
+/* Ensure comment form doesn't overlap pagination */
+#fixed-comment-box {
+    /* Reduce z-index to ensure it doesn't interfere with pagination visibility */
+    z-index: 1000 !important; /* Lower than before but still high enough to stay above content */
+}
+
+#commentform {
+    z-index: 1001 !important; /* Slightly higher than fixed-comment-box but much lower than before */
+}
+
+/* Adjust scrollable content to account for pagination spacing */
+#scrollable-content {
+    padding-bottom: 140px !important; /* Increased padding to accommodate pagination + comment form */
+}
+
+/* Ensure blog roll container has proper spacing */
+.blog-roll-container {
+    margin-bottom: 0; /* Remove any bottom margin that might interfere */
+    padding-bottom: 0; /* Remove any bottom padding that might interfere */
 }

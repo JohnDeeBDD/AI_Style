@@ -24,15 +24,15 @@ export function createActionButtonsContainer(commentForm) {
         commentForm.insertBefore(actionButtonsContainer, commentTextareaParent.nextSibling);
         
         // Add example action buttons - similar to commercial implementations
-        const plusButton = addActionBubble('dashicons-plus', '', actionButtonsContainer); // Plus button like ChatGPT
+        //const plusButton = addActionBubble('dashicons-plus', '', actionButtonsContainer); // Plus button like ChatGPT
        // addActionBubble('dashicons-upload', 'Attach', actionButtonsContainer);
        // addActionBubble('dashicons-editor-code', 'Code', actionButtonsContainer);
        // addActionBubble('dashicons-format-image', 'Image', actionButtonsContainer);
         
         // Add tooltip to plus button
-        if (plusButton) {
-            plusButton.title = "Add attachment";
-        }
+        //if (plusButton) {
+        //    plusButton.title = "Add attachment";
+       // }
     }
     
     return actionButtonsContainer;

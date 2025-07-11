@@ -40,7 +40,6 @@ export default function sidebarClick(linkedPostID) {
     fetchCacbotLinkAPI(postId, formData, endpoint)
         .then(response => {
             console.log('conversation successfully linked:', response);
-            // Reload the page to show the unarchived post
             window.location.reload();
         })
         .catch(error => {

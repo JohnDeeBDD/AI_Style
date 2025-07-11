@@ -13,20 +13,21 @@
 
 $I = new AcceptanceTester($scenario);
 
-$I->wantToTest('Prevention of new post creation from /testpost page');
-$I->amOnUrl('http://localhost');
+$I->wantToTest('Prevention of new post creation from test post page');
+$I->amOnUrl(AcceptanceConfig::BASE_URL);
 $I->loginAsAdmin();
-$I->amOnPage('/testpost');
+$I->amOnPage(AcceptanceConfig::TEST_POST_PAGE);
 
 // Wait for the admin bar to be fully loaded
-$I->waitForElement('#wpadminbar', 10);
+$I->waitForElement(AcceptanceConfig::ADMIN_BAR, 10);
 
 // Verify the "New" button is present in the admin bar
 $I->comment('Verifying the "New" button is present');
-$I->seeElement('#wp-admin-bar-new-content');
+$I->seeElement(AcceptanceConfig::ADMIN_BAR_NEW_CONTENT);
 
 // Take a screenshot before clicking
 $I->makeScreenshot('new-button-before-click');
+$I->comment("Screen shot <a href = 'http://localhost/wp-content/themes/ai_style/tests/_output/debug/new-button-before-click.png' target = '_blank'>available here</a>");
 
 // Store the current URL before clicking
 $currentUrl = $I->grabFromCurrentUrl();
@@ -34,7 +35,7 @@ $I->comment("Current URL before clicking: $currentUrl");
 
 // Click the "New" button
 $I->comment('Clicking the "New" button');
-$I->click('#wp-admin-bar-new-content a.ab-item');
+$I->click(AcceptanceConfig::ADMIN_BAR_NEW_CONTENT_LINK);
 
 // Wait a moment to ensure any navigation would have occurred
 $I->wait(2);
@@ -45,13 +46,14 @@ $I->comment("URL after clicking: $afterClickUrl");
 $I->assertEquals($currentUrl, $afterClickUrl, 'URL should not change after clicking the "New" button');
 
 // Verify we're not redirected to /wp-admin/post-new.php
-$I->dontSeeInCurrentUrl('/wp-admin/post-new.php');
+$I->dontSeeInCurrentUrl(AcceptanceConfig::ADMIN_NEW_POST);
 
 // Take a screenshot after clicking to show we're still on the same page
 $I->makeScreenshot('new-button-after-click');
+$I->comment("Screen shot <a href = 'http://localhost/wp-content/themes/ai_style/tests/_output/debug/new-button-after-click.png' target = '_blank'>available here</a>");
 
 // Verify we can still see elements that would be gone if we navigated away
-$I->seeElement('#wp-admin-bar-new-content');
+$I->seeElement(AcceptanceConfig::ADMIN_BAR_NEW_CONTENT);
 
 // Add a comment to explain console log verification limitation
 $I->comment('Note: Console log verification requires manual inspection or browser extension');

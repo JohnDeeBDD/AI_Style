@@ -12,59 +12,61 @@
 $I = new AcceptanceTester($scenario);
 
 $I->wantToTest('Admin bar customization functionality');
-$I->amOnUrl('http://localhost');
+$I->amOnUrl(AcceptanceConfig::BASE_URL);
 $I->loginAsAdmin();
-$I->amOnPage('/testpost');
+$I->amOnPage(AcceptanceConfig::TEST_POST_PAGE);
 
 // Wait for the admin bar to be fully loaded
-$I->waitForElement('#wpadminbar', 10);
+$I->waitForElement(AcceptanceConfig::ADMIN_BAR, 10);
 
 // 1. Test removal of specific admin bar elements
 $I->comment('Verifying removed admin bar elements');
 
 // WordPress icon and information should be removed
-$I->dontSeeElement('#wp-admin-bar-wp-logo');
+$I->dontSeeElement(AcceptanceConfig::ADMIN_BAR_WP_LOGO);
 
 // Customize button should be removed
-$I->dontSeeElement('#wp-admin-bar-customize');
+$I->dontSeeElement(AcceptanceConfig::ADMIN_BAR_CUSTOMIZE);
 
 // Comments indicator should be removed
-$I->dontSeeElement('#wp-admin-bar-comments');
+$I->dontSeeElement(AcceptanceConfig::ADMIN_BAR_COMMENTS);
 
 // Search icon might still be present in some environments
 // If it's a requirement to remove it, this test should fail to alert developers
-$I->comment('Note: Search icon (#wp-admin-bar-search) removal should be verified manually');
+$I->comment('Note: Search icon (' . AcceptanceConfig::ADMIN_BAR_SEARCH . ') removal should be verified manually');
 
 // 2. Test presence of elements we kept
 $I->comment('Verifying kept admin bar elements');
 
 // "New" button should be present
-$I->seeElement('#wp-admin-bar-new-content');
+$I->seeElement(AcceptanceConfig::ADMIN_BAR_NEW_CONTENT);
 
 // "Edit Post" button should be present (when viewing a post)
-$I->seeElement('#wp-admin-bar-edit');
+$I->seeElement(AcceptanceConfig::ADMIN_BAR_EDIT);
 
 // "Howdy" user menu should be present
-$I->seeElement('#wp-admin-bar-my-account');
+$I->seeElement(AcceptanceConfig::ADMIN_BAR_MY_ACCOUNT);
 
 // 3. Test modified behavior of the "New" button
 $I->comment('Verifying modified behavior of the "New" button');
 
 // Take a screenshot before hovering
 $I->makeScreenshot('admin-bar-before-hover');
+$I->comment("Screen shot <a href = 'http://localhost/wp-content/themes/ai_style/tests/_output/debug/admin-bar-before-hover.png' target = '_blank'>available here</a>");
 
 // Hover over the "New" button
-$I->moveMouseOver('#wp-admin-bar-new-content');
+$I->moveMouseOver(AcceptanceConfig::ADMIN_BAR_NEW_CONTENT);
 
 // Wait a moment for any potential dropdown to appear
 $I->wait(1);
 
 // Take a screenshot after hovering to verify no dropdown appears
 $I->makeScreenshot('admin-bar-after-hover');
+$I->comment("Screen shot <a href = 'http://localhost/wp-content/themes/ai_style/tests/_output/debug/admin-bar-after-hover.png' target = '_blank'>available here</a>");
 
 // Verify the dropdown menu doesn't appear
 // The dropdown would have class "ab-sub-wrapper"
-$I->dontSeeElement('#wp-admin-bar-new-content .ab-sub-wrapper:not([style*="display: none"])');
+$I->dontSeeElement(AcceptanceConfig::ADMIN_BAR_DROPDOWN);
 
 // Test click behavior
 // Note: We can't directly verify console logs in Codeception
@@ -77,9 +79,10 @@ $I->comment("Current URL before clicking: $currentUrl");
 
 // Take a screenshot before clicking
 $I->makeScreenshot('admin-bar-before-click');
+$I->comment("Screen shot <a href = 'http://localhost/wp-content/themes/ai_style/tests/_output/debug/admin-bar-before-click.png' target = '_blank'>available here</a>");
 
 // Click the "New" button
-$I->click('#wp-admin-bar-new-content a.ab-item');
+$I->click(AcceptanceConfig::ADMIN_BAR_NEW_CONTENT_LINK);
 
 // Wait a moment to ensure any navigation would have occurred
 $I->wait(2);
@@ -91,10 +94,11 @@ $I->assertEquals($currentUrl, $afterClickUrl, 'URL should not change after click
 
 // Take a screenshot after clicking to show we're still on the same page
 $I->makeScreenshot('admin-bar-after-click');
+$I->comment("Screen shot <a href = 'http://localhost/wp-content/themes/ai_style/tests/_output/debug/admin-bar-after-click.png' target = '_blank'>available here</a>");
 
 // Verify we can still see elements that would be gone if we navigated away
-$I->seeElement('#wp-admin-bar-new-content');
-$I->seeElement('#wp-admin-bar-edit');
+$I->seeElement(AcceptanceConfig::ADMIN_BAR_NEW_CONTENT);
+$I->seeElement(AcceptanceConfig::ADMIN_BAR_EDIT);
 
 // Add a comment to explain console log verification limitation
 $I->comment('Note: Console log verification ("New button clicked") requires manual inspection or browser extension');

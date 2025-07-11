@@ -3,6 +3,48 @@
  */
 
 /**
+ * Process markdown content using the mmd plugin if available
+ * @param {string} content - The content to process
+ * @returns {string} The processed content or original content if mmd is not available
+ */
+function processMarkdown(content) {
+    // Check if mmd function is available globally (from the mmd plugin)
+    if (typeof window.mmd === 'function') {
+        try {
+            return window.mmd(content);
+        } catch (error) {
+            console.warn('Error processing markdown with mmd:', error);
+            return content;
+        }
+    }
+    
+    // Check if MarkupMarkdown class is available
+    if (typeof window.MarkupMarkdown === 'function') {
+        try {
+            const markdown = new window.MarkupMarkdown();
+            if (typeof markdown.transform === 'function') {
+                return markdown.transform(content);
+            }
+        } catch (error) {
+            console.warn('Error processing markdown with MarkupMarkdown class:', error);
+            return content;
+        }
+    }
+    
+    // Return original content if no markdown processor is available
+    return content;
+}
+
+/**
+ * Check if markdown processing is available
+ * @returns {boolean} True if markdown processing is available
+ */
+function isMarkdownAvailable() {
+    return (typeof window.mmd === 'function') ||
+           (typeof window.MarkupMarkdown === 'function');
+}
+
+/**
  * Adds a message from the interlocutor (user) to the chat
  * @param {string} message - The message content
  */
@@ -25,7 +67,10 @@ export function addInterlocutorMessage(message) {
     const messageContentElement = document.createElement('div');
     messageContentElement.className = 'message-content';
     messageContentElement.id = 'message-content-' + messageId;
-    messageContentElement.innerHTML = message;
+    
+    // Process markdown if available
+    const processedMessage = processMarkdown(message);
+    messageContentElement.innerHTML = processedMessage;
     
     // Append the content to the message
     messageElement.appendChild(messageContentElement);
@@ -60,7 +105,10 @@ export function addRespondentMessage(message) {
     const messageContentElement = document.createElement('div');
     messageContentElement.className = 'message-content';
     messageContentElement.id = 'message-content-' + messageId;
-    messageContentElement.innerHTML = message;
+    
+    // Process markdown if available
+    const processedMessage = processMarkdown(message);
+    messageContentElement.innerHTML = processedMessage;
     
     // Append the content to the message
     messageElement.appendChild(messageContentElement);
@@ -102,5 +150,7 @@ export function clearMessages() {
 export default {
     addInterlocutorMessage,
     addRespondentMessage,
-    clearMessages
+    clearMessages,
+    processMarkdown,
+    isMarkdownAvailable
 };

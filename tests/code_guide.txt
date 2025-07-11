@@ -1,12 +1,16 @@
 We are building a WordPress theme that replicates the Chat-GPT user interface.
 
 Our development process follows Test Driven Development (TDD).
+
+For each task the user assigns to you, you should first create a failing Codeception acceptance test to test the implementation of the feature.
+
 For each new feature, we begin by creating a Codeception acceptance test. Example:
+
 /var/www/html/wp-content/themes/ai_style/tests/acceptance/ScreenCaptureCept.php
 
 The ScreenCaptureCept.php test is also useful for capturing a visual snapshot of the UI during development.
 
-For every new JavaScript feature, we should create a small, atomic file in:
+For every new JavaScript feature, we should create a small, atomic file. Example template`:
 /var/www/html/wp-content/themes/ai_style/src/AI_Style/ai-style.js_src/template.js
 
 Each new function must be imported and called from:

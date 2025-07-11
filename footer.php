@@ -10,7 +10,7 @@
 
 ?>
 		<footer id="colophon" class="site-footer">
-		Aions can make mistakes. Check important info.
+		Cacbots can make mistakes. Check important info.
 		</footer><!-- .site-footer -->
 </div><!-- .site -->
 
