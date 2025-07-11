@@ -6,8 +6,8 @@ $I = new AcceptanceTester($scenario);
 $I->amOnUrl(AcceptanceConfig::BASE_URL);
 $I->loginAsAdmin();
 $I->amOnPage(AcceptanceConfig::TEST_POST_PAGE);
-// Set zoom level to 100%
-$I->executeJS('document.body.style.zoom = "100%";');
+// Ensure 100% zoom for consistent behavior (handled automatically by Helper/Acceptance.php)
+$I->resetZoom();
 $I->makeScreenshot('testpost');
 
 // Check for footer visibility
@@ -55,7 +55,5 @@ if ($isFooterVisible) {
 //$I->seeInSource('<footer id="colophon" class="site-footer">'); // Check if footer HTML is in the source
 
 $I->comment("Screen shot <a href = 'http://localhost/wp-content/themes/ai_style/tests/_output/debug/footer-visibility.png' target = '_blank'>available here</a>");
-// Set zoom level to 100% before taking screenshot
-$I->executeJS('document.body.style.zoom = "100%";');
-// Take a screenshot to show the footer area
+// Take a screenshot to show the footer area (zoom already at 100%)
 $I->makeScreenshot('footer-visibility');

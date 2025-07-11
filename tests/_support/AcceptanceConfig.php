@@ -58,4 +58,22 @@ class AcceptanceConfig
     
     // JavaScript file paths
     const CHAT_MESSAGES_JS = '/wp-content/themes/ai_style/src/AI_Style/ai-style.js_src/chatMessages.js';
+    
+    // Zoom Management Constants
+    const ZOOM_LEVEL_25 = 0.25;
+    const ZOOM_LEVEL_50 = 0.5;
+    const ZOOM_LEVEL_75 = 0.75;
+    const ZOOM_LEVEL_100 = 1.0;
+    const ZOOM_LEVEL_150 = 1.5;
+    const ZOOM_LEVEL_200 = 2.0;
+    const ZOOM_LEVEL_DEFAULT = self::ZOOM_LEVEL_100;
+    
+    // Viewport configurations for zoom testing
+    const VIEWPORT_DESKTOP_DEFAULT = '1920x1080';
+    const VIEWPORT_DESKTOP_75 = '1440x810';
+    const VIEWPORT_DESKTOP_50 = '960x540';
+    
+    // Zoom enforcement settings
+    const ZOOM_ENFORCEMENT_ENABLED = true;
+    const ZOOM_RESET_DELAY = 500; // milliseconds
 }

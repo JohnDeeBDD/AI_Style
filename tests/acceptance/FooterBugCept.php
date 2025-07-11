@@ -22,8 +22,9 @@ $I->amOnUrl(AcceptanceConfig::BASE_URL);
 $I->loginAsAdmin();
 $I->amOnPage(AcceptanceConfig::TEST_POST_PAGE);
 
-// Set zoom level to 100% to ensure consistent behavior
-$I->executeJS('document.body.style.zoom = "100%";');
+// Ensure 100% zoom for consistent behavior (handled automatically by Helper/Acceptance.php)
+// Reset zoom explicitly for this test
+$I->resetZoom();
 
 // Wait for page to fully load
 $I->waitForElement(AcceptanceConfig::CHAT_CONTAINER, 10);

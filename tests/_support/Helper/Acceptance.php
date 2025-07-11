@@ -28,6 +28,15 @@ class Acceptance extends \Codeception\Module{
     public function _beforeSuite($settings = []){
         $this->hostname = shell_exec("hostname");
         
+        // Initialize zoom enforcement for the entire test suite
+        // Zoom enforcement removed from _beforeSuite to avoid WebDriver null error
+    }
+    
+    /**
+     * Ensure 100% zoom before each individual test
+     */
+    public function _before(\Codeception\TestInterface $test) {
+        // Zoom enforcement removed from _before; must be called explicitly after navigation in each test
     }
 
     public function switchBetweenLinkedAnchorPosts($I){
@@ -74,6 +83,80 @@ class Acceptance extends \Codeception\Module{
 
     public function get_config(){
         return $this->getModule('WPWebDriver')->_getConfig();
+    }
+
+    /**
+     * Ensures the browser is set to 100% zoom level (desktop default)
+     * This method should be called at the beginning of tests to ensure consistent zoom state
+     */
+    public function ensureDesktop100Zoom() {
+        if (!\AcceptanceConfig::ZOOM_ENFORCEMENT_ENABLED) {
+            return;
+        }
+
+        $wpWebDriver = $this->getModule('WPWebDriver');
+        if ($wpWebDriver === null) {
+            codecept_debug('Zoom enforcement skipped: WPWebDriver module not available.');
+            return;
+        }
+
+        $wpWebDriver->executeJS('
+            // Reset zoom using multiple methods for maximum compatibility
+            document.body.style.zoom = "1.0";
+            document.body.style.transform = "scale(1.0)";
+            document.documentElement.style.zoom = "1.0";
+            
+            // Also reset any CSS zoom that might be applied
+            const allElements = document.querySelectorAll("*");
+            allElements.forEach(el => {
+                if (el.style.zoom && el.style.zoom !== "1" && el.style.zoom !== "1.0") {
+                    el.style.zoom = "1.0";
+                }
+            });
+        ');
+        
+        // Wait for zoom to settle
+        $this->getModule('WPWebDriver')->wait(\AcceptanceConfig::ZOOM_RESET_DELAY / 1000);
+    }
+
+    /**
+     * Sets a specific zoom level for testing
+     * @param float $zoomLevel The zoom level (e.g., 0.75 for 75%, 1.5 for 150%)
+     */
+    public function setZoomLevel($zoomLevel) {
+        $this->getModule('WPWebDriver')->executeJS("
+            document.body.style.zoom = '$zoomLevel';
+            document.documentElement.style.zoom = '$zoomLevel';
+        ");
+        
+        $this->getModule('WPWebDriver')->wait(\AcceptanceConfig::ZOOM_RESET_DELAY / 1000);
+    }
+
+    /**
+     * Resets zoom to default 100% level
+     */
+    public function resetZoom() {
+        $this->ensureDesktop100Zoom();
+    }
+
+    /**
+     * Verifies the current zoom level
+     * @param float $expectedZoom Expected zoom level
+     */
+    public function verifyZoomLevel($expectedZoom) {
+        $currentZoom = $this->getModule('WPWebDriver')->executeJS('
+            return document.body.style.zoom ||
+                   getComputedStyle(document.body).zoom ||
+                   "1";
+        ');
+        
+        // Convert to float for comparison
+        $currentZoomFloat = floatval($currentZoom);
+        $expectedZoomFloat = floatval($expectedZoom);
+        
+        if (abs($currentZoomFloat - $expectedZoomFloat) > 0.01) {
+            throw new \Exception("Zoom level mismatch. Expected: $expectedZoom, Actual: $currentZoom");
+        }
     }
 
 }

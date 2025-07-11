@@ -75,29 +75,31 @@
             </div> <!-- end: #scrollable-content -->
             <?php endif; ?>
             <div id="fixed-comment-box">
-                <div class="comment-input-row">
-                    <div id="chat-input">
-                        <?php comment_form(); ?>
-                    </div> <!-- end: #chat-input -->
-                </div> <!-- end: .comment-input-row -->
-                <div class="comment-tools-row">
-                    <div class="tools-left">
-                        <button class="plus-icon add-button" type="button" title="Add attachment">
-                            <span>+</span>
-                        </button>
-                        <button class="tools-button tools-text" type="button" title="Tools">
-                            <span>Tools</span>
-                        </button>
-                    </div>
-                    <div class="tools-right">
-                        <button class="microphone-button" type="button" title="Voice input">
-                            <span>🎤</span>
-                        </button>
-                        <button class="submit-arrow submit-button" type="submit" title="Send message">
-                            <span>↑</span>
-                        </button>
-                    </div>
-                </div> <!-- end: .comment-tools-row -->
+                <div class="comment-box-inner">
+                    <div class="comment-input-row">
+                        <div id="chat-input">
+                            <?php comment_form(); ?>
+                        </div> <!-- end: #chat-input -->
+                    </div> <!-- end: .comment-input-row -->
+                    <div class="comment-tools-row">
+                        <div class="tools-left">
+                            <button class="plus-icon add-button" type="button" title="Add attachment">
+                                <span>+</span>
+                            </button>
+                            <button class="tools-button tools-text" type="button" title="Tools">
+                                <span>Tools</span>
+                            </button>
+                        </div>
+                        <div class="tools-right">
+                            <button class="microphone-button" type="button" title="Voice input">
+                                <span>🎤</span>
+                            </button>
+                            <button class="submit-arrow submit-button" type="submit" title="Send message">
+                                <span>↑</span>
+                            </button>
+                        </div>
+                    </div> <!-- end: .comment-tools-row -->
+                </div> <!-- end: .comment-box-inner -->
             </div> <!-- end: #fixed-comment-box -->
         </div> <!-- end: #chat-main -->
     </div> <!-- end: #chat-container -->

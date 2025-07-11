@@ -55,17 +55,23 @@ $I->seeInField(AcceptanceConfig::FIXED_COMMENT_BOX . ' .comment-input-row textar
 $I->comment("Testing that comment box has proper ChatGPT-style layout");
 $I->executeJS("
     const commentBox = document.querySelector('" . AcceptanceConfig::FIXED_COMMENT_BOX . "');
+    const commentBoxInner = commentBox.querySelector('.comment-box-inner');
     const inputRow = commentBox.querySelector('.comment-input-row');
     const toolsRow = commentBox.querySelector('.comment-tools-row');
+    
+    // Verify the unified inner wrapper exists
+    if (!commentBoxInner) {
+        throw new Error('Missing comment-box-inner wrapper for unified styling');
+    }
     
     // Verify both rows exist
     if (!inputRow || !toolsRow) {
         throw new Error('Missing required comment box rows');
     }
     
-    // Verify input row comes before tools row in DOM
-    const inputRowPosition = Array.from(commentBox.children).indexOf(inputRow);
-    const toolsRowPosition = Array.from(commentBox.children).indexOf(toolsRow);
+    // Verify input row comes before tools row in DOM within the inner wrapper
+    const inputRowPosition = Array.from(commentBoxInner.children).indexOf(inputRow);
+    const toolsRowPosition = Array.from(commentBoxInner.children).indexOf(toolsRow);
     
     if (inputRowPosition >= toolsRowPosition) {
         throw new Error('Input row should come before tools row');
@@ -85,6 +91,10 @@ $I->resizeWindow(768, 600);
 $I->wait(1);
 $I->seeElement(AcceptanceConfig::FIXED_COMMENT_BOX . ' .comment-input-row');
 $I->seeElement(AcceptanceConfig::FIXED_COMMENT_BOX . ' .comment-tools-row');
+
+// Reset window size to default after testing responsive behavior
+$I->resizeWindow(1920, 1080);
+$I->wait(1);
 
 // Take a screenshot of the final state
 $I->makeScreenshot('comment-box-rows-test');

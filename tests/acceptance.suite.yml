@@ -36,10 +36,15 @@ modules:
             - "--incognito"
             - "--disable-popup-blocking"
             - "--disable-default-apps"
+            - "--force-device-scale-factor=1"
+            - "--disable-features=TranslateUI"
             - "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
           excludeSwitches:
             - enable-automation
           useAutomationExtension: false
+          prefs:
+            "profile.default_zoom_level": 0  # 0 = 100% zoom
+            "profile.password_manager_enabled": false
     WPLoader:
       wpRootFolder: '/var/www/html'
       dbName: 'wordpress_unit_test'                      # Test database name
