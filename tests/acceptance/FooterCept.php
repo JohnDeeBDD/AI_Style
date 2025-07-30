@@ -6,8 +6,13 @@ $I = new AcceptanceTester($scenario);
 $I->amOnUrl(AcceptanceConfig::BASE_URL);
 $I->loginAsAdmin();
 $I->amOnPage(AcceptanceConfig::TEST_POST_PAGE);
+
+// REQUIRED: Enforce 100% zoom after navigation
+$I->ensureDesktop100Zoom();
+
 // Ensure 100% zoom for consistent behavior (handled automatically by Helper/Acceptance.php)
 $I->resetZoom();
+$I->wait(1); // Wait for zoom to settle
 $I->makeScreenshot('testpost');
 
 // Check for footer visibility
@@ -57,3 +62,6 @@ if ($isFooterVisible) {
 $I->comment("Screen shot <a href = 'http://localhost/wp-content/themes/ai_style/tests/_output/debug/footer-visibility.png' target = '_blank'>available here</a>");
 // Take a screenshot to show the footer area (zoom already at 100%)
 $I->makeScreenshot('footer-visibility');
+
+// Reset zoom at end of test for consistency
+$I->resetZoom();

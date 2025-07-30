@@ -31,6 +31,9 @@ $I->comment('✓ Test post created with ID: ' . $postId);
 // Navigate to a test post to see the chat interface
 $I->amOnPage('/testpost');
 
+// REQUIRED: Enforce 100% zoom after navigation
+$I->ensureDesktop100Zoom();
+
 /**
  * ========================================================================
  * CATEGORY 1: DIRECT CORRESPONDENCES (1:1 with ChatGPT)

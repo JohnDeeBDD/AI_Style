@@ -15,7 +15,6 @@ modules:
       numberOfCalls: 2
       localhostMode: false
       window_size: 1920x1080
-      #window_size: maximize
       adminUsername: 'Codeception'
       adminPassword: 'password'
       clear_cookies: false

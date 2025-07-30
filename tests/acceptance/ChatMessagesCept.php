@@ -18,6 +18,9 @@ $I->amOnUrl(AcceptanceConfig::BASE_URL);
 $I->loginAsAdmin();
 $I->amOnPage(AcceptanceConfig::TEST_POST_PAGE);
 
+// REQUIRED: Enforce 100% zoom after navigation
+$I->ensureDesktop100Zoom();
+
 // Test 1: Clear any existing messages first
 $I->comment("Testing clearMessages() function");
 $I->executeJS("clearMessages();");

@@ -22,9 +22,13 @@ $I->amOnUrl(AcceptanceConfig::BASE_URL);
 $I->loginAsAdmin();
 $I->amOnPage(AcceptanceConfig::TEST_POST_PAGE);
 
+// REQUIRED: Enforce 100% zoom after navigation
+$I->ensureDesktop100Zoom();
+
 // Ensure 100% zoom for consistent behavior (handled automatically by Helper/Acceptance.php)
 // Reset zoom explicitly for this test
 $I->resetZoom();
+$I->wait(1); // Wait for zoom to settle
 
 // Wait for page to fully load
 $I->waitForElement(AcceptanceConfig::CHAT_CONTAINER, 10);
@@ -108,3 +112,6 @@ $I->comment("Screenshots available:");
 $I->comment("- Initial state: <a href='http://localhost/wp-content/themes/ai_style/tests/_output/debug/footer-bug-sidebar-visible.png' target='_blank'>Sidebar Visible</a>");
 $I->comment("- Bug state: <a href='http://localhost/wp-content/themes/ai_style/tests/_output/debug/footer-bug-sidebar-hidden.png' target='_blank'>Sidebar Hidden (Bug)</a>");
 $I->comment("- Final state: <a href='http://localhost/wp-content/themes/ai_style/tests/_output/debug/footer-bug-sidebar-visible-again.png' target='_blank'>Sidebar Visible Again</a>");
+
+// Reset zoom at end of test for consistency
+$I->resetZoom();

@@ -24,6 +24,10 @@ $I->comment('✓ Test post created with ID: ' . $postId);
 $I->amOnUrl(AcceptanceConfig::BASE_URL);
 $I->loginAsAdmin();
 $I->amOnPage(AcceptanceConfig::TEST_POST_PAGE);
+
+// REQUIRED: Enforce 100% zoom after navigation
+$I->ensureDesktop100Zoom();
+
 $I->makeScreenshot('testpost-visibility');
 $I->comment("Screen shot <a href = 'http://localhost/wp-content/themes/ai_style/tests/_output/debug/testpost-visibility.png' target = '_blank'>available here</a>");
 

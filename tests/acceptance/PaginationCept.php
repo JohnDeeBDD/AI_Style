@@ -19,6 +19,9 @@ $I->wantToTest('Blog roll pagination functionality');
 $I->amOnUrl(AcceptanceConfig::BASE_URL);
 $I->loginAsAdmin();
 
+// REQUIRED: Enforce 100% zoom after navigation
+$I->ensureDesktop100Zoom();
+
 // Setup: Create test posts for pagination testing
 $I->comment('=== SETUP: Creating test posts for pagination ===');
 $testCategoryId = $I->cUrlWP_SiteToGetOrCreateCategory('test', 'Test Category');
@@ -43,6 +46,10 @@ try {
     // Test 1: Verify pagination appears on category page with multiple pages
     $I->comment('=== TEST 1: Pagination appears on multi-page category ===');
     $I->amOnPage('/category/test/');
+    
+    // REQUIRED: Enforce 100% zoom after navigation
+    $I->ensureDesktop100Zoom();
+    
     $I->waitForElement('.blog-roll-container', 2);
     $I->makeScreenshot('pagination-category-test');
 
@@ -102,6 +109,10 @@ try {
     // Test 2: Test pagination on main blog page
     $I->comment('=== TEST 2: Testing pagination on main blog page ===');
     $I->amOnPage('/');
+    
+    // REQUIRED: Enforce 100% zoom after navigation
+    $I->ensureDesktop100Zoom();
+    
     $I->waitForElement('.blog-roll-container', 2);
     $I->makeScreenshot('pagination-home-page');
 
@@ -116,6 +127,10 @@ try {
     // Test 3: Verify pagination CSS classes and styling
     $I->comment('=== TEST 3: Verifying pagination CSS classes and structure ===');
     $I->amOnPage('/category/test/');
+    
+    // REQUIRED: Enforce 100% zoom after navigation
+    $I->ensureDesktop100Zoom();
+    
     $I->waitForElement('.blog-roll-pagination', 2);
 
     $I->seeElement('nav.blog-roll-pagination');
@@ -139,6 +154,10 @@ try {
     // Test 4: Test pagination with different post counts
     $I->comment('=== TEST 4: Testing pagination behavior with different scenarios ===');
     $I->amOnPage('/?s=test');
+    
+    // REQUIRED: Enforce 100% zoom after navigation
+    $I->ensureDesktop100Zoom();
+    
     $I->waitForElement('.blog-roll-container', 2);
     $I->makeScreenshot('pagination-search-results');
 
@@ -152,6 +171,10 @@ try {
     // Final verification: Test pagination accessibility
     $I->comment('=== TEST 5: Testing pagination accessibility ===');
     $I->amOnPage('/category/test/');
+    
+    // REQUIRED: Enforce 100% zoom after navigation
+    $I->ensureDesktop100Zoom();
+    
     $I->waitForElement('.blog-roll-pagination', 2);
 
     $I->seeElement('.blog-roll-pagination[role="navigation"]');

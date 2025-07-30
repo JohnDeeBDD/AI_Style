@@ -41,6 +41,9 @@ $I->assertNotEmpty($comment3Id, 'Third comment should be created successfully');
 $I->amOnPage("/?p=$postId");
 //$I->waitForPageLoad();
 
+// REQUIRED: Enforce 100% zoom after navigation
+$I->ensureDesktop100Zoom();
+
 // Verify the post title and content are displayed
 $I->see($postContent);
 
@@ -51,6 +54,10 @@ $I->see($comment3Data['content']);
 
 //The Comments should not be visible on this page!
 $I->amOnPage("/category/uncategorized/");
+
+// REQUIRED: Enforce 100% zoom after navigation
+$I->ensureDesktop100Zoom();
+
 $I->dontSee($comment1Data['content']);
 $I->dontSee($comment2Data['content']);
 $I->dontSee($comment3Data['content']);

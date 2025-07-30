@@ -36,6 +36,9 @@ $I->comment('STEP 3: Navigate to the test post page');
 $I->comment('Accessing the specific post page that contains the chat interface');
 $I->amOnPage(AcceptanceConfig::TEST_POST_PAGE);
 
+// REQUIRED: Enforce 100% zoom after navigation
+$I->ensureDesktop100Zoom();
+
 $I->comment('STEP 4: Wait for critical UI elements to load');
 $I->comment('Ensuring all required elements are present before proceeding with alignment tests');
 $I->waitForElementVisible(AcceptanceConfig::CHAT_MESSAGES, 10);

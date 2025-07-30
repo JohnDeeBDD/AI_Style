@@ -92,7 +92,14 @@ class Acceptance extends \Codeception\Module{
 
     /**
      * Ensures the browser is set to 100% zoom level (desktop default)
-     * This method should be called at the beginning of tests to ensure consistent zoom state
+     * This method should be called after navigation in tests to ensure consistent zoom state
+     *
+     * IMPORTANT: Due to WebDriver initialization timing, this CANNOT be called automatically.
+     * Tests must explicitly call this method after amOnPage(), loginAsAdmin(), etc.
+     *
+     * For complete usage guide, see: tests/ZOOM_ENFORCEMENT_GUIDE.md
+     *
+     * @throws \Exception if WebDriver is not available
      */
     public function ensureDesktop100Zoom() {
         if (!\AcceptanceConfig::ZOOM_ENFORCEMENT_ENABLED) {
@@ -108,7 +115,7 @@ class Acceptance extends \Codeception\Module{
         $wpWebDriver->executeJS('
             // Reset zoom using multiple methods for maximum compatibility
             document.body.style.zoom = "1.0";
-            document.body.style.transform = "scale(1.0)";
+            //document.body.style.transform = "scale(1.0)";
             document.documentElement.style.zoom = "1.0";
             
             // Also reset any CSS zoom that might be applied
@@ -127,6 +134,11 @@ class Acceptance extends \Codeception\Module{
     /**
      * Sets a specific zoom level for testing
      * @param float $zoomLevel The zoom level (e.g., 0.75 for 75%, 1.5 for 150%)
+     *
+     * Recommended: Use AcceptanceConfig constants instead of hardcoded values
+     * Example: $I->setZoomLevel(AcceptanceConfig::ZOOM_LEVEL_75);
+     *
+     * For complete usage guide, see: tests/ZOOM_ENFORCEMENT_GUIDE.md
      */
     public function setZoomLevel($zoomLevel) {
         $this->getModule('WPWebDriver')->executeJS("
@@ -139,6 +151,9 @@ class Acceptance extends \Codeception\Module{
 
     /**
      * Resets zoom to default 100% level
+     *
+     * Should be called after testing at different zoom levels to clean up.
+     * For complete usage guide, see: tests/ZOOM_ENFORCEMENT_GUIDE.md
      */
     public function resetZoom() {
         $this->ensureDesktop100Zoom();
@@ -147,6 +162,12 @@ class Acceptance extends \Codeception\Module{
     /**
      * Verifies the current zoom level
      * @param float $expectedZoom Expected zoom level
+     *
+     * Recommended: Use AcceptanceConfig constants for expected values
+     * Example: $I->verifyZoomLevel(AcceptanceConfig::ZOOM_LEVEL_100);
+     *
+     * @throws \Exception if zoom level doesn't match expected value
+     * For complete usage guide, see: tests/ZOOM_ENFORCEMENT_GUIDE.md
      */
     public function verifyZoomLevel($expectedZoom) {
         $currentZoom = $this->getModule('WPWebDriver')->executeJS('
