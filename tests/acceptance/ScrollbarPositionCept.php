@@ -14,6 +14,12 @@ $I->wantToTest("Scrollbar position alignment");
 $I->expect("The scrollbar should be positioned at the right edge of the viewport");
 $I->expectTo("See the scrollbar aligned with the right side of the screen");
 
+// Create test post with ChatGPT interface content
+$I->comment('Creating test post for scrollbar position testing');
+$postContent = '<p>This is a test post for scrollbar position verification. The theme will automatically generate the chat interface with proper scrollbar positioning.</p>';
+$postId = $I->cUrlWP_SiteToCreatePost('testpost', $postContent);
+$I->comment('✓ Test post created with ID: ' . $postId);
+
 $I->amOnUrl(AcceptanceConfig::BASE_URL);
 $I->loginAsAdmin();
 $I->amOnPage(AcceptanceConfig::TEST_POST_PAGE);
@@ -50,5 +56,10 @@ $I->assertTrue(
 );
 $I->makeScreenshot('scrollbar-position');
 $I->comment("Screen shot <a href = 'http://localhost/wp-content/themes/ai_style/tests/_output/debug/scrollbar-position.png' target = '_blank'>available here</a>");
+
+// Cleanup test data
+$I->comment('Cleaning up test post');
+$I->cUrlWP_SiteToDeletePost($postId);
+$I->comment('✓ Test post deleted successfully');
 
 // Run this test with the command: "bin/codecept run acceptance ScrollbarPositionCept.php -vvv --html"

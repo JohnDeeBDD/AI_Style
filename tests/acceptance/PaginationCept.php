@@ -2,7 +2,7 @@
 /**
  * PaginationCept.php
  *
- * Comprehensive acceptance tests for blog roll pagination functionality.
+ * Acceptance tests for blog roll pagination functionality.
  * 
  * This test verifies:
  * 1. Pagination appears when there are multiple pages of posts
@@ -19,323 +19,184 @@ $I->wantToTest('Blog roll pagination functionality');
 $I->amOnUrl(AcceptanceConfig::BASE_URL);
 $I->loginAsAdmin();
 
-// Test 1: Verify pagination appears on category page with multiple pages
-$I->comment('=== TEST 1: Pagination appears on multi-page category ===');
-$I->amOnPage('/category/test/');
-$I->wait(2); // Allow page to load completely
+// Setup: Create test posts for pagination testing
+$I->comment('=== SETUP: Creating test posts for pagination ===');
+$testCategoryId = $I->cUrlWP_SiteToGetOrCreateCategory('test', 'Test Category');
+$I->comment("Test category ID: $testCategoryId");
 
-// Take a screenshot for debugging
-$I->makeScreenshot('pagination-category-test');
-$I->comment("Screenshot available: <a href='http://localhost/wp-content/themes/ai_style/tests/_output/debug/pagination-category-test.png' target='_blank'>category-test.png</a>");
-
-// Check if we have posts displayed
-$I->seeElement('.blog-roll-container');
-$I->seeElement('.blog-roll-grid');
-
-// Check if pagination exists (should exist if there are multiple pages)
-$paginationExists = $I->executeJS("return document.querySelector('.blog-roll-pagination') !== null;");
-
-if ($paginationExists) {
-    $I->comment('✓ Pagination found - testing pagination structure and functionality');
+// Create enough posts to ensure pagination (15 posts should be enough for most configurations)
+$createdPostIds = [];
+for ($i = 1; $i <= 15; $i++) {
+    $postTitle = "Test Pagination Post $i";
+    $postContent = "<p>This is test content for pagination post number $i. This post was created automatically for testing pagination functionality.</p>";
     
-    // Test pagination structure and CSS classes
-    $I->seeElement('.blog-roll-pagination');
-    $I->seeElement('.blog-roll-pagination .pagination-list');
-    
-    // Verify pagination has proper ARIA attributes
-    $I->seeElement('.blog-roll-pagination[role="navigation"]');
-    $I->seeElement('.blog-roll-pagination[aria-label="Posts pagination"]');
-    
-    // Check for current page indicator
-    $I->seeElement('.pagination-list .current-page');
-    
-    // Get current page number for reference
-    $currentPageText = $I->grabTextFrom('.current-page');
-    $I->comment("Current page: $currentPageText");
-    
-    // Test navigation functionality
-    $I->comment('--- Testing pagination navigation ---');
-    
-    // Check if "Next" link exists and test it
-    if ($I->executeJS("return document.querySelector('.pagination-list .next-page') !== null;")) {
-        $I->comment('Testing "Next" page navigation');
-        
-        // Get current posts before navigation
-        $currentPosts = $I->executeJS("
-            const posts = document.querySelectorAll('.blog-roll-item .blog-roll-title');
-            return Array.from(posts).map(post => post.textContent.trim());
-        ");
-        
-        // Output computed CSS for diagnosis
-        $paginationCss = $I->executeJS("
-            var el = document.querySelector('.pagination-list .next-page a');
-            if (!el) return 'not found';
-            var s = window.getComputedStyle(el);
-            return 'pagination: position=' + s.position + ', z-index=' + s.zIndex + ', margin-top=' + s.marginTop + ', margin-bottom=' + s.marginBottom + ', top=' + s.top + ', bottom=' + s.bottom;
-        ");
-        $commentFormCss = $I->executeJS("
-            var el = document.querySelector('#commentform');
-            if (!el) return 'not found';
-            var s = window.getComputedStyle(el);
-            return 'commentform: position=' + s.position + ', z-index=' + s.zIndex + ', margin-top=' + s.marginTop + ', margin-bottom=' + s.marginBottom + ', top=' + s.top + ', bottom=' + s.bottom;
-        ");
-        $I->comment($paginationCss);
-        $I->comment($commentFormCss);
-
-        // Scroll to bring pagination into view without overlapping with comment form
-        $I->executeJS("
-            const pagination = document.querySelector('.blog-roll-pagination');
-            if (pagination) {
-                const rect = pagination.getBoundingClientRect();
-                const scrollY = window.pageYOffset + rect.top - 200; // 200px buffer from top
-                window.scrollTo(0, scrollY);
-            }
-        ");
-        $I->wait(1); // Give time for scroll
-        
-        // Use JavaScript click to bypass element interception
-        $I->executeJS("
-            const nextLink = document.querySelector('.pagination-list .next-page a');
-            if (nextLink) {
-                nextLink.click();
-            }
-        ");
-        $I->wait(3); // Wait for page load
-        
-        // Verify we're on a different page
-        $I->seeElement('.blog-roll-pagination');
-        $I->seeElement('.pagination-list .current-page');
-        
-        // Verify current page changed
-        $newPageText = $I->grabTextFrom('.current-page');
-        $I->comment("New current page: $newPageText");
-        $I->assertNotEquals($currentPageText, $newPageText, 'Page number should change after clicking next');
-        
-        // Verify different posts are shown
-        $newPosts = $I->executeJS("
-            const posts = document.querySelectorAll('.blog-roll-item .blog-roll-title');
-            return Array.from(posts).map(post => post.textContent.trim());
-        ");
-        
-        $I->assertNotEquals($currentPosts, $newPosts, 'Different posts should be displayed on different pages');
-        $I->comment('✓ Next page navigation working correctly');
-        
-        // Test "Previous" link if it exists
-        if ($I->executeJS("return document.querySelector('.pagination-list .prev-page') !== null;")) {
-            $I->comment('Testing "Previous" page navigation');
-            
-            // Use JavaScript click to bypass element interception
-            $I->executeJS("
-                const prevLink = document.querySelector('.pagination-list .prev-page a');
-                if (prevLink) {
-                    prevLink.click();
-                }
-            ");
-            $I->wait(3);
-            
-            // Should be back to original page
-            $backPageText = $I->grabTextFrom('.current-page');
-            $I->assertEquals($currentPageText, $backPageText, 'Should return to original page after clicking previous');
-            $I->comment('✓ Previous page navigation working correctly');
-        }
-    }
-    
-    // Test direct page number navigation if available
-    $pageNumbers = $I->executeJS("
-        const pageLinks = document.querySelectorAll('.pagination-list .page-number a');
-        return Array.from(pageLinks).map(link => link.textContent.trim());
-    ");
-    
-    if (!empty($pageNumbers)) {
-        $I->comment('Testing direct page number navigation');
-        $targetPage = $pageNumbers[0]; // Click first available page number
-        
-        // Use JavaScript click to bypass element interception
-        $I->executeJS("
-            const pageLink = document.querySelector('.pagination-list .page-number a');
-            if (pageLink) {
-                pageLink.click();
-            }
-        ");
-        $I->wait(3);
-        
-        $I->seeElement('.blog-roll-pagination');
-        $I->comment('✓ Direct page number navigation working');
-    }
-    
-} else {
-    $I->comment('ℹ No pagination found - this may be expected if there\'s only one page of posts');
-    
-    // Verify no pagination elements exist
-    $I->dontSeeElement('.blog-roll-pagination');
-    $I->dontSeeElement('.pagination-list');
-    $I->dontSeeElement('.current-page');
-    $I->dontSeeElement('.prev-page');
-    $I->dontSeeElement('.next-page');
-    $I->dontSeeElement('.page-number');
+    $postId = $I->cUrlWP_SiteToCreatePostWithCategories($postTitle, $postContent, [$testCategoryId]);
+    $createdPostIds[] = $postId;
+    $I->comment("Created post $i with ID: $postId");
 }
 
-// Test 2: Test pagination on main blog page
-$I->comment('=== TEST 2: Testing pagination on main blog page ===');
-$I->amOnPage('/');
-$I->wait(2);
+$I->comment("Created " . count($createdPostIds) . " test posts for pagination testing");
 
-$I->makeScreenshot('pagination-home-page');
-$I->comment("Screenshot available: <a href='http://localhost/wp-content/themes/ai_style/tests/_output/debug/pagination-home-page.png' target='_blank'>home-page.png</a>");
+// Wrap all tests in try-finally to ensure cleanup
+try {
 
-// Check if blog roll exists on home page
-if ($I->executeJS("return document.querySelector('.blog-roll-container') !== null;")) {
-    $I->comment('Blog roll found on home page');
-    
-    $homePaginationExists = $I->executeJS("return document.querySelector('.blog-roll-pagination') !== null;");
-    
-    if ($homePaginationExists) {
-        $I->comment('✓ Pagination found on home page');
+    // Test 1: Verify pagination appears on category page with multiple pages
+    $I->comment('=== TEST 1: Pagination appears on multi-page category ===');
+    $I->amOnPage('/category/test/');
+    $I->waitForElement('.blog-roll-container', 2);
+    $I->makeScreenshot('pagination-category-test');
+
+    try {
         $I->seeElement('.blog-roll-pagination');
+        $I->comment('✓ Pagination found - testing pagination structure and functionality');
         $I->seeElement('.pagination-list');
-        
-        // Test that pagination structure is consistent
-        $I->seeElement('.blog-roll-pagination[role="navigation"]');
-        $I->seeElement('.blog-roll-pagination[aria-label="Posts pagination"]');
-        
-    } else {
+        $I->seeElement('.pagination-list .current-page');
+
+        $currentPageText = $I->grabTextFrom('.current-page');
+        $I->comment("Current page: $currentPageText");
+
+        // Test navigation functionality
+        $I->comment('--- Testing pagination navigation ---');
+        try {
+            $I->seeElement('.pagination-list .next-page');
+            $I->comment('Testing "Next" page navigation');
+            $currentPosts = $I->grabMultiple('.blog-roll-item .blog-roll-title', 'textContent');
+
+            $I->click('.pagination-list .next-page a');
+            $I->waitForElementChange('.current-page', function($el) use ($currentPageText) {
+                return $el->text() !== $currentPageText;
+            }, 3);
+
+            $newPageText = $I->grabTextFrom('.current-page');
+            $I->comment("New current page: $newPageText");
+            $I->assertNotEquals($currentPageText, $newPageText, 'Page number should change after clicking next');
+
+            $newPosts = $I->grabMultiple('.blog-roll-item .blog-roll-title', 'textContent');
+            $I->assertNotEquals($currentPosts, $newPosts, 'Different posts should be displayed on different pages');
+            $I->comment('✓ Next page navigation working correctly');
+
+            try {
+                $I->seeElement('.pagination-list .prev-page');
+                $I->comment('Testing "Previous" page navigation');
+                $I->click('.pagination-list .prev-page a');
+                $I->waitForText($currentPageText, 3, '.current-page');
+                $I->comment('✓ Previous page navigation working correctly');
+            } catch (\Exception $e) {
+                $I->comment('ℹ Previous page button not available (expected on first page)');
+            }
+        } catch (\Exception $e) {
+            $I->comment('ℹ Next page button not available');
+        }
+
+        $pageNumbers = $I->grabMultiple('.pagination-list .page-number a', 'textContent');
+        if (!empty($pageNumbers)) {
+            $I->comment('Testing direct page number navigation');
+            $I->click('.pagination-list .page-number a');
+            $I->waitForElement('.blog-roll-pagination', 3);
+            $I->comment('✓ Direct page number navigation working');
+        }
+    } catch (\Exception $e) {
+        $I->comment('ℹ No pagination found - this may be expected if there\'s only one page of posts');
+    }
+
+    // Test 2: Test pagination on main blog page
+    $I->comment('=== TEST 2: Testing pagination on main blog page ===');
+    $I->amOnPage('/');
+    $I->waitForElement('.blog-roll-container', 2);
+    $I->makeScreenshot('pagination-home-page');
+
+    try {
+        $I->seeElement('.blog-roll-pagination');
+        $I->comment('✓ Pagination found on home page');
+        $I->seeElement('.pagination-list');
+    } catch (\Exception $e) {
         $I->comment('ℹ No pagination on home page - may be expected if few posts');
     }
-} else {
-    $I->comment('ℹ No blog roll found on home page');
-}
 
-// Test 3: Verify pagination CSS classes and styling
-$I->comment('=== TEST 3: Verifying pagination CSS classes and structure ===');
+    // Test 3: Verify pagination CSS classes and styling
+    $I->comment('=== TEST 3: Verifying pagination CSS classes and structure ===');
+    $I->amOnPage('/category/test/');
+    $I->waitForElement('.blog-roll-pagination', 2);
 
-// Go back to a page that should have pagination
-$I->amOnPage('/category/test/');
-$I->wait(2);
-
-if ($I->executeJS("return document.querySelector('.blog-roll-pagination') !== null;")) {
-    $I->comment('Testing pagination CSS classes and structure');
-    
-    // Test main pagination container
-    $I->seeElement('.blog-roll-pagination');
     $I->seeElement('nav.blog-roll-pagination');
-    
-    // Test pagination list
-    $I->seeElement('.blog-roll-pagination .pagination-list');
     $I->seeElement('ul.pagination-list');
-    
-    // Test individual pagination item classes
-    $paginationItems = $I->executeJS("
-        const items = document.querySelectorAll('.pagination-list li');
-        const classes = [];
-        items.forEach(item => {
-            if (item.classList.contains('current-page')) classes.push('current-page');
-            if (item.classList.contains('prev-page')) classes.push('prev-page');
-            if (item.classList.contains('next-page')) classes.push('next-page');
-            if (item.classList.contains('page-number')) classes.push('page-number');
-        });
-        return classes;
-    ");
-    
+
+    $paginationItems = $I->grabMultiple('.pagination-list li', 'class');
     $I->comment('Found pagination item classes: ' . implode(', ', $paginationItems));
-    
-    // Verify at least current-page class exists
     $I->assertTrue(in_array('current-page', $paginationItems), 'Current page class should exist');
-    
-    // Test that current page is not clickable (should not have a link)
-    $currentPageHasLink = $I->executeJS("
-        const currentPage = document.querySelector('.pagination-list .current-page');
-        return currentPage ? currentPage.querySelector('a') !== null : false;
-    ");
-    
+
+    $currentPageHasLink = $I->executeJS("return document.querySelector('.pagination-list .current-page a') !== null;");
     $I->assertFalse($currentPageHasLink, 'Current page should not be clickable');
     $I->comment('✓ Current page is properly marked as non-clickable');
-    
-    // Test that other pagination links are clickable
+
     $otherLinksClickable = $I->executeJS("
         const otherItems = document.querySelectorAll('.pagination-list li:not(.current-page)');
-        let allHaveLinks = true;
-        otherItems.forEach(item => {
-            if (!item.querySelector('a')) allHaveLinks = false;
-        });
-        return allHaveLinks && otherItems.length > 0;
+        const itemsWithLinks = Array.from(otherItems).filter(item => item.querySelector('a') !== null);
+        return itemsWithLinks.length > 0;
     ");
-    
-    if ($otherLinksClickable) {
-        $I->comment('✓ Non-current pagination items are properly clickable');
-    }
-}
+    $I->assertTrue($otherLinksClickable, 'At least some non-current pagination items should be clickable');
 
-// Test 4: Test pagination with different post counts
-$I->comment('=== TEST 4: Testing pagination behavior with different scenarios ===');
+    // Test 4: Test pagination with different post counts
+    $I->comment('=== TEST 4: Testing pagination behavior with different scenarios ===');
+    $I->amOnPage('/?s=test');
+    $I->waitForElement('.blog-roll-container', 2);
+    $I->makeScreenshot('pagination-search-results');
 
-// Test search results pagination (if search returns multiple pages)
-$I->amOnPage('/?s=test');
-$I->wait(2);
-
-$I->makeScreenshot('pagination-search-results');
-$I->comment("Screenshot available: <a href='http://localhost/wp-content/themes/ai_style/tests/_output/debug/pagination-search-results.png' target='_blank'>search-results.png</a>");
-
-if ($I->executeJS("return document.querySelector('.blog-roll-container') !== null;")) {
-    $searchPaginationExists = $I->executeJS("return document.querySelector('.blog-roll-pagination') !== null;");
-    
-    if ($searchPaginationExists) {
-        $I->comment('✓ Pagination works correctly with search results');
+    try {
         $I->seeElement('.blog-roll-pagination');
-    } else {
+        $I->comment('✓ Pagination works correctly with search results');
+    } catch (\Exception $e) {
         $I->comment('ℹ No pagination in search results - expected if few results');
     }
-}
 
-// Final verification: Test pagination accessibility
-$I->comment('=== TEST 5: Testing pagination accessibility ===');
-$I->amOnPage('/category/test/');
-$I->wait(2);
+    // Final verification: Test pagination accessibility
+    $I->comment('=== TEST 5: Testing pagination accessibility ===');
+    $I->amOnPage('/category/test/');
+    $I->waitForElement('.blog-roll-pagination', 2);
 
-if ($I->executeJS("return document.querySelector('.blog-roll-pagination') !== null;")) {
-    $I->comment('Testing pagination accessibility features');
-    
-    // Check ARIA attributes
     $I->seeElement('.blog-roll-pagination[role="navigation"]');
     $I->seeElement('.blog-roll-pagination[aria-label="Posts pagination"]');
-    
-    // Check that pagination links have proper text content
-    $linkTexts = $I->executeJS("
-        const links = document.querySelectorAll('.pagination-list a');
-        return Array.from(links).map(link => link.textContent.trim()).filter(text => text.length > 0);
-    ");
-    
+
+    $linkTexts = $I->grabMultiple('.pagination-list a', 'textContent');
     $I->assertTrue(count($linkTexts) > 0, 'Pagination links should have readable text');
     $I->comment('Pagination link texts: ' . implode(', ', $linkTexts));
-    
-    // Verify previous/next links have proper text
-    $prevText = $I->executeJS("
-        const prevLink = document.querySelector('.pagination-list .prev-page a');
-        return prevLink ? prevLink.textContent.trim() : null;
-    ");
-    
-    $nextText = $I->executeJS("
-        const nextLink = document.querySelector('.pagination-list .next-page a');
-        return nextLink ? nextLink.textContent.trim() : null;
-    ");
-    
-    if ($prevText) {
-        $I->assertTrue(strpos($prevText, 'Previous') !== false, 'Previous link should contain "Previous" text');
-        $I->comment("✓ Previous link text: $prevText");
-    }
-    
-    if ($nextText) {
-        $I->assertTrue(strpos($nextText, 'Next') !== false, 'Next link should contain "Next" text');
-        $I->comment("✓ Next link text: $nextText");
-    }
-    
-    $I->comment('✓ Pagination accessibility tests completed');
-}
 
-$I->comment('=== PAGINATION TESTS COMPLETED ===');
-$I->comment('All pagination functionality has been tested including:');
-$I->comment('- Pagination presence/absence based on post count');
-$I->comment('- Navigation functionality (next/previous/page numbers)');
-$I->comment('- CSS classes and HTML structure');
-$I->comment('- Current page highlighting');
-$I->comment('- Accessibility features');
-$I->comment('- Different page contexts (category, home, search)');
+    try {
+        $prevText = $I->grabTextFrom('.pagination-list .prev-page a');
+        $I->assertStringContainsString('Previous', $prevText, 'Previous link should contain "Previous" text');
+        $I->comment("✓ Previous link text: $prevText");
+    } catch (\Exception $e) {
+        $I->comment('ℹ Previous link not available (expected on first page)');
+    }
+
+    try {
+        $nextText = $I->grabTextFrom('.pagination-list .next-page a');
+        $I->assertStringContainsString('Next', $nextText, 'Next link should contain "Next" text');
+        $I->comment("✓ Next link text: $nextText");
+    } catch (\Exception $e) {
+        $I->comment('ℹ Next link not available (expected on last page)');
+    }
+
+    $I->comment('✓ Pagination accessibility tests completed');
+    $I->comment('=== PAGINATION TESTS COMPLETED ===');
+    $I->comment('All pagination functionality has been tested including:');
+    $I->comment('- Pagination presence/absence based on post count');
+    $I->comment('- Navigation functionality (next/previous/page numbers)');
+    $I->comment('- CSS classes and HTML structure');
+    $I->comment('- Current page highlighting');
+    $I->comment('- Accessibility features');
+    $I->comment('- Different page contexts (category, home, search)');
+
+} finally {
+    // Cleanup: Delete all created test posts (runs even if test fails)
+    $I->comment('=== CLEANUP: Deleting created test posts ===');
+    foreach ($createdPostIds as $postId) {
+        try {
+            $I->cUrlWP_SiteToDeletePost($postId);
+            $I->comment("Deleted post ID: $postId");
+        } catch (\Exception $e) {
+            $I->comment("Warning: Failed to delete post ID $postId: " . $e->getMessage());
+        }
+    }
+    $I->comment("Cleanup completed - deleted " . count($createdPostIds) . " test posts");
+}

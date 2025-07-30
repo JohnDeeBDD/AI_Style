@@ -95,28 +95,21 @@ function _unsupported_iterable_to_array(o, minLen) {
     if (n === "Map" || n === "Set") return Array.from(n);
     if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _array_like_to_array(o, minLen);
 }
-function createActionButtonsContainer(t) {
-    if (document.getElementById('action-buttons-container')) return document.getElementById('action-buttons-container');
-    var e = document.createElement('div');
-    e.id = 'action-buttons-container', e.className = 'action-buttons-container';
-    var n = document.querySelector('.comment-form-comment');
-    return n && t.insertBefore(e, n.nextSibling), e;
-}
-function e() {
-    var e = document.getElementById('commentform');
-    e && (e.addEventListener('click', function(t) {
-        t.target === e && commentTextarea.focus();
-    }), createActionButtonsContainer(e), function() {
+function t() {
+    var t = document.getElementById('commentform');
+    t && (t.addEventListener('click', function(e) {
+        e.target === t && commentTextarea.focus();
+    }), function() {
         var t = document.querySelector('.form-submit input[type="submit"]'), e = document.getElementById('comment');
         if (t && e) {
-            var o = document.querySelector('.form-submit');
-            o && (o.style.display = 'flex', o.style.alignItems = 'center'), e.addEventListener('input', function() {
+            var n = document.querySelector('.form-submit');
+            n && (n.style.display = 'flex', n.style.alignItems = 'center'), e.addEventListener('input', function() {
                 '' === this.value.trim() ? (t.style.opacity = '0.6', t.style.cursor = 'default') : (t.style.opacity = '1', t.style.cursor = 'pointer');
             }), '' === e.value.trim() && (t.style.opacity = '0.6', t.style.cursor = 'default');
         }
     }());
 }
-function e1() {
+function e() {
     console.log("Applying right justification to one-liner comments"), document.querySelectorAll('.interlocutor-message').forEach(function(e) {
         var t = e.querySelector('.message-content');
         if (t) {
@@ -142,7 +135,7 @@ function e1() {
         subtree: !0
     });
 }
-function e2(e) {
+function e1(e) {
     if ('function' == typeof window.mmd) try {
         return window.mmd(e);
     } catch (n) {
@@ -162,7 +155,7 @@ function addInterlocutorMessage(o) {
     var r = 'message-' + Date.now(), a = document.createElement('div');
     a.className = 'message interlocutor-message', a.id = r;
     var s = document.createElement('div');
-    s.className = 'message-content', s.id = 'message-content-' + r, s.innerHTML = e2(o), a.appendChild(s), t.appendChild(a), n();
+    s.className = 'message-content', s.id = 'message-content-' + r, s.innerHTML = e1(o), a.appendChild(s), t.appendChild(a), n();
 }
 function addRespondentMessage(o) {
     var t = document.getElementById('chat-messages');
@@ -170,7 +163,7 @@ function addRespondentMessage(o) {
     var r = 'message-' + Date.now(), a = document.createElement('div');
     a.className = 'message respondent-message', a.id = r;
     var s = document.createElement('div');
-    s.className = 'message-content', s.id = 'message-content-' + r, s.innerHTML = e2(o), a.appendChild(s), t.appendChild(a), n();
+    s.className = 'message-content', s.id = 'message-content-' + r, s.innerHTML = e1(o), a.appendChild(s), t.appendChild(a), n();
 }
 function n() {
     var e = document.querySelector('#scrollable-content');
@@ -181,7 +174,7 @@ function clearMessages() {
     if (!e) return void console.error('Chat messages container not found');
     for(; e.firstChild;)e.removeChild(e.firstChild);
 }
-var t = new (/*#__PURE__*/ function() {
+var t1 = new (/*#__PURE__*/ function() {
     function t() {
         _class_call_check(this, t), this.data = {};
     }
@@ -290,14 +283,14 @@ function toggleSidebarVisibility() {
     if (i.isAnimating) return void console.log('Sidebar animation in progress, ignoring toggle request');
     var n = document.getElementById('chat-sidebar');
     if (!n) return void console.warn('Sidebar element not found');
-    i.isAnimating = !0, i.isVisible ? e3(n) : t1(n), i.isVisible = !i.isVisible, console.log('Toggled sidebar visibility. New state:', i.isVisible ? 'visible' : 'hidden');
+    i.isAnimating = !0, i.isVisible ? e2(n) : t2(n), i.isVisible = !i.isVisible, console.log('Toggled sidebar visibility. New state:', i.isVisible ? 'visible' : 'hidden');
 }
-function e3(e) {
+function e2(e) {
     e.classList.add('sidebar-transitioning'), e.style.width = '0', e.style.minWidth = '0', e.style.overflow = 'hidden', e.style.paddingLeft = '0', e.style.paddingRight = '0', n1(!0), setTimeout(function() {
         e.classList.remove('sidebar-transitioning'), e.classList.add('sidebar-hidden'), i.isAnimating = !1;
     }, 300);
 }
-function t1(e) {
+function t2(e) {
     e.classList.remove('sidebar-hidden'), e.classList.add('sidebar-transitioning'), e.style.width = i.originalWidth, e.style.minWidth = i.originalWidth, e.style.overflow = 'hidden', e.style.paddingLeft = '16px', e.style.paddingRight = '16px', n1(!1), setTimeout(function() {
         e.classList.remove('sidebar-transitioning'), e.style.overflow = 'auto', i.isAnimating = !1;
     }, 300);
@@ -316,12 +309,12 @@ function overrideHoverBehavior(e) {
     var n = document.createElement('style');
     return n.textContent = "\n    #wp-admin-bar-new-content .ab-sub-wrapper {\n      display: none !important;\n    }\n    #wp-admin-bar-new-content:hover .ab-sub-wrapper {\n      display: none !important;\n    }\n  ", document.head.appendChild(n), o;
 }
-function overrideClickBehavior(t1) {
-    var a = t1.querySelector('a.ab-item');
+function overrideClickBehavior(t) {
+    var a = t.querySelector('a.ab-item');
     if (!a) return void console.warn('Admin bar "New" button link not found');
-    a.addEventListener('click', function(t1) {
-        t1.preventDefault(), t1.stopPropagation(), console.log('New button clicked'), clearMessages();
-        var a = t.getPostId(), i = AIStyleSettings.nonce;
+    a.addEventListener('click', function(t) {
+        t.preventDefault(), t.stopPropagation(), console.log('New button clicked'), clearMessages();
+        var a = t1.getPostId(), i = AIStyleSettings.nonce;
         if (console.log("nonce:", i), a && i) {
             var r1 = new FormData();
             r1.append('post_id', a), r1.append('nonce', i), r(a, r1, "/wp-json/cacbot/v1/unlink-conversation").then(function(e) {
@@ -369,8 +362,8 @@ function i1() {
     }
 }
 function o(o) {
-    if ((o = parseInt(o, 10)) === parseInt(t.get('linked_post_id'), 10)) return void console.log('Clicked post is already the current linked post');
-    var e = t.getPostId(), i = AIStyleSettings.nonce, c = new FormData();
+    if ((o = parseInt(o, 10)) === parseInt(t1.get('linked_post_id'), 10)) return void console.log('Clicked post is already the current linked post');
+    var e = t1.getPostId(), i = AIStyleSettings.nonce, c = new FormData();
     c.append('nonce', i), c.append('post_id', e), c.append('linked_post_id', o), r(e, c, "/wp-json/cacbot/v1/link-conversation").then(function(t) {
         console.log('conversation successfully linked:', t), window.location.reload();
     }).catch(function(t) {
@@ -384,7 +377,7 @@ function initSidebarClickListeners() {
         });
     });
 }
-function e4() {
+function e3() {
     var e = null, t = !0, o = !1, n = void 0;
     try {
         for(var l, m = [
@@ -423,7 +416,7 @@ function e4() {
         }), console.log('Focus set to last comment:', e);
     } else console.log('No comments found on the page');
 }
-function t2(t) {
+function t3(t) {
     var n, e;
     return Promise.all([
         (n = t, fetch("/wp-json/wp/v2/posts/".concat(n)).then(function(t) {
@@ -495,7 +488,7 @@ function o1() {
                 if (!isNaN(a)) {
                     o.preventDefault();
                     var c = document.querySelector('.entry-content');
-                    c && (c.innerHTML = '<div class="loading">Loading post content...</div>'), t2(a).then(function(t) {
+                    c && (c.innerHTML = '<div class="loading">Loading post content...</div>'), t3(a).then(function(t) {
                         updatePostUI(t), window.scrollTo(0, 0);
                     }).catch(function(t) {
                         console.error('Error navigating to post:', t), c && (c.innerHTML = '<div class="error">Error loading post: '.concat(t.message, "</div>"));
@@ -504,17 +497,17 @@ function o1() {
             }
         }
     }), window.addEventListener('popstate', function(o) {
-        o.state && o.state.postId && t2(o.state.postId).then(updatePostUI).catch(function(t) {
+        o.state && o.state.postId && t3(o.state.postId).then(updatePostUI).catch(function(t) {
             console.error('Error handling history navigation:', t);
         });
     });
 }
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('ai-style.js is loaded!'), e(), e1();
+    console.log('ai-style.js is loaded!'), t(), e();
     try {
-        t.initialize(window.cacbot_data || {}), window.cacbotData = t, console.log(t.getAll());
+        t1.initialize(window.cacbot_data || {}), window.cacbotData = t1, console.log(t1.getAll());
     } catch (o) {
         console.error("Failed to initialize cacbotData:", o);
     }
-    window.addInterlocutorMessage = addInterlocutorMessage, window.addRespondentMessage = addRespondentMessage, window.clearMessages = clearMessages, console.log('Chat message functions are available globally:'), console.log('- addInterlocutorMessage(message)'), console.log('- addRespondentMessage(message)'), console.log('- clearMessages()'), initToggleSidebar(), i1(), o1(), initSidebarClickListeners(), console.log('Toggle sidebar functions are available globally:'), console.log('- toggleSidebarVisibility()'), console.log('- isSidebarVisible()'), console.log('- showSidebar()'), console.log('- hideSidebar()'), console.log('Admin bar customization functions are available globally:'), console.log('- overrideHoverBehavior(newButton)'), console.log('- overrideClickBehavior(newButton)'), console.log('- addSidebarToggleButton()'), console.log('- updateToggleButton(iconElement, labelElement)'), console.log('- initializeZoomDetection()'), e4();
+    window.addInterlocutorMessage = addInterlocutorMessage, window.addRespondentMessage = addRespondentMessage, window.clearMessages = clearMessages, console.log('Chat message functions are available globally:'), console.log('- addInterlocutorMessage(message)'), console.log('- addRespondentMessage(message)'), console.log('- clearMessages()'), initToggleSidebar(), i1(), o1(), initSidebarClickListeners(), console.log('Toggle sidebar functions are available globally:'), console.log('- toggleSidebarVisibility()'), console.log('- isSidebarVisible()'), console.log('- showSidebar()'), console.log('- hideSidebar()'), console.log('Admin bar customization functions are available globally:'), console.log('- overrideHoverBehavior(newButton)'), console.log('- overrideClickBehavior(newButton)'), console.log('- addSidebarToggleButton()'), console.log('- updateToggleButton(iconElement, labelElement)'), console.log('- initializeZoomDetection()'), e3();
 });

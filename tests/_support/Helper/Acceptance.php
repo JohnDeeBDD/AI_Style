@@ -1,6 +1,11 @@
 <?php
 namespace Helper;
 
+/**
+ * Acceptance Helper
+ *
+ * @method \Codeception\Module\WPWebDriver getModule(string $name) Get a module instance
+ */
 class Acceptance extends \Codeception\Module{
 
     private $hostname = "";
@@ -157,6 +162,410 @@ class Acceptance extends \Codeception\Module{
         if (abs($currentZoomFloat - $expectedZoomFloat) > 0.01) {
             throw new \Exception("Zoom level mismatch. Expected: $expectedZoom, Actual: $currentZoom");
         }
+    }
+
+    public function cUrlWP_SiteToCreatePost($post_title, $post_content){
+        // Read configuration from JSON file
+        $config_file = __DIR__ . '/../../../localhost_wordpress_api_config.json';
+        if (!file_exists($config_file)) {
+            throw new \Exception("Configuration file not found: $config_file");
+        }
+        
+        $config = json_decode(file_get_contents($config_file), true);
+        if (!$config) {
+            throw new \Exception("Failed to parse configuration file");
+        }
+        
+        // Prepare the API endpoint
+        $api_url = rtrim($config['site'], '/') . '/wp-json/wp/v2/posts';
+        
+        // Prepare post data
+        $post_data = [
+            'title' => $post_title,
+            'content' => $post_content,
+            'status' => 'publish'
+        ];
+        
+        // Initialize cURL
+        $ch = curl_init();
+        
+        // Set cURL options
+        curl_setopt_array($ch, [
+            CURLOPT_URL => $api_url,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => json_encode($post_data),
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: application/json',
+                'Authorization: Basic ' . base64_encode($config['username'] . ':' . $config['application_password'])
+            ],
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_SSL_VERIFYPEER => false, // For localhost testing
+            CURLOPT_SSL_VERIFYHOST => false  // For localhost testing
+        ]);
+        
+        // Execute the request
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curl_error = curl_error($ch);
+        
+        curl_close($ch);
+        
+        // Check for cURL errors
+        if ($curl_error) {
+            throw new \Exception("cURL error: $curl_error");
+        }
+        
+        // Check HTTP response code
+        if ($http_code !== 201) {
+            throw new \Exception("HTTP error $http_code. Response: $response");
+        }
+        
+        // Parse response
+        $response_data = json_decode($response, true);
+        if (!$response_data || !isset($response_data['id'])) {
+            throw new \Exception("Invalid response format: $response");
+        }
+        
+        $post_id = $response_data['id'];
+
+        return $post_id;
+    }
+
+    public function cUrlWP_SiteToDeletePost($post_id){
+        // Read configuration from JSON file
+        $config_file = __DIR__ . '/../../../localhost_wordpress_api_config.json';
+        if (!file_exists($config_file)) {
+            throw new \Exception("Configuration file not found: $config_file");
+        }
+        
+        $config = json_decode(file_get_contents($config_file), true);
+        if (!$config) {
+            throw new \Exception("Failed to parse configuration file");
+        }
+        
+        // Prepare the API endpoint for deleting a specific post with force delete
+        $api_url = rtrim($config['site'], '/') . '/wp-json/wp/v2/posts/' . $post_id . '?force=true';
+        
+        // Initialize cURL
+        $ch = curl_init();
+        
+        // Set cURL options for DELETE request
+        curl_setopt_array($ch, [
+            CURLOPT_URL => $api_url,
+            CURLOPT_CUSTOMREQUEST => 'DELETE',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: application/json',
+                'Authorization: Basic ' . base64_encode($config['username'] . ':' . $config['application_password'])
+            ],
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_SSL_VERIFYPEER => false, // For localhost testing
+            CURLOPT_SSL_VERIFYHOST => false  // For localhost testing
+        ]);
+        
+        // Execute the request
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curl_error = curl_error($ch);
+        
+        curl_close($ch);
+        
+        // Check for cURL errors
+        if ($curl_error) {
+            throw new \Exception("cURL error: $curl_error");
+        }
+        
+        // Check HTTP response code (200 for successful deletion with response data, 204 for no content)
+        if ($http_code !== 200 && $http_code !== 204) {
+            throw new \Exception("HTTP error $http_code. Response: $response");
+        }
+        
+        // Parse response if there is content
+        if ($http_code === 200 && !empty($response)) {
+            $response_data = json_decode($response, true);
+            if (!$response_data) {
+                throw new \Exception("Invalid response format: $response");
+            }
+            return $response_data;
+        }
+        
+        // Return true for successful deletion with no content (204)
+        return true;
+    }
+
+    /**
+     * Get category ID by slug, create if it doesn't exist
+     * @param string $category_slug The category slug
+     * @param string $category_name The category name (optional, defaults to slug)
+     * @return int The category ID
+     */
+    public function cUrlWP_SiteToGetOrCreateCategory($category_slug, $category_name = null) {
+        if ($category_name === null) {
+            $category_name = ucfirst($category_slug);
+        }
+        
+        // Read configuration from JSON file
+        $config_file = __DIR__ . '/../../../localhost_wordpress_api_config.json';
+        if (!file_exists($config_file)) {
+            throw new \Exception("Configuration file not found: $config_file");
+        }
+        
+        $config = json_decode(file_get_contents($config_file), true);
+        if (!$config) {
+            throw new \Exception("Failed to parse configuration file");
+        }
+        
+        // First, try to get existing category by slug
+        $api_url = rtrim($config['site'], '/') . '/wp-json/wp/v2/categories?slug=' . urlencode($category_slug);
+        
+        $ch = curl_init();
+        curl_setopt_array($ch, [
+            CURLOPT_URL => $api_url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: application/json',
+                'Authorization: Basic ' . base64_encode($config['username'] . ':' . $config['application_password'])
+            ],
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false
+        ]);
+        
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curl_error = curl_error($ch);
+        curl_close($ch);
+        
+        if ($curl_error) {
+            throw new \Exception("cURL error: $curl_error");
+        }
+        
+        if ($http_code === 200) {
+            $categories = json_decode($response, true);
+            if (!empty($categories) && isset($categories[0]['id'])) {
+                return $categories[0]['id'];
+            }
+        }
+        
+        // Category doesn't exist, create it
+        $api_url = rtrim($config['site'], '/') . '/wp-json/wp/v2/categories';
+        $category_data = [
+            'name' => $category_name,
+            'slug' => $category_slug
+        ];
+        
+        $ch = curl_init();
+        curl_setopt_array($ch, [
+            CURLOPT_URL => $api_url,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => json_encode($category_data),
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: application/json',
+                'Authorization: Basic ' . base64_encode($config['username'] . ':' . $config['application_password'])
+            ],
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false
+        ]);
+        
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curl_error = curl_error($ch);
+        curl_close($ch);
+        
+        if ($curl_error) {
+            throw new \Exception("cURL error: $curl_error");
+        }
+        
+        if ($http_code !== 201) {
+            throw new \Exception("HTTP error $http_code creating category. Response: $response");
+        }
+        
+        $response_data = json_decode($response, true);
+        if (!$response_data || !isset($response_data['id'])) {
+            throw new \Exception("Invalid response format: $response");
+        }
+        
+        return $response_data['id'];
+    }
+
+    /**
+     * Create a post with categories
+     * @param string $post_title The post title
+     * @param string $post_content The post content
+     * @param array $category_ids Array of category IDs to assign to the post
+     * @return int The created post ID
+     */
+    public function cUrlWP_SiteToCreatePostWithCategories($post_title, $post_content, $category_ids = []) {
+        // Read configuration from JSON file
+        $config_file = __DIR__ . '/../../../localhost_wordpress_api_config.json';
+        if (!file_exists($config_file)) {
+            throw new \Exception("Configuration file not found: $config_file");
+        }
+        
+        $config = json_decode(file_get_contents($config_file), true);
+        if (!$config) {
+            throw new \Exception("Failed to parse configuration file");
+        }
+        
+        // Prepare the API endpoint
+        $api_url = rtrim($config['site'], '/') . '/wp-json/wp/v2/posts';
+        
+        // Prepare post data
+        $post_data = [
+            'title' => $post_title,
+            'content' => $post_content,
+            'status' => 'publish'
+        ];
+        
+        // Add categories if provided
+        if (!empty($category_ids)) {
+            $post_data['categories'] = $category_ids;
+        }
+        
+        // Initialize cURL
+        $ch = curl_init();
+        
+        // Set cURL options
+        curl_setopt_array($ch, [
+            CURLOPT_URL => $api_url,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => json_encode($post_data),
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: application/json',
+                'Authorization: Basic ' . base64_encode($config['username'] . ':' . $config['application_password'])
+            ],
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_SSL_VERIFYPEER => false, // For localhost testing
+            CURLOPT_SSL_VERIFYHOST => false  // For localhost testing
+        ]);
+        
+        // Execute the request
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curl_error = curl_error($ch);
+        
+        curl_close($ch);
+        
+        // Check for cURL errors
+        if ($curl_error) {
+            throw new \Exception("cURL error: $curl_error");
+        }
+        
+        // Check HTTP response code
+        if ($http_code !== 201) {
+            throw new \Exception("HTTP error $http_code. Response: $response");
+        }
+        
+        // Parse response
+        $response_data = json_decode($response, true);
+        if (!$response_data || !isset($response_data['id'])) {
+            throw new \Exception("Invalid response format: $response");
+        }
+        
+        $post_id = $response_data['id'];
+
+        return $post_id;
+    }
+
+    /**
+     * Add an approved comment to a post via WordPress REST API
+     * @param int $postID The ID of the post to comment on
+     * @param array $commentData Array containing comment data (content, author_name, author_email, etc.)
+     * @return int The created comment ID
+     */
+    public function cUrlWP_SiteToAddComment($postID, $commentData) {
+        // Read configuration from JSON file
+        $config_file = __DIR__ . '/../../../localhost_wordpress_api_config.json';
+        if (!file_exists($config_file)) {
+            throw new \Exception("Configuration file not found: $config_file");
+        }
+        
+        $config = json_decode(file_get_contents($config_file), true);
+        if (!$config) {
+            throw new \Exception("Failed to parse configuration file");
+        }
+        
+        // Prepare the API endpoint
+        $api_url = rtrim($config['site'], '/') . '/wp-json/wp/v2/comments';
+        
+        // Prepare comment data with required fields
+        $comment_data = [
+            'post' => $postID,
+            'content' => $commentData['content'] ?? '',
+            'status' => 'approved' // Set comment as approved
+        ];
+        
+        // Add optional fields if provided
+        if (isset($commentData['author_name'])) {
+            $comment_data['author_name'] = $commentData['author_name'];
+        }
+        
+        if (isset($commentData['author_email'])) {
+            $comment_data['author_email'] = $commentData['author_email'];
+        }
+        
+        if (isset($commentData['author_url'])) {
+            $comment_data['author_url'] = $commentData['author_url'];
+        }
+        
+        if (isset($commentData['parent'])) {
+            $comment_data['parent'] = $commentData['parent'];
+        }
+        
+        // Initialize cURL
+        $ch = curl_init();
+        
+        // Set cURL options
+        curl_setopt_array($ch, [
+            CURLOPT_URL => $api_url,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => json_encode($comment_data),
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: application/json',
+                'Authorization: Basic ' . base64_encode($config['username'] . ':' . $config['application_password'])
+            ],
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_SSL_VERIFYPEER => false, // For localhost testing
+            CURLOPT_SSL_VERIFYHOST => false  // For localhost testing
+        ]);
+        
+        // Execute the request
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curl_error = curl_error($ch);
+        
+        curl_close($ch);
+        
+        // Check for cURL errors
+        if ($curl_error) {
+            throw new \Exception("cURL error: $curl_error");
+        }
+        
+        // Check HTTP response code
+        if ($http_code !== 201) {
+            throw new \Exception("HTTP error $http_code. Response: $response");
+        }
+        
+        // Parse response
+        $response_data = json_decode($response, true);
+        if (!$response_data || !isset($response_data['id'])) {
+            throw new \Exception("Invalid response format: $response");
+        }
+        
+        $comment_id = $response_data['id'];
+
+        return $comment_id;
     }
 
 }

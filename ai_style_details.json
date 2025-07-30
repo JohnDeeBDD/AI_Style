@@ -1,9 +1,9 @@
 {
     "name" : "AI Style",
-    "version" : "25",
+    "version" : "29",
     "details_url": "https://cabot.com/",
     "download_url" : "https://cacbot.com/wp-content/uploads/ai_style.zip",
     "sections" : {
-        "description" : "Talk to the Aions homie."
+        "description" : "Open AI's Chat-GPT, Google's Gemini, and xAI's Grok all share a common style, which is the 'AI Style'. Now you can deploy an AI Style website directly on your WordPress site with the AI_Style WordPress theme! This fully function theme incorporates generic styling inspired by the latest crop of AI chat interface websites. While AI_Style can be used by itself as a traditional WordPress theme, it's recommended you actually turn on the AI by installing the Cacbot plugin."
     }
 }

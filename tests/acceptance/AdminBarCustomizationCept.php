@@ -12,6 +12,13 @@
 $I = new AcceptanceTester($scenario);
 
 $I->wantToTest('Admin bar customization functionality');
+
+// Create test post with ChatGPT interface content
+$I->comment('Creating test post for admin bar customization testing');
+$postContent = '<p>This is a test post for admin bar customization verification. The theme will automatically generate the chat interface with customized admin bar.</p>';
+$postId = $I->cUrlWP_SiteToCreatePost('testpost', $postContent);
+$I->comment('✓ Test post created with ID: ' . $postId);
+
 $I->amOnUrl(AcceptanceConfig::BASE_URL);
 $I->loginAsAdmin();
 $I->amOnPage(AcceptanceConfig::TEST_POST_PAGE);
@@ -102,3 +109,8 @@ $I->seeElement(AcceptanceConfig::ADMIN_BAR_EDIT);
 
 // Add a comment to explain console log verification limitation
 $I->comment('Note: Console log verification ("New button clicked") requires manual inspection or browser extension');
+
+// Cleanup test data
+$I->comment('Cleaning up test post');
+$I->cUrlWP_SiteToDeletePost($postId);
+$I->comment('✓ Test post deleted successfully');

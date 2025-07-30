@@ -20,17 +20,23 @@ $I->wantToTest('Fixed comment box alignment with scrollable content');
 $I->comment('=== STARTING ALIGNMENT TEST ===');
 $I->comment('This test verifies that the fixed comment box maintains proper horizontal alignment with the chat messages container');
 
-$I->comment('STEP 1: Navigate to test environment and authenticate');
+$I->comment('STEP 1: Create test post with ChatGPT interface content');
+$I->comment('Creating a test post that will render the ChatGPT-like interface');
+$postContent = '<p>This is a test post for the ChatGPT-like interface. The theme will automatically generate the chat container, sidebar, and messaging interface around this content.</p>';
+$postId = $I->cUrlWP_SiteToCreatePost('testpost', $postContent);
+$I->comment('✓ Test post created with ID: ' . $postId);
+
+$I->comment('STEP 2: Navigate to test environment and authenticate');
 $I->comment('Loading the base URL and logging in as admin to access test content');
 $I->amOnUrl(AcceptanceConfig::BASE_URL);
 $I->loginAsAdmin();
 $I->comment('Successfully authenticated as admin user');
 
-$I->comment('STEP 2: Navigate to the test post page');
+$I->comment('STEP 3: Navigate to the test post page');
 $I->comment('Accessing the specific post page that contains the chat interface');
 $I->amOnPage(AcceptanceConfig::TEST_POST_PAGE);
 
-$I->comment('STEP 3: Wait for critical UI elements to load');
+$I->comment('STEP 4: Wait for critical UI elements to load');
 $I->comment('Ensuring all required elements are present before proceeding with alignment tests');
 $I->waitForElementVisible(AcceptanceConfig::CHAT_MESSAGES, 10);
 $I->comment('✓ Chat messages container is visible and ready');
@@ -39,7 +45,7 @@ $I->comment('✓ Fixed comment box is visible and ready');
 $I->waitForElementVisible(AcceptanceConfig::SCROLLABLE_CONTENT, 10);
 $I->comment('✓ Scrollable content container is visible and ready');
 
-$I->comment('STEP 4: Prepare test data by populating chat messages');
+$I->comment('STEP 5: Prepare test data by populating chat messages');
 $I->comment('Clearing any existing messages and adding standardized lorem ipsum content to test alignment');
 $I->comment('This ensures consistent test conditions regardless of previous page state');
 
@@ -77,13 +83,13 @@ $I->comment('Allowing time for DOM updates and message rendering to complete');
 $I->wait(1);
 $I->comment('✓ Message rendering completed');
 
-$I->comment('STEP 5: Capture baseline screenshot for visual reference');
+$I->comment('STEP 6: Capture baseline screenshot for visual reference');
 $I->comment('Taking a screenshot of the current state before performing alignment analysis');
 $I->makeScreenshot('centered_items_before_test');
 $I->comment("📸 Baseline screenshot captured");
 $I->comment("View screenshot: <a href='http://localhost/wp-content/themes/ai_style/tests/_output/debug/centered_items_before_test.png' target='_blank'>centered_items_before_test.png</a>");
 
-$I->comment('STEP 6: Measure element positions and dimensions');
+$I->comment('STEP 7: Measure element positions and dimensions');
 $I->comment('Collecting precise positioning data for all relevant UI elements to analyze alignment');
 
 $positions = $I->executeJS("
@@ -134,7 +140,7 @@ if (isset($positions['error'])) {
     $I->fail('Could not locate required DOM elements for alignment testing');
 }
 
-$I->comment('STEP 7: Create visual alignment indicators for debugging');
+$I->comment('STEP 8: Create visual alignment indicators for debugging');
 $I->comment('Adding colored vertical lines to visually demonstrate the alignment (or misalignment) of elements');
 $I->comment('Red line = Chat messages left edge | Blue line = Fixed comment box left edge');
 
@@ -208,14 +214,14 @@ if ($alignmentTestResult['success']) {
     $I->comment('❌ Failed to create visual indicators: ' . $alignmentTestResult['error']);
 }
 
-$I->comment('STEP 8: Capture screenshot with visual alignment indicators');
+$I->comment('STEP 9: Capture screenshot with visual alignment indicators');
 $I->comment('Taking a screenshot that shows the colored alignment lines for visual verification');
 $I->makeScreenshot('centered_items_alignment_analysis');
 $I->comment("📸 Alignment analysis screenshot captured");
 $I->comment("View screenshot: <a href='http://localhost/wp-content/themes/ai_style/tests/_output/debug/centered_items_alignment_analysis.png' target='_blank'>centered_items_alignment_analysis.png</a>");
 $I->comment("🔍 Look for red and blue vertical lines - they should overlap if elements are properly aligned");
 
-$I->comment('STEP 9: Perform final alignment verification');
+$I->comment('STEP 10: Perform final alignment verification');
 $I->comment('Executing the definitive alignment test to determine pass/fail status');
 
 $finalAlignmentCheck = $I->executeJS("
@@ -284,5 +290,10 @@ if ($finalAlignmentCheck['success']) {
     $I->comment('❌ CRITICAL ERROR: ' . $finalAlignmentCheck['error']);
     $I->fail('Unable to complete alignment verification due to missing DOM elements');
 }
+
+$I->comment('STEP 11: Cleanup test data');
+$I->comment('Removing the test post to clean up after the test');
+$I->cUrlWP_SiteToDeletePost($postId);
+$I->comment('✓ Test post deleted successfully');
 
 $I->comment('=== ALIGNMENT TEST COMPLETED ===');

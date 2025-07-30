@@ -28,7 +28,7 @@ class AcceptanceConfig
     const ADMIN_BAR = '#wpadminbar';
     const ADMIN_BAR_NEW_CONTENT = '#wp-admin-bar-new-content';
     const ADMIN_BAR_NEW_CONTENT_LINK = '#wp-admin-bar-new-content a.ab-item';
-    const ADMIN_BAR_DROPDOWN = '#wp-admin-bar-new-content .ab-sub-wrapper:not([style*="display: none"])';
+    const ADMIN_BAR_DROPDOWN = '#wp-admin-bar-new-post';
     const ADMIN_BAR_EDIT = '#wp-admin-bar-edit';
     const ADMIN_BAR_MY_ACCOUNT = '#wp-admin-bar-my-account';
     const ADMIN_BAR_WP_LOGO = '#wp-admin-bar-wp-logo';
@@ -50,6 +50,20 @@ class AcceptanceConfig
     const RESPONDENT_MESSAGE = '.respondent-message';
     const SITE_FOOTER = '.site-footer';
     const SUBMIT_BUTTON = 'input[type=submit], button[type=submit]';
+    const SUBMIT_ARROW_BUTTON = '.submit-arrow.submit-button';
+    
+    // Comment form and toolbar selectors
+    const COMMENT_BOX_INNER = '.comment-box-inner';
+    const COMMENT_INPUT_ROW = '.comment-input-row';
+    const COMMENT_TOOLS_ROW = '.comment-tools-row';
+    const TOOLS_LEFT = '.tools-left';
+    const TOOLS_RIGHT = '.tools-right';
+    const MESSAGE_CONTENT = '.message-content';
+    
+    // Button selectors
+    const PLUS_ICON_BUTTON = '.plus-icon.add-button';
+    const TOOLS_BUTTON = '.tools-button';
+    const MICROPHONE_BUTTON = '.microphone-button';
     
     // Sidebar selectors
     const SIDEBAR_ANCHOR = '#chat-sidebar li a';

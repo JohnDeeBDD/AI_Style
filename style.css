@@ -1,7 +1,7 @@
 /*
  Theme Name:   A.I. Style
  Description:  A WordPress theme inspired by commercial LLMs like Chat-GPT, Gemini, and Grok
- Version:      25.0.0.0
+ Version:      29.0.0.0
  Author:       General Chicken
  Author URI:   https://generalchicken.guru
  Tags:         ai
@@ -83,7 +83,7 @@ body.admin-bar #chat-container {
     width: 377px;
     min-width: 377px;
     max-width: 435px;
-    background: #202123;
+    background: #171717; /* ChatGPT dark sidebar color */
     border-right: 1px solid #444654;
     padding: 16px;
     box-sizing: border-box;
@@ -119,7 +119,7 @@ body.admin-bar #chat-container {
 #chat-sidebar li a {
     display: block;
     padding: 8px 12px;
-    color: #ffffff !important; /* White color for sidebar anchors */
+    color: #8e8e8e !important; /* ChatGPT light gray color for sidebar anchors */
     text-decoration: none !important; /* Remove underlines */
     border-radius: 6px; /* Rounded corners */
     transition: background-color 0.2s ease;
@@ -152,7 +152,7 @@ body.admin-bar #chat-container {
     flex-direction: column;
     padding: 0;
     min-width: 0;
-    background: #202123;
+    background: #212121; /* ChatGPT dark main area color */
     height: 100%; /* Take full height of container */
     position: relative; /* For proper positioning of fixed elements */
     align-items: center; /* Center all content in the main area */
@@ -180,7 +180,7 @@ body.admin-bar #chat-container {
 #chat-messages {
     flex: 1 1 auto;
     padding: 24px 16px; /* Increased top/bottom padding */
-    color: #ececf1;
+    color: #343541; /* Dark text on light background for ChatGPT style */
     width: 100%;
     box-sizing: border-box;
     max-width: 768px;
@@ -193,8 +193,8 @@ body.admin-bar #chat-container {
 #chat-input {
     flex: 0 0 auto;
     padding: 16px;
-    background: #202123;
-    border-top: 1px solid #444654;
+    background: #212121; /* Match main area background */
+    border-top: 1px solid #444654; /* Dark border for dark theme */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -354,7 +354,7 @@ body.zoom-250-plus #wp-admin-bar-sidebar-toggle .ab-item .dashicons {
 /* WordPress Comment Form - ChatGPT Style */
 #chat-input {
     padding: 0;
-    background-color: #202123;
+    background-color: #212121; /* Match main area background */
     border-top: none;
     display: flex;
     align-items: center;
@@ -369,7 +369,6 @@ body.zoom-250-plus #wp-admin-bar-sidebar-toggle .ab-item .dashicons {
 
 .comment-respond {
     margin: 0 auto; /* Center the comment form */
-    padding: 16px;
     width: 100%;
     max-width: 768px;
     /* Removed fixed height to allow it to size based on content */
@@ -392,7 +391,7 @@ body.zoom-250-plus #wp-admin-bar-sidebar-toggle .ab-item .dashicons {
 /* AI message styling (respondent) */
 .respondent-message {
     width: 100%;
-    background-color: #202123;
+    background-color: #212121; /* ChatGPT dark gray for assistant messages */
     padding: 16px 16px 16px 20px; /* Increased left padding */
     border-radius: 0;
     margin-bottom: 16px;
@@ -406,7 +405,7 @@ body.zoom-250-plus #wp-admin-bar-sidebar-toggle .ab-item .dashicons {
 .interlocutor-message {
     width: 70%;
     max-width: 70%;
-    background-color: #444654;
+    background-color: #303030; /* ChatGPT medium dark gray for user messages */
     padding: 16px;
     border-radius: 20px;
     margin-bottom: 16px;
@@ -418,16 +417,16 @@ body.zoom-250-plus #wp-admin-bar-sidebar-toggle .ab-item .dashicons {
 
 /* Add a subtle hover effect to messages */
 .respondent-message:hover {
-    background-color: #2a2b32;
+    background-color: #2a2a2a; /* Slightly lighter dark gray on hover */
 }
 
 .interlocutor-message:hover {
-    background-color: #4d4f5e;
+    background-color: #3a3a3a; /* Slightly lighter medium dark gray on hover */
 }
 
 /* Message content styling */
 .message-content {
-    color: #ececf1;
+    color: #ececf1; /* Light text for dark background */
     font-size: 16px;
     line-height: 1.6;
     letter-spacing: 0.2px;
@@ -462,14 +461,17 @@ body.zoom-250-plus #wp-admin-bar-sidebar-toggle .ab-item .dashicons {
     width: 100%;
     max-width: 768px;
     box-sizing: border-box;
-    padding: 16px;
+    padding: 0;
     z-index: 9999 !important; /* Very high z-index to stay above all content */
-    background-color: #202123; /* Match the main chat area background */
     display: flex;
     justify-content: center; /* Center the comment form horizontally */
     align-items: center; /* Center vertically */
     border-top: none; /* Removed border that was causing the white line */
     margin: 0 auto; /* Center within chat-main area */
+}
+
+#respond{
+    background: #303030;
 }
 
 /* Hide elements that don't appear in ChatGPT interface */
@@ -521,11 +523,11 @@ body.zoom-250-plus #wp-admin-bar-sidebar-toggle .ab-item .dashicons {
     width: 100%;
     background-color: transparent;
     border: none;
-    color: #fff;
+    color: #8e8e8e;
     font-size: 16px;
     padding: 12px 45px 12px 12px;
     resize: none;
-    min-height: 24px;
+    min-height: 140px;
     line-height: 1.5;
     font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
     margin-right: 32px; /* Make space for the submit button */
@@ -538,7 +540,7 @@ body.zoom-250-plus #wp-admin-bar-sidebar-toggle .ab-item .dashicons {
 }
 
 #comment::placeholder {
-    color: #8e8ea0;
+    color: #6b7280; /* Medium gray placeholder for light background */
     font-size: 16px;
     font-weight: 400;
 }
@@ -554,7 +556,7 @@ body.zoom-250-plus #wp-admin-bar-sidebar-toggle .ab-item .dashicons {
 
 /* Replace text submit button with icon */
 .form-submit input[type="submit"] {
-    background-color: #444654; /* Changed from green to gray to match theme */
+    background-color: white;
     border: none;
     font-size: 0; /* Hide text content */
     color: transparent; /* Hide text content */
@@ -562,7 +564,7 @@ body.zoom-250-plus #wp-admin-bar-sidebar-toggle .ab-item .dashicons {
     height: 32px;
     cursor: pointer;
     border-radius: 50%; /* Make it circular like commercial implementations */
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FFFFFF'%3E%3Cpath d='M2.01 21L23 12 2.01 3 2 10l15 2-15 2z'%3E%3C/path%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23404040'%3E%3Cpath d='M2.01 21L23 12 2.01 3 2 10l15 2-15 2z'%3E%3C/path%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: center;
     background-size: 16px;
@@ -579,7 +581,7 @@ body.zoom-250-plus #wp-admin-bar-sidebar-toggle .ab-item .dashicons {
 }
 
 .form-submit input[type="submit"]:hover {
-    background-color: #565869; /* Darker gray on hover */
+    background-color: white; /* Darker green on hover */
     transform: scale(1.05); /* Slight scale effect on hover */
 }
 
@@ -595,7 +597,7 @@ body.zoom-250-plus #wp-admin-bar-sidebar-toggle .ab-item .dashicons {
     width: 32px;
     height: 32px;
     background-color: #40414f;
-    border-radius: 50%;
+    border-radius: 50%; 
     margin-right: 8px;
     position: relative;
     cursor: pointer;
@@ -713,7 +715,7 @@ body.zoom-250-plus #wp-admin-bar-sidebar-toggle .ab-item .dashicons {
 }
 /* ChatGPT-style unified comment box structure */
 .comment-box-inner {
-    background-color: #40414f;
+    background-color: #f7f7f8; /* ChatGPT light gray background for input area */
     border-radius: 12px;
     padding: 0;
     display: flex;
@@ -760,7 +762,7 @@ body.zoom-250-plus #wp-admin-bar-sidebar-toggle .ab-item .dashicons {
 .submit-arrow {
     background: none;
     border: none;
-    color: #8e8ea0;
+    color: #6b7280; /* Darker gray for better visibility on light background */
     cursor: pointer;
     padding: 6px;
     border-radius: 6px;
@@ -775,8 +777,8 @@ body.zoom-250-plus #wp-admin-bar-sidebar-toggle .ab-item .dashicons {
 .plus-icon:hover,
 .tools-button:hover,
 .microphone-button:hover {
-    background-color: #565869;
-    color: #ececf1;
+    background-color: #e5e7eb; /* Light gray hover for light background */
+    color: #374151; /* Darker text on hover */
 }
 
 .submit-arrow {
@@ -789,26 +791,24 @@ body.zoom-250-plus #wp-admin-bar-sidebar-toggle .ab-item .dashicons {
     font-weight: bold;
 }
 
-.submit-arrow:hover {
-    background-color: #16a66b;
-}
 
 .submit-arrow:disabled {
-    background-color: #565869;
-    color: #8e8ea0;
+    background-color: #d1d5db; /* Light gray disabled state for light background */
+    color: #9ca3af; /* Medium gray text for disabled state */
     cursor: not-allowed;
 }
 
 /* Adjust the comment form to fit the new structure */
 #commentform {
     border-radius: 12px 12px 0 0; /* Only round top corners */
+    padding: 9px;
     margin-bottom: 0;
 }
 
 /* Responsive adjustments for two-row layout */
 @media (max-width: 700px) {
     .comment-tools-row {
-        padding: 6px 10px;
+
     }
     
     .tools-left {

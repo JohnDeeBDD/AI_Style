@@ -15,6 +15,12 @@ $I->wantToTest("Scrollbar visibility behavior");
 $I->expect("The scrollbar should only be visible when content requires scrolling");
 $I->expectTo("Not see a scrollbar when content is small enough");
 
+// Create test post with ChatGPT interface content
+$I->comment('Creating test post for scrollbar visibility testing');
+$postContent = '<p>This is a test post for scrollbar visibility verification. The theme will automatically generate the chat interface with proper scrollbar behavior.</p>';
+$postId = $I->cUrlWP_SiteToCreatePost('testpost', $postContent);
+$I->comment('✓ Test post created with ID: ' . $postId);
+
 $I->amOnUrl(AcceptanceConfig::BASE_URL);
 $I->loginAsAdmin();
 $I->amOnPage(AcceptanceConfig::TEST_POST_PAGE);
@@ -133,5 +139,10 @@ $I->assertTrue($scrollbarCheck['hasVerticalScrollbar'],
 // Take another screenshot after the checks
 $I->makeScreenshot('scrollbar-visibility-long-content-after-checks');
 $I->comment("Screen shot <a href = 'http://localhost/wp-content/themes/ai_style/tests/_output/debug/scrollbar-visibility-long-content-after-checks.png' target = '_blank'>available here</a>");
+
+// Cleanup test data
+$I->comment('Cleaning up test post');
+$I->cUrlWP_SiteToDeletePost($postId);
+$I->comment('✓ Test post deleted successfully');
 
 // Run this test with the command: "bin/codecept run acceptance ScrollbarVisableCept.php -vvv --html"

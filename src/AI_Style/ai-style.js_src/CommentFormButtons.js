@@ -21,7 +21,7 @@ export function createActionButtonsContainer(commentForm) {
     // Insert container after the textarea but before the submit button
     const commentTextareaParent = document.querySelector('.comment-form-comment');
     if (commentTextareaParent) {
-        commentForm.insertBefore(actionButtonsContainer, commentTextareaParent.nextSibling);
+        //commentForm.insertBefore(actionButtonsContainer, commentTextareaParent.nextSibling);
         
         // Add example action buttons - similar to commercial implementations
         //const plusButton = addActionBubble('dashicons-plus', '', actionButtonsContainer); // Plus button like ChatGPT

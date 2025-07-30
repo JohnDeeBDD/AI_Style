@@ -13,10 +13,16 @@
 $I = new AcceptanceTester($scenario);
 
 $I->wantToTest("That main divisions of the UI interface exist");
+
+// Create test post with ChatGPT interface content
+$I->comment('Creating test post for main features testing');
+$postContent = '<p>This is a test post for main features verification. The theme will automatically generate the chat interface with all required UI divisions.</p>';
+$postId = $I->cUrlWP_SiteToCreatePost('testpost', $postContent);
+$I->comment('✓ Test post created with ID: ' . $postId);
+
 $I->amOnUrl(AcceptanceConfig::BASE_URL);
 $I->loginAsAdmin();
 $I->amOnPage(AcceptanceConfig::TEST_POST_PAGE);
-
 
 $I->executeJS("clearMessages()");
 
@@ -57,3 +63,8 @@ $I->comment("Screen shot <a href = 'http://localhost/wp-content/themes/ai_style/
 
 $I->makeScreenshot('testpost');
 $I->comment("Screen shot <a href = 'http://localhost/wp-content/themes/ai_style/tests/_output/debug/testpost.png' target = '_blank'>available here</a>");
+
+// Cleanup test data
+$I->comment('Cleaning up test post');
+$I->cUrlWP_SiteToDeletePost($postId);
+$I->comment('✓ Test post deleted successfully');
