@@ -90,4 +90,106 @@ class AcceptanceConfig
     // Zoom enforcement settings
     const ZOOM_ENFORCEMENT_ENABLED = true;
     const ZOOM_RESET_DELAY = 500; // milliseconds
+    
+    // Device mode configurations
+    const DEVICE_MODE_DESKTOP = 'desktop';
+    const DEVICE_MODE_TABLET_PORTRAIT = 'tablet_portrait';
+    const DEVICE_MODE_TABLET_LANDSCAPE = 'tablet_landscape';
+    const DEVICE_MODE_MOBILE_PORTRAIT = 'mobile_portrait';
+    const DEVICE_MODE_MOBILE_LANDSCAPE = 'mobile_landscape';
+    
+    // Device window size mappings
+    const DEVICE_WINDOW_SIZES = [
+        self::DEVICE_MODE_DESKTOP => '1920x1080',
+        self::DEVICE_MODE_TABLET_PORTRAIT => '768x1024',
+        self::DEVICE_MODE_TABLET_LANDSCAPE => '1024x768',
+        self::DEVICE_MODE_MOBILE_PORTRAIT => '375x667',
+        self::DEVICE_MODE_MOBILE_LANDSCAPE => '667x375'
+    ];
+    
+    /**
+     * Get the current window size from the suite configuration
+     * This method reads from the codeception configuration to determine
+     * the current window size setting
+     *
+     * @return string Window size in format "widthxheight" (e.g., "1920x1080")
+     */
+    public static function getWindowSize()
+    {
+        // Try to get from Codeception configuration
+        if (class_exists('\Codeception\Configuration')) {
+            $config = \Codeception\Configuration::config();
+            if (isset($config['modules']['config']['WPWebDriver']['window_size'])) {
+                return $config['modules']['config']['WPWebDriver']['window_size'];
+            }
+        }
+        
+        // Fallback to default desktop size
+        return self::VIEWPORT_DESKTOP_DEFAULT;
+    }
+    
+    /**
+     * Get the current device mode from the suite configuration
+     * This method reads from the codeception configuration to determine
+     * the current device mode setting
+     *
+     * @return string Device mode (desktop, tablet_portrait, tablet_landscape, mobile_portrait, mobile_landscape)
+     */
+    public static function getDeviceMode()
+    {
+        // Try to get from Codeception configuration
+        if (class_exists('\Codeception\Configuration')) {
+            $config = \Codeception\Configuration::config();
+            if (isset($config['modules']['config']['WPWebDriver']['device_mode'])) {
+                return $config['modules']['config']['WPWebDriver']['device_mode'];
+            }
+        }
+        
+        // Fallback: determine device mode from window size
+        $windowSize = self::getWindowSize();
+        
+        // Map window size to device mode
+        foreach (self::DEVICE_WINDOW_SIZES as $deviceMode => $size) {
+            if ($windowSize === $size) {
+                return $deviceMode;
+            }
+        }
+        
+        // Default fallback
+        return self::DEVICE_MODE_DESKTOP;
+    }
+    
+    /**
+     * Check if current configuration is desktop mode
+     *
+     * @return bool True if desktop mode
+     */
+    public static function isDesktop()
+    {
+        return self::getDeviceMode() === self::DEVICE_MODE_DESKTOP;
+    }
+    
+    /**
+     * Check if current configuration is tablet mode (portrait or landscape)
+     *
+     * @return bool True if tablet mode
+     */
+    public static function isTablet()
+    {
+        $deviceMode = self::getDeviceMode();
+        return $deviceMode === self::DEVICE_MODE_TABLET_PORTRAIT ||
+               $deviceMode === self::DEVICE_MODE_TABLET_LANDSCAPE;
+    }
+    
+    /**
+     * Check if current configuration is mobile mode (portrait or landscape)
+     *
+     * @return bool True if mobile mode
+     */
+    public static function isMobile()
+    {
+        $deviceMode = self::getDeviceMode();
+        return $deviceMode === self::DEVICE_MODE_MOBILE_PORTRAIT ||
+               $deviceMode === self::DEVICE_MODE_MOBILE_LANDSCAPE;
+    }
 }

@@ -36,8 +36,13 @@ $I->comment('STEP 3: Navigate to the test post page');
 $I->comment('Accessing the specific post page that contains the chat interface');
 $I->amOnPage(AcceptanceConfig::TEST_POST_PAGE);
 
-// REQUIRED: Enforce 100% zoom after navigation
-$I->ensureDesktop100Zoom();
+// Configuration-driven approach: Test behavior adapts based on current device configuration
+// The window size and device mode are determined by the suite configuration in acceptance.suite.yml
+// This eliminates the need for dynamic zoom changes during test execution
+$deviceMode = AcceptanceConfig::getDeviceMode();
+$windowSize = AcceptanceConfig::getWindowSize();
+$I->comment("Testing centered items for {$deviceMode} mode ({$windowSize})");
+$I->comment("Configuration-driven test: Device mode = {$deviceMode}, Window size = {$windowSize}");
 
 $I->comment('STEP 4: Wait for critical UI elements to load');
 $I->comment('Ensuring all required elements are present before proceeding with alignment tests');

@@ -41,8 +41,13 @@ $I->assertNotEmpty($comment3Id, 'Third comment should be created successfully');
 $I->amOnPage("/?p=$postId");
 //$I->waitForPageLoad();
 
-// REQUIRED: Enforce 100% zoom after navigation
-$I->ensureDesktop100Zoom();
+// Configuration-driven approach: Test behavior adapts based on current device configuration
+// The window size and device mode are determined by the suite configuration in acceptance.suite.yml
+// This eliminates the need for dynamic zoom changes during test execution
+$deviceMode = AcceptanceConfig::getDeviceMode();
+$windowSize = AcceptanceConfig::getWindowSize();
+$I->comment("Testing comment visibility for {$deviceMode} mode ({$windowSize})");
+$I->comment("Configuration-driven test: Device mode = {$deviceMode}, Window size = {$windowSize}");
 
 // Verify the post title and content are displayed
 $I->see($postContent);
@@ -55,8 +60,9 @@ $I->see($comment3Data['content']);
 //The Comments should not be visible on this page!
 $I->amOnPage("/category/uncategorized/");
 
-// REQUIRED: Enforce 100% zoom after navigation
-$I->ensureDesktop100Zoom();
+// Configuration-driven approach: Verify comments are not visible on category pages
+// Test behavior adapts to current device configuration without dynamic zoom changes
+$I->comment("Verifying comments are not displayed on category pages for {$deviceMode} mode");
 
 $I->dontSee($comment1Data['content']);
 $I->dontSee($comment2Data['content']);

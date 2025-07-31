@@ -10,44 +10,119 @@ modules:
     WPWebDriver:
       url: 'http://localhost'
       url2: 'http://localhost'
-      remoteRoute: 'wp/v2/posts'
-      testPostUrl: '/testpost'
+      remoteRoute: wp/v2/posts
+      testPostUrl: /testpost
       numberOfCalls: 2
-      localhostMode: false
-      window_size: 1920x1080
-      adminUsername: 'Codeception'
-      adminPassword: 'password'
+      adminUsername: Codeception
+      adminPassword: password
       clear_cookies: false
       adminPath: /wp-admin
-      port: 4444 #9515
-      #to launch in visual mode: chromedriver --url-base=/wd/hub
-      #browser: phantomjs #./phantomjs --webdriver=4444
-      #nohup xvfb-run java -Dwebdriver.chrome.driver=/var/www/html/wp-content/plugins/WPbdd/chromedriver -jar selenium.jar &>/dev/null &
-      ## ^^ requires the corect versions of chromedriver and chrome
-      ##
+      port: 4444
       browser: chrome
       capabilities:
         chromeOptions:
           args:
-            - "--disable-blink-features=AutomationControlled"
-            - "--disable-infobars"
-            - "--disable-extensions"
-            - "--incognito"
-            - "--disable-popup-blocking"
-            - "--disable-default-apps"
-            - "--force-device-scale-factor=1"
-            - "--disable-features=TranslateUI"
-            - "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
+            - '--disable-blink-features=AutomationControlled'
+            - '--disable-infobars'
+            - '--disable-extensions'
+            - '--incognito'
+            - '--disable-popup-blocking'
+            - '--disable-default-apps'
+            - '--force-device-scale-factor=1'
+            - '--disable-features=TranslateUI'
+            - >-
+              --user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64)
+              AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0
+              Safari/537.36
           excludeSwitches:
             - enable-automation
           useAutomationExtension: false
           prefs:
-            "profile.default_zoom_level": 0  # 0 = 100% zoom
-            "profile.password_manager_enabled": false
+            profile.default_zoom_level: 0
+            profile.password_manager_enabled: false
     WPLoader:
-      wpRootFolder: '/var/www/html'
-      dbName: 'wordpress_unit_test'                      # Test database name
-      dbHost: '127.0.0.1'                       # Database host
-      dbUser: 'wordpressuser'                            # Datbase user
-      dbPassword: 'password'                            # Database password
-      tablePrefix: 'wp_'
+      wpRootFolder: /var/www/html
+      dbName: wordpress_unit_test
+      dbHost: 127.0.0.1
+      dbUser: wordpressuser
+      dbPassword: password
+      tablePrefix: wp_
+env:
+  iphone8_portrait:
+    modules:
+      config:
+        WPWebDriver:
+          window_size: 375x667
+          device_mode: mobile
+  iphone11_portrait:
+    modules:
+      config:
+        WPWebDriver:
+          window_size: 414x896
+          device_mode: mobile
+  android_standard_portrait:
+    modules:
+      config:
+        WPWebDriver:
+          window_size: 360x640
+          device_mode: mobile
+  iphone8_landscape:
+    modules:
+      config:
+        WPWebDriver:
+          window_size: 667x375
+          device_mode: mobile
+  iphone11_landscape:
+    modules:
+      config:
+        WPWebDriver:
+          window_size: 896x414
+          device_mode: mobile
+  android_standard_landscape:
+    modules:
+      config:
+        WPWebDriver:
+          window_size: 640x360
+          device_mode: mobile
+  ipad_portrait:
+    modules:
+      config:
+        WPWebDriver:
+          window_size: 768x1024
+          device_mode: tablet
+  android_tablet_portrait:
+    modules:
+      config:
+        WPWebDriver:
+          window_size: 800x1280
+          device_mode: tablet
+  ipad_landscape:
+    modules:
+      config:
+        WPWebDriver:
+          window_size: 1024x768
+          device_mode: tablet
+  android_tablet_landscape:
+    modules:
+      config:
+        WPWebDriver:
+          window_size: 1280x800
+          device_mode: tablet
+  full_hd_desktop:
+    modules:
+      config:
+        WPWebDriver:
+          window_size: 1920x1080
+          device_mode: desktop
+  common_laptop_desktop:
+    modules:
+      config:
+        WPWebDriver:
+          window_size: 1366x768
+          device_mode: desktop
+  macbook_desktop:
+    modules:
+      config:
+        WPWebDriver:
+          window_size: 1440x900
+          device_mode: desktop
