@@ -18,15 +18,55 @@ let sidebarState = {
 };
 
 /**
+ * LocalStorage key for persisting sidebar state
+ */
+const SIDEBAR_STORAGE_KEY = 'ai_style_sidebar_visible';
+
+/**
+ * Save sidebar state to localStorage
+ */
+function saveSidebarState() {
+  try {
+    localStorage.setItem(SIDEBAR_STORAGE_KEY, sidebarState.isVisible.toString());
+    console.log('Sidebar state saved to localStorage:', sidebarState.isVisible);
+  } catch (error) {
+    console.warn('Failed to save sidebar state to localStorage:', error);
+  }
+}
+
+/**
+ * Load sidebar state from localStorage
+ * @returns {boolean|null} The saved state, or null if not found
+ */
+function loadSidebarState() {
+  try {
+    const savedState = localStorage.getItem(SIDEBAR_STORAGE_KEY);
+    if (savedState !== null) {
+      const isVisible = savedState === 'true';
+      console.log('Sidebar state loaded from localStorage:', isVisible);
+      return isVisible;
+    }
+  } catch (error) {
+    console.warn('Failed to load sidebar state from localStorage:', error);
+  }
+  return null;
+}
+
+/**
  * Initialize the toggle sidebar functionality
- * Sets up initial state based on zoom level detection
+ * Sets up initial state based on zoom level detection and localStorage
  */
 export function initToggleSidebar() {
   console.log('Initializing toggle sidebar functionality');
   
-  // Detect zoom level and set initial sidebar state
+  // Detect zoom level first
   detectZoomLevel();
-  setInitialSidebarState();
+  
+  // Load saved state from localStorage
+  const savedState = loadSidebarState();
+  
+  // Set initial sidebar state based on saved state or zoom level
+  setInitialSidebarState(savedState);
   
   // Add CSS for animations if not already present
   addToggleAnimationCSS();
@@ -62,10 +102,10 @@ function detectZoomLevel() {
 }
 
 /**
- * Set initial sidebar state based on zoom level
- * Hides sidebar by default at 175%+ zoom
+ * Set initial sidebar state based on saved state or zoom level
+ * @param {boolean|null} savedState - The saved state from localStorage, or null if not found
  */
-function setInitialSidebarState() {
+function setInitialSidebarState(savedState) {
   const sidebar = document.getElementById('chat-sidebar');
   if (!sidebar) {
     console.warn('Sidebar element not found');
@@ -76,16 +116,30 @@ function setInitialSidebarState() {
   const computedStyle = window.getComputedStyle(sidebar);
   sidebarState.originalWidth = computedStyle.width;
   
-  // Hide sidebar by default at 175%+ zoom
-  if (sidebarState.zoomLevel >= 175) {
-    sidebarState.isVisible = false;
-    hideSidebarImmediate(sidebar);
-    console.log('Sidebar hidden due to high zoom level:', sidebarState.zoomLevel + '%');
+  // Determine initial visibility state
+  let shouldBeVisible;
+  
+  if (savedState !== null) {
+    // Use saved state if available
+    shouldBeVisible = savedState;
+    console.log('Using saved sidebar state:', shouldBeVisible);
   } else {
-    sidebarState.isVisible = true;
-    showSidebarImmediate(sidebar);
-    console.log('Sidebar visible at zoom level:', sidebarState.zoomLevel + '%');
+    // Fall back to zoom level logic if no saved state
+    shouldBeVisible = sidebarState.zoomLevel < 175;
+    console.log('Using zoom level logic for sidebar state:', shouldBeVisible, 'at zoom level:', sidebarState.zoomLevel + '%');
   }
+  
+  // Apply the determined state
+  sidebarState.isVisible = shouldBeVisible;
+  
+  if (shouldBeVisible) {
+    showSidebarImmediate(sidebar);
+  } else {
+    hideSidebarImmediate(sidebar);
+  }
+  
+  // Save the initial state to localStorage
+  saveSidebarState();
 }
 
 /**
@@ -114,6 +168,9 @@ export function toggleSidebarVisibility() {
   
   // Update state
   sidebarState.isVisible = !sidebarState.isVisible;
+  
+  // Save the new state to localStorage
+  saveSidebarState();
   
   console.log('Toggled sidebar visibility. New state:', sidebarState.isVisible ? 'visible' : 'hidden');
 }
@@ -326,6 +383,7 @@ export function showSidebar() {
   if (sidebar) {
     showSidebarAnimated(sidebar);
     sidebarState.isVisible = true;
+    saveSidebarState();
   }
 }
 
@@ -339,6 +397,7 @@ export function hideSidebar() {
   if (sidebar) {
     hideSidebarAnimated(sidebar);
     sidebarState.isVisible = false;
+    saveSidebarState();
   }
 }
 

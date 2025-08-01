@@ -9,9 +9,9 @@ $I->amOnPage(AcceptanceConfig::TEST_POST_PAGE);
 
 // Configuration-driven approach: Get current device configuration
 // Window size and device mode are set via YAML configuration, not dynamically changed
-$deviceMode = AcceptanceConfig::getDeviceMode();
+$deviceMode = $I->getDeviceMode();
 
-$windowSize = AcceptanceConfig::getWindowSize();
+$windowSize = $I->getWindowSize();
 
 $I->comment("Testing footer visibility in $deviceMode mode with window size: $windowSize");
 $I->makeScreenshot('testpost');
@@ -27,7 +27,7 @@ $I->seeElement('#colophon'); // Check if footer element exists
 // Device-specific footer behavior testing
 // Footer behavior may differ based on device configuration
     $I->makeScreenshot("footer-visibility-27");
-if (AcceptanceConfig::isDesktop()) {
+if (strpos($deviceMode, 'desktop') !== false) {
         $I->makeScreenshot("footer-visibility-29");
     $I->comment('Desktop mode: Testing full footer visibility and interaction');
     
@@ -69,7 +69,7 @@ if (AcceptanceConfig::isDesktop()) {
         $I->see('Cacbots can make mistakes'); // Check if footer text is visible
     }
     $I->makeScreenshot("footer-visibility-65");
-} elseif (AcceptanceConfig::isTablet()) {
+} elseif (strpos($deviceMode, 'tablet') !== false) {
     $I->comment('Tablet mode: Testing footer visibility with potential layout adjustments');
     
     // On tablet, footer should still be accessible but layout may be different
@@ -103,7 +103,7 @@ if (AcceptanceConfig::isDesktop()) {
         $I->see('Cacbots can make mistakes'); // Footer text should still be visible
     }
     
-} elseif (AcceptanceConfig::isMobile()) {
+} elseif (strpos($deviceMode, 'mobile') !== false) {
     $I->comment('Mobile mode: Testing footer visibility with mobile-specific considerations');
     
     // On mobile, footer behavior may be different due to space constraints

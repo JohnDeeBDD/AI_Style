@@ -10,7 +10,7 @@
  * WordPress core behavior across different device modes.
  * 
  * REFACTORED APPROACH:
- * - Uses AcceptanceConfig::getDeviceMode() and AcceptanceConfig::getWindowSize() 
+ * - Uses $I->getDeviceMode() and $I->getWindowSize() 
  *   to determine current configuration
  * - Implements device-specific test logic that adapts based on window size
  * - No longer uses deprecated zoom helper functions or dynamic zoom changes
@@ -30,8 +30,8 @@
 $I = new AcceptanceTester($scenario);
 
 // Get current configuration from suite settings
-$deviceMode = AcceptanceConfig::getDeviceMode();
-$windowSize = AcceptanceConfig::getWindowSize();
+$deviceMode = $I->getDeviceMode();
+$windowSize = $I->getWindowSize();
 
 $I->wantToTest("Admin bar custom icon zoom breakpoint functionality for {$deviceMode} mode ({$windowSize})");
 $I->comment("Configuration-driven test: Device mode = {$deviceMode}, Window size = {$windowSize}");
@@ -68,7 +68,7 @@ $I->seeElement($sidebarToggleLabel);
  * - Mobile: Small viewport testing (simulates mobile zoom behavior)
  */
 
-if (AcceptanceConfig::isDesktop()) {
+if (strpos($deviceMode, 'desktop') !== false) {
     $I->comment('=== DESKTOP MODE TESTING ===');
     $I->comment('Testing desktop zoom breakpoint behavior with window size: ' . $windowSize);
     
@@ -264,7 +264,7 @@ if (AcceptanceConfig::isDesktop()) {
         console.log('Cleaned up zoom test classes');
     ");
     
-} elseif (AcceptanceConfig::isTablet()) {
+} elseif (strpos($deviceMode, 'tablet') !== false) {
     $I->comment('=== TABLET MODE TESTING ===');
     $I->comment('Testing tablet zoom breakpoint behavior with window size: ' . $windowSize);
     
@@ -328,7 +328,7 @@ if (AcceptanceConfig::isDesktop()) {
         console.log('Cleaned up tablet test classes');
     ");
     
-} elseif (AcceptanceConfig::isMobile()) {
+} elseif (strpos($deviceMode, 'mobile') !== false) {
     $I->comment('=== MOBILE MODE TESTING ===');
     $I->comment('Testing mobile zoom breakpoint behavior with window size: ' . $windowSize);
     
@@ -469,17 +469,17 @@ $I->comment("Configuration-driven admin bar zoom breakpoint test completed succe
 $I->comment("Device mode: {$deviceMode}");
 $I->comment("Window size: {$windowSize}");
 
-if (AcceptanceConfig::isDesktop()) {
+if (strpos($deviceMode, 'desktop') !== false) {
     $I->comment('Desktop testing completed:');
     $I->comment('- Baseline (100% zoom equivalent): Both icon and label visible ✓');
     $I->comment('- Medium zoom (175% zoom equivalent): Both icon and label visible (bug fix verified) ✓');
     $I->comment('- High zoom (200% zoom equivalent): Only icon visible, label hidden (WordPress core behavior) ✓');
     $I->comment('- Maximum zoom (250% zoom equivalent): Only icon visible, label hidden (same as high zoom) ✓');
-} elseif (AcceptanceConfig::isTablet()) {
+} elseif (strpos($deviceMode, 'tablet') !== false) {
     $I->comment('Tablet testing completed:');
     $I->comment('- Tablet baseline: Icon visibility verified ✓');
     $I->comment('- Tablet zoom behavior: Tested and documented ✓');
-} elseif (AcceptanceConfig::isMobile()) {
+} elseif (strpos($deviceMode, 'mobile') !== false) {
     $I->comment('Mobile testing completed:');
     $I->comment('- Mobile baseline: Icon visibility verified ✓');
     $I->comment('- Mobile zoom behavior: Tested and documented ✓');

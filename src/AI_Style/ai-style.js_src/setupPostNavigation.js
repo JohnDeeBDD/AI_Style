@@ -4,7 +4,7 @@ import fetchPost, { updatePostUI } from "./fetchPost";
  * Sets up event listeners for post navigation without page refresh
  */
 export default function setupPostNavigation() {
-  console.log("anchor clicked...");
+  console.log("setupPostNavigation()");
   // Listen for clicks on post links
   document.addEventListener('click', function(event) {
     // Check if the clicked element is a link to a post

@@ -23,8 +23,8 @@ $I->amOnUrl(AcceptanceConfig::BASE_URL);
 $I->loginAsAdmin();
 
 // Configuration-driven approach: Get current device mode and window size
-$deviceMode = AcceptanceConfig::getDeviceMode();
-$windowSize = AcceptanceConfig::getWindowSize();
+$deviceMode = $I->getDeviceMode();
+$windowSize = $I->getWindowSize();
 $I->comment("Testing pagination with device mode: $deviceMode, window size: $windowSize");
 
 // Setup: Create test posts for pagination testing
@@ -53,11 +53,11 @@ try {
     $I->amOnPage('/category/test/');
     
     // Configuration-aware testing: Adapt behavior based on device mode
-    if (AcceptanceConfig::isMobile()) {
+    if (strpos($deviceMode, 'mobile') !== false) {
         $I->comment('Mobile mode: Testing pagination with touch-friendly interface');
         // Mobile devices may have different pagination layouts or behaviors
         $waitTime = 3; // Longer wait for mobile rendering
-    } elseif (AcceptanceConfig::isTablet()) {
+    } elseif (strpos($deviceMode, 'tablet') !== false) {
         $I->comment('Tablet mode: Testing pagination with medium screen layout');
         $waitTime = 2;
     } else {
@@ -81,10 +81,10 @@ try {
         $I->comment("--- Testing pagination navigation for $deviceMode ---");
         
         // Adjust interaction method based on device type
-        if (AcceptanceConfig::isMobile()) {
+        if (strpos($deviceMode, 'mobile') !== false) {
             $I->comment('Mobile: Testing touch-based pagination navigation');
             $clickDelay = 1000; // Add delay for mobile touch interactions
-        } elseif (AcceptanceConfig::isTablet()) {
+        } elseif (strpos($deviceMode, 'tablet') !== false) {
             $I->comment('Tablet: Testing tablet-optimized pagination navigation');
             $clickDelay = 500;
         } else {
@@ -104,7 +104,7 @@ try {
             $I->click('.pagination-list .next-page a');
             
             // Longer wait times for mobile/tablet due to potential slower rendering
-            $waitTime = AcceptanceConfig::isMobile() ? 5 : 3;
+            $waitTime = strpos($deviceMode, 'mobile') !== false ? 5 : 3;
             $I->waitForElementChange('.current-page', function($el) use ($currentPageText) {
                 return $el->text() !== $currentPageText;
             }, $waitTime);
@@ -137,7 +137,7 @@ try {
         $pageNumbers = $I->grabMultiple('.pagination-list .page-number a', 'textContent');
         if (!empty($pageNumbers)) {
             $I->comment("Testing direct page number navigation in $deviceMode mode");
-            if (AcceptanceConfig::isMobile()) {
+            if (strpos($deviceMode, 'mobile') !== false) {
                 $I->comment('Mobile: Ensuring page numbers are touch-friendly');
                 // On mobile, we might want to test that page numbers are large enough for touch
                 $I->seeElement('.pagination-list .page-number');
@@ -190,7 +190,7 @@ try {
     $I->assertTrue(in_array('current-page', $paginationItems), 'Current page class should exist');
 
     // Verify pagination structure is appropriate for device type
-    if (AcceptanceConfig::isMobile()) {
+    if (strpos($deviceMode, 'mobile') !== false) {
         $I->comment('Mobile: Verifying touch-friendly pagination structure');
         // On mobile, pagination items should be large enough for touch interaction
         $paginationHeight = $I->executeJS("
@@ -198,7 +198,7 @@ try {
             return pagination ? window.getComputedStyle(pagination).height : '0px';
         ");
         $I->comment("Mobile pagination link height: $paginationHeight");
-    } elseif (AcceptanceConfig::isTablet()) {
+    } elseif (strpos($deviceMode, 'tablet') !== false) {
         $I->comment('Tablet: Verifying medium-screen pagination layout');
     } else {
         $I->comment('Desktop: Verifying full-size pagination layout');
@@ -238,9 +238,9 @@ try {
     
     // Device-aware accessibility testing
     $I->comment("Testing pagination accessibility for $deviceMode mode");
-    if (AcceptanceConfig::isMobile()) {
+    if (strpos($deviceMode, 'mobile') !== false) {
         $I->comment('Mobile: Verifying touch-friendly pagination controls');
-    } elseif (AcceptanceConfig::isTablet()) {
+    } elseif (strpos($deviceMode, 'tablet') !== false) {
         $I->comment('Tablet: Verifying medium-screen accessibility features');
     } else {
         $I->comment('Desktop: Verifying full keyboard and mouse accessibility');
@@ -256,7 +256,7 @@ try {
     $I->comment("Pagination link texts for $deviceMode: " . implode(', ', $linkTexts));
 
     // Device-specific accessibility checks
-    if (AcceptanceConfig::isMobile()) {
+    if (strpos($deviceMode, 'mobile') !== false) {
         $I->comment('Mobile: Verifying touch accessibility features');
         // Check if pagination links have adequate touch targets
         $touchTargetSize = $I->executeJS("

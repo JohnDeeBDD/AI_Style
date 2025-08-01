@@ -589,4 +589,63 @@ class Acceptance extends \Codeception\Module{
         return $comment_id;
     }
 
+    /**
+     * Get the current window size from the WPWebDriver module configuration
+     * This method uses the getModule approach to retrieve the window size
+     * from the active WPWebDriver module configuration
+     *
+     * @return string Window size in format "widthxheight" (e.g., "1920x1080")
+     */
+    public function getWindowSize()
+    {
+        $wpWebDriver = $this->getModule('WPWebDriver');
+        $config = $wpWebDriver->_getConfig();
+        
+        if (isset($config['window_size'])) {
+            return $config['window_size'];
+        }
+        
+        // Fallback to default desktop size
+        return '1920x1080';
+    }
+    
+    /**
+     * Get the current device mode from the WPWebDriver module configuration
+     * This method uses the getModule approach to retrieve the device mode
+     * from the active WPWebDriver module configuration
+     *
+     * @return string Device mode (desktop, tablet_portrait, tablet_landscape, mobile_portrait, mobile_landscape)
+     */
+    public function getDeviceMode()
+    {
+        $wpWebDriver = $this->getModule('WPWebDriver');
+        $config = $wpWebDriver->_getConfig();
+        
+        if (isset($config['device_mode'])) {
+            return $config['device_mode'];
+        }
+        
+        // Fallback: determine device mode from window size
+        $windowSize = $this->getWindowSize();
+        
+        // Device window size mappings
+        $deviceWindowSizes = [
+            'desktop' => '1920x1080',
+            'tablet_portrait' => '768x1024',
+            'tablet_landscape' => '1024x768',
+            'mobile_portrait' => '375x667',
+            'mobile_landscape' => '667x375'
+        ];
+        
+        // Map window size to device mode
+        foreach ($deviceWindowSizes as $deviceMode => $size) {
+            if ($windowSize === $size) {
+                return $deviceMode;
+            }
+        }
+        
+        // Default fallback
+        return 'desktop';
+    }
+
 }

@@ -23,14 +23,14 @@ $I->loginAsAdmin();
 $I->amOnPage(AcceptanceConfig::TEST_POST_PAGE);
 
 // Configuration-driven approach: Get current device mode and window size
-$deviceMode = AcceptanceConfig::getDeviceMode();
-$windowSize = AcceptanceConfig::getWindowSize();
+$deviceMode = $I->getDeviceMode();
+$windowSize = $I->getWindowSize();
 $I->comment("Running footer bug test in $deviceMode mode with window size: $windowSize");
 
 // Device-specific setup: Different devices may have different footer positioning expectations
-$isDesktop = AcceptanceConfig::isDesktop();
-$isTablet = AcceptanceConfig::isTablet();
-$isMobile = AcceptanceConfig::isMobile();
+$isDesktop = strpos($deviceMode, 'desktop') !== false;
+$isTablet = strpos($deviceMode, 'tablet') !== false;
+$isMobile = strpos($deviceMode, 'mobile') !== false;
 
 // Wait for zoom and layout to stabilize (configuration-driven, no manual zoom changes)
 $I->wait(1);

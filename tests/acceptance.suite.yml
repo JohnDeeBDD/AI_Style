@@ -53,68 +53,68 @@ env:
       config:
         WPWebDriver:
           window_size: 375x667
-          device_mode: mobile
+          device_mode: mobile_portrait
   iphone11_portrait:
     modules:
       config:
         WPWebDriver:
           window_size: 414x896
-          device_mode: mobile
+          device_mode: mobile_portrait
   android_standard_portrait:
     modules:
       config:
         WPWebDriver:
           window_size: 360x640
-          device_mode: mobile
+          device_mode: mobile_portrait
   iphone8_landscape:
     modules:
       config:
         WPWebDriver:
           window_size: 667x375
-          device_mode: mobile
+          device_mode: mobile_landscape
   iphone11_landscape:
     modules:
       config:
         WPWebDriver:
           window_size: 896x414
-          device_mode: mobile
+          device_mode: mobile_landscape
   android_standard_landscape:
     modules:
       config:
         WPWebDriver:
           window_size: 640x360
-          device_mode: mobile
+          device_mode: mobile_landscape
   ipad_portrait:
     modules:
       config:
         WPWebDriver:
           window_size: 768x1024
-          device_mode: tablet
+          device_mode: tablet_portrait
   android_tablet_portrait:
     modules:
       config:
         WPWebDriver:
           window_size: 800x1280
-          device_mode: tablet
+          device_mode: tablet_portrait
   ipad_landscape:
     modules:
       config:
         WPWebDriver:
           window_size: 1024x768
-          device_mode: tablet
+          device_mode: tablet_landscape
   android_tablet_landscape:
     modules:
       config:
         WPWebDriver:
           window_size: 1280x800
-          device_mode: tablet
+          device_mode: tablet_landscape
   full_hd_desktop:
     modules:
       config:
         WPWebDriver:
           window_size: 1920x1080
           device_mode: desktop
-  common_laptop_desktop:
+  bin/codecept build:
     modules:
       config:
         WPWebDriver:

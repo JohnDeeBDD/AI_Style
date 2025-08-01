@@ -265,14 +265,32 @@ var i = {
     isAnimating: !1,
     originalWidth: '377px',
     zoomLevel: 100
-};
+}, e2 = 'ai_style_sidebar_visible';
+function t2() {
+    try {
+        localStorage.setItem(e2, i.isVisible.toString()), console.log('Sidebar state saved to localStorage:', i.isVisible);
+    } catch (i) {
+        console.warn('Failed to save sidebar state to localStorage:', i);
+    }
+}
 function initToggleSidebar() {
-    var e, t, o;
-    console.log('Initializing toggle sidebar functionality'), e = window.devicePixelRatio || 1, t = screen.width / window.outerWidth, 100 === (o = Math.round(100 * e)) && t > 1 && (o = Math.round(100 * t)), i.zoomLevel = o, console.log('Detected zoom level:', o + '%'), function() {
-        var e, t, o = document.getElementById('chat-sidebar');
-        if (!o) return console.warn('Sidebar element not found');
-        i.originalWidth = window.getComputedStyle(o).width, i.zoomLevel >= 175 ? (i.isVisible = !1, (e = o).style.width = '0', e.style.minWidth = '0', e.style.overflow = 'hidden', e.style.paddingLeft = '0', e.style.paddingRight = '0', e.classList.add('sidebar-hidden'), n1(!0), console.log('Sidebar hidden due to high zoom level:', i.zoomLevel + '%')) : (i.isVisible = !0, (t = o).classList.remove('sidebar-hidden'), t.style.width = i.originalWidth, t.style.minWidth = i.originalWidth, t.style.overflow = 'auto', t.style.paddingLeft = '16px', t.style.paddingRight = '16px', n1(!1), console.log('Sidebar visible at zoom level:', i.zoomLevel + '%'));
-    }(), function() {
+    var n, o, s;
+    console.log('Initializing toggle sidebar functionality'), n = window.devicePixelRatio || 1, o = screen.width / window.outerWidth, 100 === (s = Math.round(100 * n)) && o > 1 && (s = Math.round(100 * o)), i.zoomLevel = s, console.log('Detected zoom level:', s + '%'), function(e) {
+        var n, o, s, d = document.getElementById('chat-sidebar');
+        if (!d) return console.warn('Sidebar element not found');
+        i.originalWidth = window.getComputedStyle(d).width, null !== e ? console.log('Using saved sidebar state:', s = e) : console.log('Using zoom level logic for sidebar state:', s = i.zoomLevel < 175, 'at zoom level:', i.zoomLevel + '%'), i.isVisible = s, s ? ((n = d).classList.remove('sidebar-hidden'), n.style.width = i.originalWidth, n.style.minWidth = i.originalWidth, n.style.overflow = 'auto', n.style.paddingLeft = '16px', n.style.paddingRight = '16px', a(!1)) : ((o = d).style.width = '0', o.style.minWidth = '0', o.style.overflow = 'hidden', o.style.paddingLeft = '0', o.style.paddingRight = '0', o.classList.add('sidebar-hidden'), a(!0)), t2();
+    }(function() {
+        try {
+            var i = localStorage.getItem(e2);
+            if (null !== i) {
+                var t = 'true' === i;
+                return console.log('Sidebar state loaded from localStorage:', t), t;
+            }
+        } catch (i) {
+            console.warn('Failed to load sidebar state from localStorage:', i);
+        }
+        return null;
+    }()), function() {
         if (!document.getElementById('sidebar-toggle-styles')) {
             var i = document.createElement('style');
             i.id = 'sidebar-toggle-styles', i.textContent = "\n    /* Sidebar toggle animation styles */\n    #chat-sidebar.sidebar-transitioning {\n      transition: width 300ms ease-in-out, \n                  min-width 300ms ease-in-out,\n                  padding-left 300ms ease-in-out,\n                  padding-right 300ms ease-in-out;\n    }\n    \n    #chat-sidebar.sidebar-hidden {\n      width: 0 !important;\n      min-width: 0 !important;\n      padding-left: 0 !important;\n      padding-right: 0 !important;\n      overflow: hidden !important;\n      border-right: none !important;\n    }\n    \n    /* Ensure main content expands when sidebar is hidden */\n    #chat-sidebar.sidebar-hidden + #chat-main {\n      width: 100% !important;\n      max-width: 100% !important;\n    }\n    \n    /* Add smooth transition for footer position changes */\n    .site-footer {\n      transition: left 300ms ease-in-out;\n    }\n    \n    /* Admin bar toggle button styles */\n    #wp-admin-bar-sidebar-toggle .ab-item {\n      display: flex !important;\n      align-items: center;\n      gap: 4px;\n    }\n    \n    #wp-admin-bar-sidebar-toggle .ab-item .dashicons {\n      font-size: 24px !important;\n      width: 24px !important;\n      height: 24px !important;\n      line-height: 1 !important;\n      vertical-align: middle !important;\n      margin: 0 !important;\n      padding: 0 !important;\n      display: inline-block !important;\n    }\n    \n    #wp-admin-bar-sidebar-toggle .ab-item .ab-label {\n      font-size: 13px;\n    }\n    \n    /* Hide label text at high zoom levels (175%+) following WordPress patterns */\n    @media screen and (min-resolution: 1.75dppx) {\n      #wp-admin-bar-sidebar-toggle .ab-item .ab-label {\n        display: none;\n      }\n    }\n    \n    /* Alternative media query for browsers that don't support dppx */\n    @media screen and (-webkit-min-device-pixel-ratio: 1.75) {\n      #wp-admin-bar-sidebar-toggle .ab-item .ab-label {\n        display: none;\n      }\n    }\n  ", document.head.appendChild(i), console.log('Added sidebar toggle animation CSS');
@@ -281,21 +299,21 @@ function initToggleSidebar() {
 }
 function toggleSidebarVisibility() {
     if (i.isAnimating) return void console.log('Sidebar animation in progress, ignoring toggle request');
-    var n = document.getElementById('chat-sidebar');
-    if (!n) return void console.warn('Sidebar element not found');
-    i.isAnimating = !0, i.isVisible ? e2(n) : t2(n), i.isVisible = !i.isVisible, console.log('Toggled sidebar visibility. New state:', i.isVisible ? 'visible' : 'hidden');
+    var e = document.getElementById('chat-sidebar');
+    if (!e) return void console.warn('Sidebar element not found');
+    i.isAnimating = !0, i.isVisible ? n1(e) : o(e), i.isVisible = !i.isVisible, t2(), console.log('Toggled sidebar visibility. New state:', i.isVisible ? 'visible' : 'hidden');
 }
-function e2(e) {
-    e.classList.add('sidebar-transitioning'), e.style.width = '0', e.style.minWidth = '0', e.style.overflow = 'hidden', e.style.paddingLeft = '0', e.style.paddingRight = '0', n1(!0), setTimeout(function() {
+function n1(e) {
+    e.classList.add('sidebar-transitioning'), e.style.width = '0', e.style.minWidth = '0', e.style.overflow = 'hidden', e.style.paddingLeft = '0', e.style.paddingRight = '0', a(!0), setTimeout(function() {
         e.classList.remove('sidebar-transitioning'), e.classList.add('sidebar-hidden'), i.isAnimating = !1;
     }, 300);
 }
-function t2(e) {
-    e.classList.remove('sidebar-hidden'), e.classList.add('sidebar-transitioning'), e.style.width = i.originalWidth, e.style.minWidth = i.originalWidth, e.style.overflow = 'hidden', e.style.paddingLeft = '16px', e.style.paddingRight = '16px', n1(!1), setTimeout(function() {
+function o(e) {
+    e.classList.remove('sidebar-hidden'), e.classList.add('sidebar-transitioning'), e.style.width = i.originalWidth, e.style.minWidth = i.originalWidth, e.style.overflow = 'hidden', e.style.paddingLeft = '16px', e.style.paddingRight = '16px', a(!1), setTimeout(function() {
         e.classList.remove('sidebar-transitioning'), e.style.overflow = 'auto', i.isAnimating = !1;
     }, 300);
 }
-function n1(i) {
+function a(i) {
     var e = document.querySelector('.site-footer');
     if (!e) return void console.warn('Footer element not found');
     i ? (e.style.left = '0px', console.log('Footer position updated: left = 0px (sidebar hidden)')) : (e.style.left = '377px', console.log('Footer position updated: left = 377px (sidebar visible)'));
@@ -361,7 +379,7 @@ function i1() {
         overrideClickBehavior(overrideHoverBehavior(e)), addSidebarToggleButton(), initializeZoomDetection();
     }
 }
-function o(o) {
+function o1(o) {
     if ((o = parseInt(o, 10)) === parseInt(t1.get('linked_post_id'), 10)) return void console.log('Clicked post is already the current linked post');
     var e = t1.getPostId(), i = AIStyleSettings.nonce, c = new FormData();
     c.append('nonce', i), c.append('post_id', e), c.append('linked_post_id', o), r(e, c, "/wp-json/cacbot/v1/link-conversation").then(function(t) {
@@ -373,7 +391,7 @@ function o(o) {
 function initSidebarClickListeners() {
     console.log("initSidebarClickListerners"), document.querySelectorAll('.anchor-post-list li a').forEach(function(t) {
         t.addEventListener('click', function(t) {
-            t.preventDefault(), o(this.closest('li').getAttribute('data-post-id'));
+            t.preventDefault(), o1(this.closest('li').getAttribute('data-post-id'));
         });
     });
 }
@@ -476,8 +494,8 @@ function updatePostUI(t) {
         }), c.querySelector('.comment-list') || c.appendChild(r);
     }
 }
-function o1() {
-    console.log("anchor clicked..."), document.addEventListener('click', function(o) {
+function o2() {
+    console.log("setupPostNavigation()"), document.addEventListener('click', function(o) {
         var e = o.target.closest('a');
         if (!e) return;
         var r = e.getAttribute('href');
@@ -487,11 +505,11 @@ function o1() {
                 var a = parseInt(i[1], 10);
                 if (!isNaN(a)) {
                     o.preventDefault();
-                    var c = document.querySelector('.entry-content');
-                    c && (c.innerHTML = '<div class="loading">Loading post content...</div>'), t3(a).then(function(t) {
+                    var s = document.querySelector('.entry-content');
+                    s && (s.innerHTML = '<div class="loading">Loading post content...</div>'), t3(a).then(function(t) {
                         updatePostUI(t), window.scrollTo(0, 0);
                     }).catch(function(t) {
-                        console.error('Error navigating to post:', t), c && (c.innerHTML = '<div class="error">Error loading post: '.concat(t.message, "</div>"));
+                        console.error('Error navigating to post:', t), s && (s.innerHTML = '<div class="error">Error loading post: '.concat(t.message, "</div>"));
                     });
                 }
             }
@@ -509,5 +527,5 @@ document.addEventListener('DOMContentLoaded', function() {
     } catch (o) {
         console.error("Failed to initialize cacbotData:", o);
     }
-    window.addInterlocutorMessage = addInterlocutorMessage, window.addRespondentMessage = addRespondentMessage, window.clearMessages = clearMessages, console.log('Chat message functions are available globally:'), console.log('- addInterlocutorMessage(message)'), console.log('- addRespondentMessage(message)'), console.log('- clearMessages()'), initToggleSidebar(), i1(), o1(), initSidebarClickListeners(), console.log('Toggle sidebar functions are available globally:'), console.log('- toggleSidebarVisibility()'), console.log('- isSidebarVisible()'), console.log('- showSidebar()'), console.log('- hideSidebar()'), console.log('Admin bar customization functions are available globally:'), console.log('- overrideHoverBehavior(newButton)'), console.log('- overrideClickBehavior(newButton)'), console.log('- addSidebarToggleButton()'), console.log('- updateToggleButton(iconElement, labelElement)'), console.log('- initializeZoomDetection()'), e3();
+    window.addInterlocutorMessage = addInterlocutorMessage, window.addRespondentMessage = addRespondentMessage, window.clearMessages = clearMessages, console.log('Chat message functions are available globally:'), console.log('- addInterlocutorMessage(message)'), console.log('- addRespondentMessage(message)'), console.log('- clearMessages()'), initToggleSidebar(), i1(), o2(), initSidebarClickListeners(), console.log('Toggle sidebar functions are available globally:'), console.log('- toggleSidebarVisibility()'), console.log('- isSidebarVisible()'), console.log('- showSidebar()'), console.log('- hideSidebar()'), console.log('Admin bar customization functions are available globally:'), console.log('- overrideHoverBehavior(newButton)'), console.log('- overrideClickBehavior(newButton)'), console.log('- addSidebarToggleButton()'), console.log('- updateToggleButton(iconElement, labelElement)'), console.log('- initializeZoomDetection()'), e3();
 });
