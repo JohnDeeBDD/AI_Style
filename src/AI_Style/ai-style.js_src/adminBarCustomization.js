@@ -223,8 +223,6 @@ export function initializeZoomDetection() {
     if (detectedZoom >= 2.5) {
       document.body.classList.add('zoom-250-plus');
       console.log('Applied zoom-250-plus class');
-      } else {
-      jQuery("#wp-admin-bar-sidebar-toggle").show();
     }
     
   }

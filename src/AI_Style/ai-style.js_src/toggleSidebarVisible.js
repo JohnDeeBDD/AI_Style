@@ -340,18 +340,25 @@ function addToggleAnimationCSS() {
       font-size: 13px;
     }
     
-    /* Hide label text at high zoom levels (175%+) following WordPress patterns */
-    @media screen and (min-resolution: 1.75dppx) {
+    /* Hide label text at high zoom levels (250%+) following WordPress patterns */
+    @media screen and (min-resolution: 2.5dppx) {
       #wp-admin-bar-sidebar-toggle .ab-item .ab-label {
         display: none;
       }
     }
     
     /* Alternative media query for browsers that don't support dppx */
-    @media screen and (-webkit-min-device-pixel-ratio: 1.75) {
+    @media screen and (-webkit-min-device-pixel-ratio: 2.5) {
       #wp-admin-bar-sidebar-toggle .ab-item .ab-label {
         display: none;
       }
+    }
+    
+    /* Ensure icon remains visible at all zoom levels */
+    #wp-admin-bar-sidebar-toggle .ab-item .dashicons {
+      display: inline-block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
     }
   `;
   

@@ -297,19 +297,39 @@ body.admin-bar #chat-container {
     display: inline-block;
 }
 
-/* Hide label when zoom is 200% or higher */
-body.zoom-200-plus #wp-admin-bar-sidebar-toggle .ab-item .ab-label,
+/* Hide label when zoom is 250% or higher */
 body.zoom-250-plus #wp-admin-bar-sidebar-toggle .ab-item .ab-label {
     display: none !important;
 }
 
-/* Ensure icon remains visible at all zoom levels */
-body.zoom-200-plus #wp-admin-bar-sidebar-toggle .ab-item .dashicons,
-body.zoom-250-plus #wp-admin-bar-sidebar-toggle .ab-item .dashicons {
-    display: inline-block !important;
+/* Ensure the entire toggle button remains visible at all zoom levels */
+/* WordPress core CSS may hide admin bar items at high zoom, so we need high specificity */
+body.zoom-200-plus #wp-admin-bar-sidebar-toggle,
+body.zoom-250-plus #wp-admin-bar-sidebar-toggle,
+#wpadminbar #wp-admin-bar-sidebar-toggle {
+    display: block !important;
+    visibility: visible !important;
 }
 
-/* Ensure dashicon remains visible at all zoom levels */
+/* Ensure the ab-item link remains visible at all zoom levels */
+body.zoom-200-plus #wp-admin-bar-sidebar-toggle .ab-item,
+body.zoom-250-plus #wp-admin-bar-sidebar-toggle .ab-item,
+#wpadminbar #wp-admin-bar-sidebar-toggle .ab-item {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Ensure icon remains visible at all zoom levels */
+body.zoom-200-plus #wp-admin-bar-sidebar-toggle .ab-item .dashicons,
+body.zoom-250-plus #wp-admin-bar-sidebar-toggle .ab-item .dashicons,
+#wpadminbar #wp-admin-bar-sidebar-toggle .ab-item .dashicons {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Ensure dashicon remains visible at all zoom levels with maximum specificity */
 #wp-admin-bar-sidebar-toggle .ab-item .dashicons {
     display: inline-block !important;
     visibility: visible !important;
