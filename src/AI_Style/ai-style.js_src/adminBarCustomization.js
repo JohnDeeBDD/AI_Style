@@ -214,7 +214,7 @@ export function initializeZoomDetection() {
       detectedZoom = calculatedZoom;
     }
     
-    // console.log('Detected zoom level:', detectedZoom);
+    console.log('Detected zoom level:', detectedZoom);
     
     // Remove existing zoom classes
     document.body.classList.remove('zoom-200-plus', 'zoom-250-plus');

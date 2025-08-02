@@ -88,7 +88,7 @@ body.admin-bar #chat-container {
     padding: 16px;
     box-sizing: border-box;
     color: #ececf1;
-    height: 100% !important; /* Force height to be 100% */
+    height: 100%; /* Force height to be 100% */
     overflow-y: auto;
 }
 
@@ -119,21 +119,21 @@ body.admin-bar #chat-container {
 #chat-sidebar li a {
     display: block;
     padding: 8px 12px;
-    color: #8e8e8e !important; /* ChatGPT light gray color for sidebar anchors */
-    text-decoration: none !important; /* Remove underlines */
+    color: #8e8e8e; /* ChatGPT light gray color for sidebar anchors */
+    text-decoration: none; /* Remove underlines */
     border-radius: 6px; /* Rounded corners */
     transition: background-color 0.2s ease;
 }
 
 /* Hover effect - faint gray roundbox */
 #chat-sidebar li a:hover {
-    background-color: rgba(128, 128, 128, 0.2) !important; /* Faint gray background on hover */
+    background-color: rgba(128, 128, 128, 0.2); /* Faint gray background on hover */
 }
 
 /* Active/clicked state - darker gray box */
 #chat-sidebar li a:active,
 #chat-sidebar li a:focus {
-    background-color: rgba(128, 128, 128, 0.4) !important; /* Darker gray background on click */
+    background-color: rgba(128, 128, 128, 0.4); /* Darker gray background on click */
 }
 
 /* Remove hover effect from li when anchor is present */
@@ -151,26 +151,25 @@ body.admin-bar #chat-container {
     display: flex;
     flex-direction: column;
     padding: 0;
+    padding-bottom: 30px; /* Reduced padding to account for thinner footer */
     min-width: 0;
     background: #212121; /* ChatGPT dark main area color */
     height: 100%; /* Take full height of container */
     position: relative; /* For proper positioning of fixed elements */
     align-items: center; /* Center all content in the main area */
     overflow-y: visible; /* Allow scrolling in main container */
+    transition: width 300ms ease-in-out, max-width 300ms ease-in-out;
 }
-
-/* Make sidebar independently scrollable */
-/* Styles moved to main #chat-sidebar definition */
 
 /* Create a container for both post content and chat messages */
 #scrollable-content {
-    overflow-y: auto !important; /* Only show scrollbar when content requires scrolling */
-    height: calc(100vh - 200px) !important; /* Use viewport height for better calculation */
+    overflow-y: auto; /* Show scrollbar when content requires scrolling */
+    height: calc(100vh - 150px); /* Use viewport height for better calculation */
     display: flex;
     flex-direction: column;
     width: 100%;
     align-items: center; /* Center the children horizontally */
-    padding-bottom: 120px; /* Add padding at the bottom for better spacing */
+    padding-bottom: 140px; /* Increased padding to accommodate pagination + comment form */
     max-width: 100%; /* Take full width to ensure scrollbar is at viewport edge */
     position: relative;
     z-index: 10;
@@ -183,24 +182,31 @@ body.admin-bar #chat-container {
     color: #343541; /* Dark text on light background for ChatGPT style */
     width: 100%;
     box-sizing: border-box;
-    max-width: 768px;
+    max-width: 768px; /* Match fixed-comment-box max-width */
     margin: 0 auto;
     overflow-y: visible; /* Allow content to be visible */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center message content */
 }
-
-/* Removed main-call-to-action styles */
 
 #chat-input {
     flex: 0 0 auto;
-    padding: 16px;
+    padding: 0;
     background: #212121; /* Match main area background */
-    border-top: 1px solid #444654; /* Dark border for dark theme */
+    border-top: none;
     display: flex;
     align-items: center;
     justify-content: center;
     position: sticky;
     bottom: 0;
-    z-index: 10;
+    z-index: 150; /* Higher than content but lower than footer */
+    width: 100%;
+    max-width: 768px; /* Match the width of other elements */
+    margin: 0 auto; /* Center in the chat-main area */
+    left: 0; /* Align with chat-main instead of viewport */
+    transform: none; /* Remove the transform that was centering on viewport */
+    box-sizing: border-box;
 }
 
 @media (max-width: 700px) {
@@ -232,36 +238,36 @@ body.admin-bar #chat-container {
 }
 
 #chat-sidebar.sidebar-hidden {
-    width: 0 !important;
-    min-width: 0 !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    overflow: hidden !important;
-    border-right: none !important;
+    width: 0;
+    min-width: 0;
+    padding-left: 0;
+    padding-right: 0;
+    overflow: hidden;
+    border-right: none;
 }
 
 /* Ensure main content expands when sidebar is hidden */
 #chat-sidebar.sidebar-hidden + #chat-main {
-    width: 100% !important;
-    max-width: 100% !important;
+    width: 100%;
+    max-width: 100%;
 }
 
 /* Admin Bar Sidebar Toggle Button Styles */
 #wp-admin-bar-sidebar-toggle .ab-item {
-    display: flex !important;
+    display: flex;
     align-items: center;
     gap: 4px;
-    padding: 0 8px !important;
+    padding: 0 8px;
     text-decoration: none;
-    color: #a7aaad !important;
+    color: #a7aaad;
     font-size: 13px;
     line-height: 32px;
     height: 32px;
 }
 
 #wp-admin-bar-sidebar-toggle .ab-item:hover {
-    color: #00a0d2 !important;
-    background-color: #32373c !important;
+    color: #00a0d2;
+    background-color: #32373c;
 }
 
 #wp-admin-bar-sidebar-toggle .ab-item .dashicons {
@@ -329,13 +335,6 @@ body.zoom-250-plus #wp-admin-bar-sidebar-toggle .ab-item .dashicons,
     opacity: 1 !important;
 }
 
-/* Ensure dashicon remains visible at all zoom levels with maximum specificity */
-#wp-admin-bar-sidebar-toggle .ab-item .dashicons {
-    display: inline-block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-}
-
 /* Mobile responsive behavior for toggle button */
 @media screen and (max-width: 782px) {
     #wp-admin-bar-sidebar-toggle .ab-item {
@@ -366,26 +365,8 @@ body.zoom-250-plus #wp-admin-bar-sidebar-toggle .ab-item .dashicons,
     }
 }
 
-/* Ensure smooth transitions for main content area when sidebar toggles */
-#chat-main {
-    transition: width 300ms ease-in-out, max-width 300ms ease-in-out;
-}
 
 /* WordPress Comment Form - ChatGPT Style */
-#chat-input {
-    padding: 0;
-    background-color: #212121; /* Match main area background */
-    border-top: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: sticky;
-    bottom: 0;
-    z-index: 10;
-    width: 100%;
-    max-width: 768px; /* Match the width of other elements */
-    margin: 0 auto; /* Center in the chat-main area */
-}
 
 .comment-respond {
     margin: 0 auto; /* Center the comment form */
@@ -474,15 +455,15 @@ body.zoom-250-plus #wp-admin-bar-sidebar-toggle .ab-item .dashicons,
 
 /* Fixed comment box positioning */
 #fixed-comment-box {
-    position: absolute !important;
-    bottom: 0 !important;
+    position: absolute;
+    bottom: 0;
     left: 0;
     right: 0;
     width: 100%;
     max-width: 768px;
     box-sizing: border-box;
     padding: 0;
-    z-index: 9999 !important; /* Very high z-index to stay above all content */
+    z-index: 1000; /* Lower than before but still high enough to stay above content */
     display: flex;
     justify-content: center; /* Center the comment form horizontally */
     align-items: center; /* Center vertically */
@@ -490,7 +471,7 @@ body.zoom-250-plus #wp-admin-bar-sidebar-toggle .ab-item .dashicons,
     margin: 0 auto; /* Center within chat-main area */
 }
 
-#respond{
+#respond {
     background: #303030;
 }
 
@@ -551,7 +532,7 @@ body.zoom-250-plus #wp-admin-bar-sidebar-toggle .ab-item .dashicons,
     line-height: 1.5;
     font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
     margin-right: 32px; /* Make space for the submit button */
-    outline: none !important;
+    outline: none;
     box-sizing: border-box;
 }
 
@@ -633,10 +614,6 @@ body.zoom-250-plus #wp-admin-bar-sidebar-toggle .ab-item .dashicons,
     -webkit-mask-position: center;
     -webkit-mask-repeat: no-repeat;
 }
-
-/* Search button - removed */
-
-/* Microphone button - removed */
 
 /* Responsive adjustments */
 @media (max-width: 700px) {
@@ -827,9 +804,6 @@ body.zoom-250-plus #wp-admin-bar-sidebar-toggle .ab-item .dashicons,
 
 /* Responsive adjustments for two-row layout */
 @media (max-width: 700px) {
-    .comment-tools-row {
-
-    }
     
     .tools-left {
         gap: 8px;
@@ -875,19 +849,6 @@ body.zoom-250-plus #wp-admin-bar-sidebar-toggle .ab-item .dashicons,
     padding: 16px;
 }
 
-#chat-messages {
-    max-width: 768px; /* Match fixed-comment-box max-width */
-    margin: 0 auto;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Center message content */
-}
-
-/* Make the content area scrollable as one unit */
-#chat-main {
-    /* Remove overflow: hidden to allow the scrollbar to appear */
-}
 
 /* Footer styling - ChatGPT style */
 .site-footer {
@@ -906,7 +867,7 @@ body.zoom-250-plus #wp-admin-bar-sidebar-toggle .ab-item .dashicons,
     font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
     letter-spacing: 0.2px;
     height: 30px; /* Set explicit height for calculations */
-    z-index: 10000; /* Ensure footer is above fixed-comment-box (z-index: 9999) */
+    z-index: 2000; /* Ensure footer is above fixed-comment-box */
 }
 
 /* Responsive adjustment for footer */
@@ -916,23 +877,6 @@ body.zoom-250-plus #wp-admin-bar-sidebar-toggle .ab-item .dashicons,
     }
 }
 
-/* Position the fixed-comment-box to prevent overlap with footer */
-/* This section is overridden by the previous definition */
-
-/* Adjust the scrollable-content to account for the fixed comment box and footer */
-#scrollable-content {
-    height: calc(100vh - 150px) !important; /* Use viewport height for better calculation */
-    padding-bottom: 100px; /* Increased padding to prevent content from being hidden */
-    margin-bottom: 80px; /* Add space for the fixed comment box */
-    overflow-y: auto !important; /* Show scrollbar when content requires scrolling */
-    position: relative;
-    z-index: 10;
-    width: 100%;
-    max-width: 100%; /* Take full width to ensure scrollbar is at viewport edge */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
 
 /* Adjust for WordPress admin bar */
 body.admin-bar #scrollable-content {
@@ -950,22 +894,7 @@ body.admin-bar .site-footer {
     bottom: 0; /* Keep at bottom */
 }
 
-/* Add padding to the bottom of chat-main to prevent content from being hidden behind the footer */
-#chat-main {
-    padding-bottom: 30px; /* Reduced padding to account for thinner footer */
-}
 
-/* Ensure the input area is above other content but below the footer */
-#chat-input {
-    z-index: 150; /* Higher than content but lower than footer */
-    width: 100%;
-    max-width: 768px; /* Match the width of other elements */
-    margin: 0 auto; /* Center in the chat-main area */
-    position: relative;
-    left: 0; /* Align with chat-main instead of viewport */
-    transform: none; /* Remove the transform that was centering on viewport */
-    box-sizing: border-box;
-}
 #cacbot-archive-button{
     display:none !important;
 }
@@ -1240,20 +1169,10 @@ body.admin-bar .site-footer {
     }
 }
 
-/* Ensure comment form doesn't overlap pagination */
-#fixed-comment-box {
-    /* Reduce z-index to ensure it doesn't interfere with pagination visibility */
-    z-index: 1000 !important; /* Lower than before but still high enough to stay above content */
-}
-
 #commentform {
-    z-index: 1001 !important; /* Slightly higher than fixed-comment-box but much lower than before */
+    z-index: 1001; /* Slightly higher than fixed-comment-box but much lower than before */
 }
 
-/* Adjust scrollable content to account for pagination spacing */
-#scrollable-content {
-    padding-bottom: 140px !important; /* Increased padding to accommodate pagination + comment form */
-}
 
 /* Ensure blog roll container has proper spacing */
 .blog-roll-container {

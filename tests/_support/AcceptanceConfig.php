@@ -80,7 +80,12 @@ class AcceptanceConfig
     const ZOOM_LEVEL_100 = 1.0;
     const ZOOM_LEVEL_150 = 1.5;
     const ZOOM_LEVEL_200 = 2.0;
+    const ZOOM_LEVEL_250 = 2.5;
+    const ZOOM_LEVEL_300 = 3.0;
     const ZOOM_LEVEL_DEFAULT = self::ZOOM_LEVEL_100;
+    
+    // High zoom breakpoint for new functionality
+    const HIGH_ZOOM_BREAKPOINT = self::ZOOM_LEVEL_250;
     
     // Viewport configurations for zoom testing
     const VIEWPORT_DESKTOP_DEFAULT = '1920x1080';

@@ -14,7 +14,9 @@ let sidebarState = {
   isVisible: true,
   isAnimating: false,
   originalWidth: '377px',
-  zoomLevel: 100
+  zoomLevel: 100,
+  isHighZoomOrMobilePortrait: false,
+  resizeTimeout: null
 };
 
 /**
@@ -62,6 +64,10 @@ export function initToggleSidebar() {
   // Detect zoom level first
   detectZoomLevel();
   
+  // Detect if we're in high zoom or mobile portrait mode
+  sidebarState.isHighZoomOrMobilePortrait = isHighZoomOrMobilePortrait();
+  console.log('High zoom or mobile portrait mode:', sidebarState.isHighZoomOrMobilePortrait);
+  
   // Load saved state from localStorage
   const savedState = loadSidebarState();
   
@@ -71,7 +77,43 @@ export function initToggleSidebar() {
   // Add CSS for animations if not already present
   addToggleAnimationCSS();
   
+  // Update element visibility based on current mode
+  updateElementVisibility();
+  
+  // Add resize listener to handle dynamic changes
+  window.addEventListener('resize', handleWindowResize);
+  
   console.log('Toggle sidebar initialized with state:', sidebarState);
+}
+
+/**
+ * Handle window resize events to update responsive behavior
+ */
+function handleWindowResize() {
+  // Debounce resize events
+  clearTimeout(sidebarState.resizeTimeout);
+  sidebarState.resizeTimeout = setTimeout(() => {
+    // Re-detect zoom level and mobile portrait mode
+    detectZoomLevel();
+    const wasHighZoomOrMobilePortrait = sidebarState.isHighZoomOrMobilePortrait;
+    sidebarState.isHighZoomOrMobilePortrait = isHighZoomOrMobilePortrait();
+    
+    // If mode changed, update sidebar and element visibility
+    if (wasHighZoomOrMobilePortrait !== sidebarState.isHighZoomOrMobilePortrait) {
+      console.log('Mode changed on resize. High zoom or mobile portrait:', sidebarState.isHighZoomOrMobilePortrait);
+      
+      const sidebar = document.getElementById('chat-sidebar');
+      if (sidebar && sidebarState.isVisible) {
+        // Update sidebar width if it's currently visible
+        const sidebarWidth = getSidebarWidth();
+        sidebar.style.width = sidebarWidth;
+        sidebar.style.minWidth = sidebarWidth;
+      }
+      
+      // Update element visibility
+      updateElementVisibility();
+    }
+  }, 250);
 }
 
 /**
@@ -99,6 +141,42 @@ function detectZoomLevel() {
   console.log('Detected zoom level:', zoomLevel + '%');
   
   return zoomLevel;
+}
+
+/**
+ * Detect if we're in mobile portrait mode
+ * @returns {boolean}
+ */
+function isMobilePortrait() {
+  // Check if viewport width is typical mobile portrait (less than 480px) and height > width
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+  
+  return viewportWidth <= 480 && viewportHeight > viewportWidth;
+}
+
+/**
+ * Detect if we're in high zoom mode (250%+) or mobile portrait
+ * @returns {boolean}
+ */
+function isHighZoomOrMobilePortrait() {
+  const zoomLevel = sidebarState.zoomLevel;
+  const mobilePortrait = isMobilePortrait();
+  
+  console.log('Zoom level:', zoomLevel + '%', 'Mobile portrait:', mobilePortrait);
+  
+  return zoomLevel >= 250 || mobilePortrait;
+}
+
+/**
+ * Get the appropriate sidebar width based on current mode
+ * @returns {string}
+ */
+function getSidebarWidth() {
+  if (sidebarState.isHighZoomOrMobilePortrait) {
+    return '85%';
+  }
+  return sidebarState.originalWidth;
 }
 
 /**
@@ -192,6 +270,9 @@ function hideSidebarAnimated(sidebar) {
   // Update footer position to extend to left edge when sidebar is hidden
   updateFooterPosition(true);
   
+  // Update element visibility based on current mode
+  updateElementVisibility();
+  
   // Remove animation class and reset state after animation completes
   setTimeout(() => {
     sidebar.classList.remove('sidebar-transitioning');
@@ -208,15 +289,21 @@ function showSidebarAnimated(sidebar) {
   sidebar.classList.remove('sidebar-hidden');
   sidebar.classList.add('sidebar-transitioning');
   
+  // Get appropriate width based on current mode
+  const sidebarWidth = getSidebarWidth();
+  
   // Start the animation
-  sidebar.style.width = sidebarState.originalWidth;
-  sidebar.style.minWidth = sidebarState.originalWidth;
+  sidebar.style.width = sidebarWidth;
+  sidebar.style.minWidth = sidebarWidth;
   sidebar.style.overflow = 'hidden'; // Keep hidden during animation
   sidebar.style.paddingLeft = '16px';
   sidebar.style.paddingRight = '16px';
   
   // Update footer position to align with sidebar when sidebar is shown
   updateFooterPosition(false);
+  
+  // Update element visibility based on current mode
+  updateElementVisibility();
   
   // Remove animation class and restore overflow after animation completes
   setTimeout(() => {
@@ -239,6 +326,52 @@ function hideSidebarImmediate(sidebar) {
   
   // Update footer position immediately
   updateFooterPosition(true);
+  
+  // Update element visibility based on current mode
+  updateElementVisibility();
+}
+
+/**
+ * Update element visibility based on sidebar state and current mode
+ */
+function updateElementVisibility() {
+  const commentForm = document.getElementById('fixed-comment-box');
+  const footer = document.querySelector('.site-footer');
+  
+  if (sidebarState.isHighZoomOrMobilePortrait) {
+    // In high zoom or mobile portrait mode
+    if (sidebarState.isVisible) {
+      // Sidebar is open: hide comment form and footer
+      if (commentForm) {
+        commentForm.style.display = 'none';
+        console.log('Comment form hidden (sidebar open in high zoom/mobile portrait)');
+      }
+      if (footer) {
+        footer.style.display = 'none';
+        console.log('Footer hidden (sidebar open in high zoom/mobile portrait)');
+      }
+    } else {
+      // Sidebar is closed: show comment form, keep footer hidden
+      if (commentForm) {
+        commentForm.style.display = 'block';
+        console.log('Comment form shown (sidebar closed in high zoom/mobile portrait)');
+      }
+      if (footer) {
+        footer.style.display = 'none';
+        console.log('Footer remains hidden (high zoom/mobile portrait mode)');
+      }
+    }
+  } else {
+    // Normal mode: show both elements
+    if (commentForm) {
+      commentForm.style.display = 'block';
+      console.log('Comment form shown (normal mode)');
+    }
+    if (footer) {
+      footer.style.display = 'block';
+      console.log('Footer shown (normal mode)');
+    }
+  }
 }
 
 /**
@@ -246,14 +379,21 @@ function hideSidebarImmediate(sidebar) {
  */
 function showSidebarImmediate(sidebar) {
   sidebar.classList.remove('sidebar-hidden');
-  sidebar.style.width = sidebarState.originalWidth;
-  sidebar.style.minWidth = sidebarState.originalWidth;
+  
+  // Get appropriate width based on current mode
+  const sidebarWidth = getSidebarWidth();
+  
+  sidebar.style.width = sidebarWidth;
+  sidebar.style.minWidth = sidebarWidth;
   sidebar.style.overflow = 'auto';
   sidebar.style.paddingLeft = '16px';
   sidebar.style.paddingRight = '16px';
   
   // Update footer position immediately
   updateFooterPosition(false);
+  
+  // Update element visibility based on current mode
+  updateElementVisibility();
 }
 
 /**
@@ -292,7 +432,7 @@ function addToggleAnimationCSS() {
   style.textContent = `
     /* Sidebar toggle animation styles */
     #chat-sidebar.sidebar-transitioning {
-      transition: width 300ms ease-in-out, 
+      transition: width 300ms ease-in-out,
                   min-width 300ms ease-in-out,
                   padding-left 300ms ease-in-out,
                   padding-right 300ms ease-in-out;
@@ -315,7 +455,52 @@ function addToggleAnimationCSS() {
     
     /* Add smooth transition for footer position changes */
     .site-footer {
-      transition: left 300ms ease-in-out;
+      transition: left 300ms ease-in-out, display 300ms ease-in-out;
+    }
+    
+    /* Add smooth transition for comment form visibility */
+    #fixed-comment-box {
+      transition: display 300ms ease-in-out;
+    }
+    
+    /* Mobile portrait and high zoom responsive styles */
+    @media screen and (max-width: 480px) and (orientation: portrait) {
+      /* Mobile portrait mode */
+      #chat-sidebar:not(.sidebar-hidden) {
+        width: 85% !important;
+        min-width: 85% !important;
+      }
+      
+      /* Hide footer in mobile portrait mode */
+      .site-footer {
+        display: none !important;
+      }
+    }
+    
+    /* High zoom level styles (250%+) */
+    @media screen and (min-resolution: 2.5dppx) {
+      #chat-sidebar:not(.sidebar-hidden) {
+        width: 85% !important;
+        min-width: 85% !important;
+      }
+      
+      /* Hide footer in high zoom mode */
+      .site-footer {
+        display: none !important;
+      }
+    }
+    
+    /* Alternative media query for browsers that don't support dppx */
+    @media screen and (-webkit-min-device-pixel-ratio: 2.5) {
+      #chat-sidebar:not(.sidebar-hidden) {
+        width: 85% !important;
+        min-width: 85% !important;
+      }
+      
+      /* Hide footer in high zoom mode */
+      .site-footer {
+        display: none !important;
+      }
     }
     
     /* Admin bar toggle button styles */
@@ -363,7 +548,7 @@ function addToggleAnimationCSS() {
   `;
   
   document.head.appendChild(style);
-  console.log('Added sidebar toggle animation CSS');
+  console.log('Added sidebar toggle animation CSS with responsive styles');
 }
 
 /**
@@ -408,6 +593,14 @@ export function hideSidebar() {
   }
 }
 
+// Export additional functions for testing and external use
+export {
+  isMobilePortrait,
+  isHighZoomOrMobilePortrait,
+  getSidebarWidth,
+  updateElementVisibility
+};
+
 // Export default function for easy importing
 export default {
   initToggleSidebar,
@@ -415,5 +608,9 @@ export default {
   isSidebarVisible,
   getSidebarState,
   showSidebar,
-  hideSidebar
+  hideSidebar,
+  isMobilePortrait,
+  isHighZoomOrMobilePortrait,
+  getSidebarWidth,
+  updateElementVisibility
 };
