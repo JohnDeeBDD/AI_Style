@@ -165,6 +165,59 @@ export function addSidebarToggleButton() {
 }
 
 /**
+ * Add mobile hamburger icon to the WordPress admin bar
+ * Positions it as the first item in the admin bar for mobile devices
+ */
+export function addMobileHamburgerIcon() {
+  const adminBar = document.getElementById('wp-admin-bar-root-default');
+  if (!adminBar) {
+    console.warn('Admin bar root element not found');
+    return;
+  }
+  
+  // Create the mobile hamburger button
+  const hamburgerButton = document.createElement('li');
+  hamburgerButton.id = 'wp-admin-bar-mobile-hamburger';
+  hamburgerButton.className = 'menupop';
+  
+  // Create the link element
+  const hamburgerLink = document.createElement('a');
+  hamburgerLink.className = 'ab-item';
+  hamburgerLink.href = '#';
+  hamburgerLink.setAttribute('aria-label', 'Toggle Sidebar');
+  
+  // Create icon element - using WordPress hamburger icon (dashicons-menu)
+  const icon = document.createElement('span');
+  icon.className = 'dashicons dashicons-menu';
+  icon.setAttribute('title', 'Toggle Sidebar');
+  
+  // Assemble the button
+  hamburgerLink.appendChild(icon);
+  hamburgerButton.appendChild(hamburgerLink);
+  
+  // Position the button as the first item in the admin bar
+  const firstChild = adminBar.firstChild;
+  if (firstChild) {
+    adminBar.insertBefore(hamburgerButton, firstChild);
+  } else {
+    adminBar.appendChild(hamburgerButton);
+  }
+  
+  // Add click event listener
+  hamburgerLink.addEventListener('click', function(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    console.log('Mobile hamburger icon clicked');
+    
+    // Toggle the sidebar
+    toggleSidebarVisibility();
+  });
+  
+  console.log('Added mobile hamburger icon to admin bar');
+}
+
+/**
  * Update the toggle button icon and text based on sidebar visibility state
  * Uses dashicons "arrow-left" for close and "arrow-right" for open
  * Updates button text to "Close Sidebar" or "Open Sidebar"
@@ -187,61 +240,6 @@ export function updateToggleButton(iconElement, labelElement) {
   }
 }
 
-/**
- * Initialize zoom detection for admin bar responsiveness
- * Detects browser zoom level and applies appropriate CSS classes to body
- * This allows CSS to hide/show admin bar elements based on zoom level
- */
-export function initializeZoomDetection() {
-  console.log('Initializing zoom detection for admin bar');
-  
-  // Function to detect and apply zoom classes
-  function detectAndApplyZoom() {
-    // Get the current zoom level by comparing window dimensions
-    const devicePixelRatio = window.devicePixelRatio || 1;
-    const zoomLevel = Math.round(devicePixelRatio * 100) / 100;
-    
-    // Alternative method: detect zoom by comparing screen width to window width
-    const screenWidth = screen.width;
-    const windowWidth = window.outerWidth;
-    const calculatedZoom = Math.round((screenWidth / windowWidth) * 100) / 100;
-    
-    // Use the more reliable method (devicePixelRatio for most cases)
-    let detectedZoom = devicePixelRatio;
-    
-    // For browsers where devicePixelRatio doesn't change with zoom, use alternative method
-    if (Math.abs(calculatedZoom - 1) > 0.1) {
-      detectedZoom = calculatedZoom;
-    }
-    
-    console.log('Detected zoom level:', detectedZoom);
-    
-    // Remove existing zoom classes
-    document.body.classList.remove('zoom-200-plus', 'zoom-250-plus');
-    
-    // Apply appropriate zoom classes
-    if (detectedZoom >= 2.5) {
-      document.body.classList.add('zoom-250-plus');
-      console.log('Applied zoom-250-plus class');
-    }
-    
-  }
-  
-  // Initial detection
-  detectAndApplyZoom();
-  
-  // Listen for resize events (which can indicate zoom changes)
-  window.addEventListener('resize', detectAndApplyZoom);
-  
-  // Listen for zoom events (if supported)
-  if ('onzoom' in window) {
-    window.addEventListener('zoom', detectAndApplyZoom);
-
-  }
-  
-  // Periodically check for zoom changes (fallback method)
-  setInterval(detectAndApplyZoom, 1000);
-}
 
 /**
  * Customizes the WordPress admin bar "New" button behavior and adds sidebar toggle
@@ -277,6 +275,6 @@ export default function adminBarCustomization() {
   // Add sidebar toggle button to admin bar
   addSidebarToggleButton();
   
-  // Initialize zoom detection for admin bar responsiveness
-  initializeZoomDetection();
+  // Add mobile hamburger icon to admin bar
+  addMobileHamburgerIcon();
 }

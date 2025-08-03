@@ -12,7 +12,7 @@ import fetchCacbotLinkAPI from "./fetchCacbotLinkAPI"
  * @param {string|number} linkedPostID - The ID of the linked post that was clicked
  * @returns {void}
  */
-export default function sidebarClick(linkedPostID) {
+export default function sidebarAnchorPostLinkClick(linkedPostID) {
     // Convert linkedPostID to a number for consistent comparison
     linkedPostID = parseInt(linkedPostID, 10);
     
@@ -48,11 +48,11 @@ export default function sidebarClick(linkedPostID) {
 }
 
 /**
- * Initialize event listeners for sidebar clicks
+ * Initialize event listeners for sidebar anchor post link clicks
  *
  * This function adds event listeners to all anchor elements in the sidebar list.
  * It extracts the post ID from the parent li element's data-post-id attribute
- * and calls the sidebarClick function with that ID.
+ * and calls the sidebarAnchorPostLinkClick function with that ID.
  */
 export function initSidebarClickListeners() {
     console.log("initSidebarClickListerners");
@@ -71,8 +71,8 @@ export function initSidebarClickListeners() {
             // Extract the post ID from the data-post-id attribute
             const postId = listItem.getAttribute('data-post-id');
             
-            // Call the sidebarClick function with the post ID
-            sidebarClick(postId);
+            // Call the sidebarAnchorPostLinkClick function with the post ID
+            sidebarAnchorPostLinkClick(postId);
         });
     });
 }

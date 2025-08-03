@@ -16,6 +16,8 @@ let sidebarState = {
   originalWidth: '377px',
   zoomLevel: 100,
   isHighZoomOrMobilePortrait: false,
+  isMobileView: false,
+  isDesktopView: true,
   resizeTimeout: null
 };
 
@@ -64,14 +66,19 @@ export function initToggleSidebar() {
   // Detect zoom level first
   detectZoomLevel();
   
-  // Detect if we're in high zoom or mobile portrait mode
-  sidebarState.isHighZoomOrMobilePortrait = isHighZoomOrMobilePortrait();
-  console.log('High zoom or mobile portrait mode:', sidebarState.isHighZoomOrMobilePortrait);
+  // Update responsive mode detection (includes both breakpoint and zoom detection)
+  updateResponsiveMode();
+  
+  console.log('Responsive modes detected:', {
+    isMobileView: sidebarState.isMobileView,
+    isDesktopView: sidebarState.isDesktopView,
+    isHighZoomOrMobilePortrait: sidebarState.isHighZoomOrMobilePortrait
+  });
   
   // Load saved state from localStorage
   const savedState = loadSidebarState();
   
-  // Set initial sidebar state based on saved state or zoom level
+  // Set initial sidebar state based on saved state or responsive mode
   setInitialSidebarState(savedState);
   
   // Add CSS for animations if not already present
@@ -93,21 +100,69 @@ function handleWindowResize() {
   // Debounce resize events
   clearTimeout(sidebarState.resizeTimeout);
   sidebarState.resizeTimeout = setTimeout(() => {
-    // Re-detect zoom level and mobile portrait mode
+    // Re-detect zoom level and responsive modes
     detectZoomLevel();
-    const wasHighZoomOrMobilePortrait = sidebarState.isHighZoomOrMobilePortrait;
-    sidebarState.isHighZoomOrMobilePortrait = isHighZoomOrMobilePortrait();
+    const modeChanged = updateResponsiveMode();
     
-    // If mode changed, update sidebar and element visibility
-    if (wasHighZoomOrMobilePortrait !== sidebarState.isHighZoomOrMobilePortrait) {
-      console.log('Mode changed on resize. High zoom or mobile portrait:', sidebarState.isHighZoomOrMobilePortrait);
+    // If responsive mode changed, handle the transition
+    if (modeChanged) {
+      console.log('Responsive mode changed on resize:', {
+        isMobileView: sidebarState.isMobileView,
+        isDesktopView: sidebarState.isDesktopView,
+        isHighZoomOrMobilePortrait: sidebarState.isHighZoomOrMobilePortrait
+      });
       
       const sidebar = document.getElementById('chat-sidebar');
-      if (sidebar && sidebarState.isVisible) {
-        // Update sidebar width if it's currently visible
-        const sidebarWidth = getSidebarWidth();
-        sidebar.style.width = sidebarWidth;
-        sidebar.style.minWidth = sidebarWidth;
+      if (sidebar) {
+        // Handle mode transition for sidebar
+/**
+ * Handle transition between mobile and desktop modes
+ * @param {HTMLElement} sidebar - The sidebar element
+ */
+function handleModeTransition(sidebar) {
+  if (sidebarState.isMobileView) {
+    // Switching to mobile view: use overlay behavior
+    console.log('Switching to mobile overlay mode');
+    
+    if (sidebarState.isVisible) {
+      // Show sidebar with mobile overlay behavior
+      sidebar.classList.add('sidebar-visible');
+      sidebar.style.left = '0';
+    } else {
+      // Hide sidebar with mobile overlay behavior
+      sidebar.classList.remove('sidebar-visible');
+      sidebar.style.left = '-100%';
+    }
+    
+    // Reset desktop-specific styles
+    sidebar.style.width = '';
+    sidebar.style.minWidth = '';
+    sidebar.style.position = '';
+    
+  } else {
+    // Switching to desktop view: use push/shrink behavior
+    console.log('Switching to desktop push/shrink mode');
+    
+    // Remove mobile overlay classes
+    sidebar.classList.remove('sidebar-visible');
+    sidebar.style.left = '';
+    
+    if (sidebarState.isVisible) {
+      // Show sidebar with desktop push behavior
+      const sidebarWidth = getSidebarWidth();
+      sidebar.style.width = sidebarWidth;
+      sidebar.style.minWidth = sidebarWidth;
+      sidebar.classList.remove('sidebar-hidden');
+    } else {
+      // Hide sidebar with desktop push behavior
+      sidebar.style.width = '0';
+      sidebar.style.minWidth = '0';
+      sidebar.classList.add('sidebar-hidden');
+    }
+  }
+}
+
+        handleModeTransition(sidebar);
       }
       
       // Update element visibility
@@ -144,6 +199,23 @@ function detectZoomLevel() {
 }
 
 /**
+ * Detect if we're in mobile view based on 782px breakpoint
+ * This is separate from zoom detection and matches CSS media queries
+ * @returns {boolean}
+ */
+function isMobileView() {
+  return window.innerWidth < 782;
+}
+
+/**
+ * Detect if we're in desktop view based on 782px breakpoint
+ * @returns {boolean}
+ */
+function isDesktopView() {
+  return window.innerWidth >= 782;
+}
+
+/**
  * Detect if we're in mobile portrait mode
  * @returns {boolean}
  */
@@ -166,6 +238,31 @@ function isHighZoomOrMobilePortrait() {
   console.log('Zoom level:', zoomLevel + '%', 'Mobile portrait:', mobilePortrait);
   
   return zoomLevel >= 250 || mobilePortrait;
+}
+
+/**
+ * Update responsive mode detection
+ * Updates both breakpoint-based and zoom-based detection
+ */
+function updateResponsiveMode() {
+  const wasMobileView = sidebarState.isMobileView;
+  const wasDesktopView = sidebarState.isDesktopView;
+  
+  sidebarState.isMobileView = isMobileView();
+  sidebarState.isDesktopView = isDesktopView();
+  sidebarState.isHighZoomOrMobilePortrait = isHighZoomOrMobilePortrait();
+  
+  const modeChanged = wasMobileView !== sidebarState.isMobileView ||
+                     wasDesktopView !== sidebarState.isDesktopView;
+  
+  console.log('Responsive mode updated:', {
+    isMobileView: sidebarState.isMobileView,
+    isDesktopView: sidebarState.isDesktopView,
+    isHighZoomOrMobilePortrait: sidebarState.isHighZoomOrMobilePortrait,
+    modeChanged: modeChanged
+  });
+  
+  return modeChanged;
 }
 
 /**
@@ -238,6 +335,9 @@ export function toggleSidebarVisibility() {
   
   sidebarState.isAnimating = true;
   
+  // Update responsive mode before toggling
+  updateResponsiveMode();
+  
   if (sidebarState.isVisible) {
     hideSidebarAnimated(sidebar);
   } else {
@@ -250,7 +350,7 @@ export function toggleSidebarVisibility() {
   // Save the new state to localStorage
   saveSidebarState();
   
-  console.log('Toggled sidebar visibility. New state:', sidebarState.isVisible ? 'visible' : 'hidden');
+  console.log('Toggled sidebar visibility. New state:', sidebarState.isVisible ? 'visible' : 'hidden', 'Mode:', sidebarState.isMobileView ? 'mobile' : 'desktop');
 }
 
 /**
@@ -260,15 +360,25 @@ function hideSidebarAnimated(sidebar) {
   // Add transitioning class for animation
   sidebar.classList.add('sidebar-transitioning');
   
-  // Start the animation
-  sidebar.style.width = '0';
-  sidebar.style.minWidth = '0';
-  sidebar.style.overflow = 'hidden';
-  sidebar.style.paddingLeft = '0';
-  sidebar.style.paddingRight = '0';
+  if (sidebarState.isMobileView) {
+    // Mobile: Use overlay behavior - slide out to the left
+    sidebar.classList.remove('sidebar-visible');
+    sidebar.style.left = '-100%';
+    
+    // Don't modify width/padding for mobile overlay
+    
+  } else {
+    // Desktop: Use push/shrink behavior
+    sidebar.style.width = '0';
+    sidebar.style.minWidth = '0';
+    sidebar.style.paddingLeft = '0';
+    sidebar.style.paddingRight = '0';
+    
+    // Update footer position to extend to left edge when sidebar is hidden
+    updateFooterPosition(true);
+  }
   
-  // Update footer position to extend to left edge when sidebar is hidden
-  updateFooterPosition(true);
+  sidebar.style.overflow = 'hidden';
   
   // Update element visibility based on current mode
   updateElementVisibility();
@@ -276,7 +386,9 @@ function hideSidebarAnimated(sidebar) {
   // Remove animation class and reset state after animation completes
   setTimeout(() => {
     sidebar.classList.remove('sidebar-transitioning');
-    sidebar.classList.add('sidebar-hidden');
+    if (!sidebarState.isMobileView) {
+      sidebar.classList.add('sidebar-hidden');
+    }
     sidebarState.isAnimating = false;
   }, 300);
 }
@@ -289,18 +401,26 @@ function showSidebarAnimated(sidebar) {
   sidebar.classList.remove('sidebar-hidden');
   sidebar.classList.add('sidebar-transitioning');
   
-  // Get appropriate width based on current mode
-  const sidebarWidth = getSidebarWidth();
+  if (sidebarState.isMobileView) {
+    // Mobile: Use overlay behavior - slide in from the left
+    sidebar.classList.add('sidebar-visible');
+    sidebar.style.left = '0';
+    
+    // Don't modify width/padding for mobile overlay - CSS handles it
+    
+  } else {
+    // Desktop: Use push/shrink behavior
+    const sidebarWidth = getSidebarWidth();
+    sidebar.style.width = sidebarWidth;
+    sidebar.style.minWidth = sidebarWidth;
+    sidebar.style.paddingLeft = '16px';
+    sidebar.style.paddingRight = '16px';
+    
+    // Update footer position to align with sidebar when sidebar is shown
+    updateFooterPosition(false);
+  }
   
-  // Start the animation
-  sidebar.style.width = sidebarWidth;
-  sidebar.style.minWidth = sidebarWidth;
   sidebar.style.overflow = 'hidden'; // Keep hidden during animation
-  sidebar.style.paddingLeft = '16px';
-  sidebar.style.paddingRight = '16px';
-  
-  // Update footer position to align with sidebar when sidebar is shown
-  updateFooterPosition(false);
   
   // Update element visibility based on current mode
   updateElementVisibility();
@@ -317,15 +437,24 @@ function showSidebarAnimated(sidebar) {
  * Hide sidebar immediately without animation
  */
 function hideSidebarImmediate(sidebar) {
-  sidebar.style.width = '0';
-  sidebar.style.minWidth = '0';
-  sidebar.style.overflow = 'hidden';
-  sidebar.style.paddingLeft = '0';
-  sidebar.style.paddingRight = '0';
-  sidebar.classList.add('sidebar-hidden');
+  if (sidebarState.isMobileView) {
+    // Mobile: Use overlay behavior
+    sidebar.classList.remove('sidebar-visible');
+    sidebar.style.left = '-100%';
+    
+  } else {
+    // Desktop: Use push/shrink behavior
+    sidebar.style.width = '0';
+    sidebar.style.minWidth = '0';
+    sidebar.style.paddingLeft = '0';
+    sidebar.style.paddingRight = '0';
+    sidebar.classList.add('sidebar-hidden');
+    
+    // Update footer position immediately
+    updateFooterPosition(true);
+  }
   
-  // Update footer position immediately
-  updateFooterPosition(true);
+  sidebar.style.overflow = 'hidden';
   
   // Update element visibility based on current mode
   updateElementVisibility();
@@ -380,17 +509,24 @@ function updateElementVisibility() {
 function showSidebarImmediate(sidebar) {
   sidebar.classList.remove('sidebar-hidden');
   
-  // Get appropriate width based on current mode
-  const sidebarWidth = getSidebarWidth();
+  if (sidebarState.isMobileView) {
+    // Mobile: Use overlay behavior
+    sidebar.classList.add('sidebar-visible');
+    sidebar.style.left = '0';
+    
+  } else {
+    // Desktop: Use push/shrink behavior
+    const sidebarWidth = getSidebarWidth();
+    sidebar.style.width = sidebarWidth;
+    sidebar.style.minWidth = sidebarWidth;
+    sidebar.style.paddingLeft = '16px';
+    sidebar.style.paddingRight = '16px';
+    
+    // Update footer position immediately
+    updateFooterPosition(false);
+  }
   
-  sidebar.style.width = sidebarWidth;
-  sidebar.style.minWidth = sidebarWidth;
   sidebar.style.overflow = 'auto';
-  sidebar.style.paddingLeft = '16px';
-  sidebar.style.paddingRight = '16px';
-  
-  // Update footer position immediately
-  updateFooterPosition(false);
   
   // Update element visibility based on current mode
   updateElementVisibility();
@@ -595,8 +731,11 @@ export function hideSidebar() {
 
 // Export additional functions for testing and external use
 export {
+  isMobileView,
+  isDesktopView,
   isMobilePortrait,
   isHighZoomOrMobilePortrait,
+  updateResponsiveMode,
   getSidebarWidth,
   updateElementVisibility
 };
@@ -609,8 +748,11 @@ export default {
   getSidebarState,
   showSidebar,
   hideSidebar,
+  isMobileView,
+  isDesktopView,
   isMobilePortrait,
   isHighZoomOrMobilePortrait,
+  updateResponsiveMode,
   getSidebarWidth,
   updateElementVisibility
 };

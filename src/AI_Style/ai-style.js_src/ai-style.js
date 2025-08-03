@@ -16,7 +16,7 @@ import adminBarCustomization, {
 } from "./adminBarCustomization";
 import cacbotData from "./cacbotData";
 import fetchPost, { updatePostUI } from "./fetchPost";
-import sidebarClick, { initSidebarClickListeners } from "./sidebarClick";
+import sidebarAnchorPostLinkClick, { initSidebarClickListeners } from "./sidebarAnchorPostLinkClick";
 import { clearSidebar, addSidebarLink } from "./sidebarLinks";
 import toggleSidebarVisible, {
   initToggleSidebar,

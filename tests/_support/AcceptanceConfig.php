@@ -36,6 +36,7 @@ class AcceptanceConfig
     const ADMIN_BAR_COMMENTS = '#wp-admin-bar-comments';
     const ADMIN_BAR_SEARCH = '#wp-admin-bar-search';
     const ADMIN_BAR_SIDEBAR_TOGGLE = '#wp-admin-bar-sidebar-toggle';
+    const ADMIN_BAR_MOBILE_HAMBURGER = '#wp-admin-bar-mobile-hamburger';
     
     // Chat UI selectors
     const CHAT_CONTAINER = '#chat-container';
