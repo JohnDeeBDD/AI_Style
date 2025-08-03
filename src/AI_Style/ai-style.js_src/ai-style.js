@@ -58,6 +58,12 @@ document.addEventListener('DOMContentLoaded', function() {
   // Initialize toggle sidebar functionality
   initToggleSidebar();
   
+  // Make toggle sidebar functions available globally
+  window.toggleSidebarVisibility = toggleSidebarVisibility;
+  window.isSidebarVisible = isSidebarVisible;
+  window.showSidebar = showSidebar;
+  window.hideSidebar = hideSidebar;
+  
   // Initialize admin bar customization (includes sidebar toggle button)
   adminBarCustomization();
   

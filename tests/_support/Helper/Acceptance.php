@@ -648,4 +648,19 @@ class Acceptance extends \Codeception\Module{
         return 'desktop';
     }
 
+    /**
+     * Determine if we're in mobile breakpoint (window width < 768px)
+     * @return bool
+     */
+    public function isMobileBreakpoint() {
+        try {
+            $windowWidth = $this->getModule('WPWebDriver')->executeJS("return window.innerWidth;");
+            codecept_debug("Window width: {$windowWidth}px");
+            return $windowWidth < 768;
+        } catch (\Exception $e) {
+            codecept_debug("Failed to detect window width, assuming desktop: " . $e->getMessage());
+            return false;
+        }
+    }
+
 }

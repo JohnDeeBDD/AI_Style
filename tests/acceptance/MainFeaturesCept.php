@@ -46,7 +46,7 @@ $windowSize = $I->getWindowSize();
 $I->comment("Testing main features with window size: {$windowSize}");
 
 // Determine breakpoint based on window width (mobile < 768px, desktop >= 768px)
-$isMobile = isMobileBreakpoint($I);
+$isMobile = $I->isMobileBreakpoint();
 $breakpoint = $isMobile ? 'mobile' : 'desktop';
 $I->comment("Detected breakpoint: {$breakpoint}");
 
@@ -80,22 +80,6 @@ $I->comment('✓ Test post deleted successfully');
 /**
  * Helper functions for breakpoint detection
  */
-
-/**
- * Determine if we're in mobile breakpoint (window width < 768px)
- * @param AcceptanceTester $I
- * @return bool
- */
-function isMobileBreakpoint($I) {
-    try {
-        $windowWidth = $I->executeJS("return window.innerWidth;");
-        $I->comment("Window width: {$windowWidth}px");
-        return $windowWidth < 768;
-    } catch (Exception $e) {
-        $I->comment("Failed to detect window width, assuming desktop: " . $e->getMessage());
-        return false;
-    }
-}
 
 /**
  * Test sidebar width as percentage of viewport

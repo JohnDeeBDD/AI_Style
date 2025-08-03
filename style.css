@@ -603,6 +603,13 @@ body.admin-bar #scrollable-content {
     margin: 0 auto; /* Center within chat-main area */
 }
 
+/* Desktop: Position comment box above footer */
+@media screen and (min-width: 782px) {
+    #fixed-comment-box {
+        bottom: 74px; /* Position comment box just above footer with proper spacing */
+    }
+}
+
 #respond {
     background: #303030;
 }

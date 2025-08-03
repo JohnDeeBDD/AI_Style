@@ -350,6 +350,9 @@ export function toggleSidebarVisibility() {
   // Save the new state to localStorage
   saveSidebarState();
   
+  // Update toggle button to reflect new state
+  updateToggleButtonState();
+  
   console.log('Toggled sidebar visibility. New state:', sidebarState.isVisible ? 'visible' : 'hidden', 'Mode:', sidebarState.isMobileView ? 'mobile' : 'desktop');
 }
 
@@ -688,6 +691,34 @@ function addToggleAnimationCSS() {
 }
 
 /**
+ * Update the toggle button state to reflect current sidebar visibility
+ */
+function updateToggleButtonState() {
+  const toggleButton = document.querySelector('#wp-admin-bar-sidebar-toggle .dashicons');
+  const toggleLabel = document.querySelector('#wp-admin-bar-sidebar-toggle .ab-label');
+  
+  if (toggleButton && toggleLabel) {
+    // Remove existing arrow classes
+    toggleButton.classList.remove('dashicons-arrow-left', 'dashicons-arrow-right');
+    
+    // Add appropriate class and text based on sidebar state
+    if (sidebarState.isVisible) {
+      toggleButton.classList.add('dashicons-arrow-left');
+      toggleButton.setAttribute('title', 'Close Sidebar');
+      toggleLabel.textContent = 'Close Sidebar';
+    } else {
+      toggleButton.classList.add('dashicons-arrow-right');
+      toggleButton.setAttribute('title', 'Open Sidebar');
+      toggleLabel.textContent = 'Open Sidebar';
+    }
+    
+    console.log('Updated toggle button state:', sidebarState.isVisible ? 'arrow-left (close)' : 'arrow-right (open)');
+  } else {
+    console.warn('Toggle button elements not found for state update');
+  }
+}
+
+/**
  * Get current sidebar visibility state
  */
 export function isSidebarVisible() {
@@ -712,6 +743,7 @@ export function showSidebar() {
     showSidebarAnimated(sidebar);
     sidebarState.isVisible = true;
     saveSidebarState();
+    updateToggleButtonState();
   }
 }
 
@@ -726,6 +758,7 @@ export function hideSidebar() {
     hideSidebarAnimated(sidebar);
     sidebarState.isVisible = false;
     saveSidebarState();
+    updateToggleButtonState();
   }
 }
 
