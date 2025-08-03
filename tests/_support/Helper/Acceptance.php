@@ -32,16 +32,10 @@ class Acceptance extends \Codeception\Module{
 
     public function _beforeSuite($settings = []){
         $this->hostname = shell_exec("hostname");
-        
-        // Initialize zoom enforcement for the entire test suite
-        // Zoom enforcement removed from _beforeSuite to avoid WebDriver null error
     }
     
-    /**
-     * Ensure 100% zoom before each individual test
-     */
     public function _before(\Codeception\TestInterface $test) {
-        // Zoom enforcement removed from _before; must be called explicitly after navigation in each test
+
     }
 
     public function switchBetweenLinkedAnchorPosts($I){
@@ -250,7 +244,7 @@ class Acceptance extends \Codeception\Module{
         }
         
         $post_id = $response_data['id'];
-
+        sleep(2);
         return $post_id;
     }
 

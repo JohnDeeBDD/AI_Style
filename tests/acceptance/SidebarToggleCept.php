@@ -12,6 +12,10 @@ $I->comment('✓ Test post created with ID: ' . $postId);
 
 $I->amOnUrl(AcceptanceConfig::BASE_URL);
 $I->loginAsAdmin();
+// Clear localStorage to prevent data bleeding from other tests
+$I->comment('Clearing localStorage to ensure clean test state');
+$I->executeJS('localStorage.clear();');
+$I->comment('✓ localStorage cleared');
 $I->wait(2);
 $I->amOnPage("/?p=" . $postId);
 
@@ -25,6 +29,8 @@ $I->comment("Testing sidebar toggle for {$deviceMode} mode ({$windowSize})");
 
 // Wait for the page to be fully loaded
 $I->waitForElement(AcceptanceConfig::ADMIN_BAR, 10);
+
+
 
 // Define the toggle button selector based on device mode
 $toggleButtonSelector = $isMobile
@@ -84,6 +90,7 @@ $I->comment("Initial sidebar visibility state: " . ($initialSidebarVisible ? 'vi
 
 // Check initial sidebar state based on device mode
 if ($deviceMode === 'desktop') {
+    sleep(2);
     // EXPECTED: Desktop sidebar should be VISIBLE initially (arrow points left to hide it)
     $I->seeElement('#wp-admin-bar-sidebar-toggle .dashicons-arrow-left');
     $I->comment('✓ DESKTOP: Sidebar is initially VISIBLE (toggle shows arrow-left)');

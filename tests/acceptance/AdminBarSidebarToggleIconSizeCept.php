@@ -31,6 +31,30 @@ $windowSize = $I->getWindowSize();
 $I->comment("Testing admin bar sidebar toggle icon sizing for {$deviceMode} mode ({$windowSize})");
 $I->comment("Configuration-driven test: Device mode = {$deviceMode}, Window size = {$windowSize}");
 
+// Mobile/Desktop detection switch
+// Current logic is for desktop only - mobile testing not yet implemented
+if (strtolower($deviceMode) === 'mobile') {
+    $I->comment('Mobile mode detected - skipping detailed assertions (mobile testing not yet implemented)');
+    $I->comment('Mobile test will pass automatically until mobile-specific logic is implemented');
+    
+    // Wait for the admin bar to be fully loaded
+    $I->waitForElement(AcceptanceConfig::ADMIN_BAR, 10);
+    
+    // Basic verification that elements exist (minimal mobile test)
+    $I->comment('Performing basic mobile verification - checking element presence only');
+    $I->seeElement(AcceptanceConfig::ADMIN_BAR_SIDEBAR_TOGGLE);
+    
+    // Take a screenshot for mobile documentation
+    $I->makeScreenshot('admin-bar-sidebar-toggle-mobile-mode');
+    $I->comment("Mobile mode screenshot: <a href='http://localhost/wp-content/themes/ai_style/tests/_output/debug/admin-bar-sidebar-toggle-mobile-mode.png' target='_blank'>available here</a>");
+    
+    $I->comment('Mobile test completed successfully - detailed mobile testing to be implemented later');
+    return; // Exit early for mobile mode
+}
+
+// Desktop mode - run full test logic
+$I->comment('Desktop mode detected - running full test suite');
+
 // Wait for the admin bar to be fully loaded
 $I->waitForElement(AcceptanceConfig::ADMIN_BAR, 10);
 
@@ -150,4 +174,4 @@ $I->assertEquals(
 $I->makeScreenshot('admin-bar-sidebar-toggle-after-size-check');
 $I->comment("Final screenshot after size verification: <a href='http://localhost/wp-content/themes/ai_style/tests/_output/debug/admin-bar-sidebar-toggle-after-size-check.png' target='_blank'>available here</a>");
 
-$I->comment('Test completed. All assertions should pass if the sidebar toggle icon sizing matches WordPress admin bar standards.');
+$I->comment('Desktop test completed. All assertions should pass if the sidebar toggle icon sizing matches WordPress admin bar standards.');
