@@ -2,7 +2,7 @@
  * Toggle Sidebar Visibility
  *
  * This module provides functionality to toggle the sidebar visibility with smooth animations.
- * It includes state management, zoom level detection, and smooth slide animations.
+ * It includes state management and smooth slide animations using CSS media queries.
  *
  * @package AI_Style
  */
@@ -14,8 +14,6 @@ let sidebarState = {
   isVisible: true,
   isAnimating: false,
   originalWidth: '377px',
-  zoomLevel: 100,
-  isHighZoomOrMobilePortrait: false,
   isMobileView: false,
   isDesktopView: true,
   resizeTimeout: null
@@ -58,21 +56,17 @@ function loadSidebarState() {
 
 /**
  * Initialize the toggle sidebar functionality
- * Sets up initial state based on zoom level detection and localStorage
+ * Sets up initial state based on localStorage and responsive breakpoints
  */
 export function initToggleSidebar() {
   console.log('Initializing toggle sidebar functionality');
   
-  // Detect zoom level first
-  detectZoomLevel();
-  
-  // Update responsive mode detection (includes both breakpoint and zoom detection)
+  // Update responsive mode detection
   updateResponsiveMode();
   
   console.log('Responsive modes detected:', {
     isMobileView: sidebarState.isMobileView,
-    isDesktopView: sidebarState.isDesktopView,
-    isHighZoomOrMobilePortrait: sidebarState.isHighZoomOrMobilePortrait
+    isDesktopView: sidebarState.isDesktopView
   });
   
   // Load saved state from localStorage
@@ -83,9 +77,6 @@ export function initToggleSidebar() {
   
   // Add CSS for animations if not already present
   addToggleAnimationCSS();
-  
-  // Update element visibility based on current mode
-  updateElementVisibility();
   
   // Add resize listener to handle dynamic changes
   window.addEventListener('resize', handleWindowResize);
@@ -100,16 +91,14 @@ function handleWindowResize() {
   // Debounce resize events
   clearTimeout(sidebarState.resizeTimeout);
   sidebarState.resizeTimeout = setTimeout(() => {
-    // Re-detect zoom level and responsive modes
-    detectZoomLevel();
+    // Update responsive modes
     const modeChanged = updateResponsiveMode();
     
     // If responsive mode changed, handle the transition
     if (modeChanged) {
       console.log('Responsive mode changed on resize:', {
         isMobileView: sidebarState.isMobileView,
-        isDesktopView: sidebarState.isDesktopView,
-        isHighZoomOrMobilePortrait: sidebarState.isHighZoomOrMobilePortrait
+        isDesktopView: sidebarState.isDesktopView
       });
       
       const sidebar = document.getElementById('chat-sidebar');
@@ -164,38 +153,8 @@ function handleModeTransition(sidebar) {
 
         handleModeTransition(sidebar);
       }
-      
-      // Update element visibility
-      updateElementVisibility();
     }
   }, 250);
-}
-
-/**
- * Detect the current zoom level of the browser
- * Uses a combination of devicePixelRatio and window dimensions
- */
-function detectZoomLevel() {
-  // Method 1: Using devicePixelRatio (most reliable)
-  const devicePixelRatio = window.devicePixelRatio || 1;
-  
-  // Method 2: Using screen dimensions vs window dimensions
-  const screenWidth = screen.width;
-  const windowWidth = window.outerWidth;
-  const ratio = screenWidth / windowWidth;
-  
-  // Calculate zoom level (approximate)
-  let zoomLevel = Math.round(devicePixelRatio * 100);
-  
-  // Fallback calculation if devicePixelRatio seems off
-  if (zoomLevel === 100 && ratio > 1) {
-    zoomLevel = Math.round(ratio * 100);
-  }
-  
-  sidebarState.zoomLevel = zoomLevel;
-  console.log('Detected zoom level:', zoomLevel + '%');
-  
-  return zoomLevel;
 }
 
 /**
@@ -216,33 +175,8 @@ function isDesktopView() {
 }
 
 /**
- * Detect if we're in mobile portrait mode
- * @returns {boolean}
- */
-function isMobilePortrait() {
-  // Check if viewport width is typical mobile portrait (less than 480px) and height > width
-  const viewportWidth = window.innerWidth;
-  const viewportHeight = window.innerHeight;
-  
-  return viewportWidth <= 480 && viewportHeight > viewportWidth;
-}
-
-/**
- * Detect if we're in high zoom mode (250%+) or mobile portrait
- * @returns {boolean}
- */
-function isHighZoomOrMobilePortrait() {
-  const zoomLevel = sidebarState.zoomLevel;
-  const mobilePortrait = isMobilePortrait();
-  
-  console.log('Zoom level:', zoomLevel + '%', 'Mobile portrait:', mobilePortrait);
-  
-  return zoomLevel >= 250 || mobilePortrait;
-}
-
-/**
  * Update responsive mode detection
- * Updates both breakpoint-based and zoom-based detection
+ * Updates breakpoint-based detection using WordPress-compliant breakpoints
  */
 function updateResponsiveMode() {
   const wasMobileView = sidebarState.isMobileView;
@@ -250,7 +184,6 @@ function updateResponsiveMode() {
   
   sidebarState.isMobileView = isMobileView();
   sidebarState.isDesktopView = isDesktopView();
-  sidebarState.isHighZoomOrMobilePortrait = isHighZoomOrMobilePortrait();
   
   const modeChanged = wasMobileView !== sidebarState.isMobileView ||
                      wasDesktopView !== sidebarState.isDesktopView;
@@ -258,7 +191,6 @@ function updateResponsiveMode() {
   console.log('Responsive mode updated:', {
     isMobileView: sidebarState.isMobileView,
     isDesktopView: sidebarState.isDesktopView,
-    isHighZoomOrMobilePortrait: sidebarState.isHighZoomOrMobilePortrait,
     modeChanged: modeChanged
   });
   
@@ -270,14 +202,11 @@ function updateResponsiveMode() {
  * @returns {string}
  */
 function getSidebarWidth() {
-  if (sidebarState.isHighZoomOrMobilePortrait) {
-    return '85%';
-  }
   return sidebarState.originalWidth;
 }
 
 /**
- * Set initial sidebar state based on saved state or zoom level
+ * Set initial sidebar state based on saved state or responsive mode
  * @param {boolean|null} savedState - The saved state from localStorage, or null if not found
  */
 function setInitialSidebarState(savedState) {
@@ -299,9 +228,9 @@ function setInitialSidebarState(savedState) {
     shouldBeVisible = savedState;
     console.log('Using saved sidebar state:', shouldBeVisible);
   } else {
-    // Fall back to zoom level logic if no saved state
-    shouldBeVisible = sidebarState.zoomLevel < 175;
-    console.log('Using zoom level logic for sidebar state:', shouldBeVisible, 'at zoom level:', sidebarState.zoomLevel + '%');
+    // Default to visible on desktop, hidden on mobile
+    shouldBeVisible = sidebarState.isDesktopView;
+    console.log('Using responsive logic for sidebar state:', shouldBeVisible, 'Mode:', sidebarState.isDesktopView ? 'desktop' : 'mobile');
   }
   
   // Apply the determined state
@@ -383,9 +312,6 @@ function hideSidebarAnimated(sidebar) {
   
   sidebar.style.overflow = 'hidden';
   
-  // Update element visibility based on current mode
-  updateElementVisibility();
-  
   // Remove animation class and reset state after animation completes
   setTimeout(() => {
     sidebar.classList.remove('sidebar-transitioning');
@@ -425,9 +351,6 @@ function showSidebarAnimated(sidebar) {
   
   sidebar.style.overflow = 'hidden'; // Keep hidden during animation
   
-  // Update element visibility based on current mode
-  updateElementVisibility();
-  
   // Remove animation class and restore overflow after animation completes
   setTimeout(() => {
     sidebar.classList.remove('sidebar-transitioning');
@@ -458,52 +381,6 @@ function hideSidebarImmediate(sidebar) {
   }
   
   sidebar.style.overflow = 'hidden';
-  
-  // Update element visibility based on current mode
-  updateElementVisibility();
-}
-
-/**
- * Update element visibility based on sidebar state and current mode
- */
-function updateElementVisibility() {
-  const commentForm = document.getElementById('fixed-comment-box');
-  const footer = document.querySelector('.site-footer');
-  
-  if (sidebarState.isHighZoomOrMobilePortrait) {
-    // In high zoom or mobile portrait mode
-    if (sidebarState.isVisible) {
-      // Sidebar is open: hide comment form and footer
-      if (commentForm) {
-        commentForm.style.display = 'none';
-        console.log('Comment form hidden (sidebar open in high zoom/mobile portrait)');
-      }
-      if (footer) {
-        footer.style.display = 'none';
-        console.log('Footer hidden (sidebar open in high zoom/mobile portrait)');
-      }
-    } else {
-      // Sidebar is closed: show comment form, keep footer hidden
-      if (commentForm) {
-        commentForm.style.display = 'block';
-        console.log('Comment form shown (sidebar closed in high zoom/mobile portrait)');
-      }
-      if (footer) {
-        footer.style.display = 'none';
-        console.log('Footer remains hidden (high zoom/mobile portrait mode)');
-      }
-    }
-  } else {
-    // Normal mode: show both elements
-    if (commentForm) {
-      commentForm.style.display = 'block';
-      console.log('Comment form shown (normal mode)');
-    }
-    if (footer) {
-      footer.style.display = 'block';
-      console.log('Footer shown (normal mode)');
-    }
-  }
 }
 
 /**
@@ -530,9 +407,6 @@ function showSidebarImmediate(sidebar) {
   }
   
   sidebar.style.overflow = 'auto';
-  
-  // Update element visibility based on current mode
-  updateElementVisibility();
 }
 
 /**
@@ -598,48 +472,8 @@ function addToggleAnimationCSS() {
     }
     
     /* Add smooth transition for comment form visibility */
-    #fixed-comment-box {
+    #fixed-content {
       transition: display 300ms ease-in-out;
-    }
-    
-    /* Mobile portrait and high zoom responsive styles */
-    @media screen and (max-width: 480px) and (orientation: portrait) {
-      /* Mobile portrait mode */
-      #chat-sidebar:not(.sidebar-hidden) {
-        width: 85% !important;
-        min-width: 85% !important;
-      }
-      
-      /* Hide footer in mobile portrait mode */
-      .site-footer {
-        display: none !important;
-      }
-    }
-    
-    /* High zoom level styles (250%+) */
-    @media screen and (min-resolution: 2.5dppx) {
-      #chat-sidebar:not(.sidebar-hidden) {
-        width: 85% !important;
-        min-width: 85% !important;
-      }
-      
-      /* Hide footer in high zoom mode */
-      .site-footer {
-        display: none !important;
-      }
-    }
-    
-    /* Alternative media query for browsers that don't support dppx */
-    @media screen and (-webkit-min-device-pixel-ratio: 2.5) {
-      #chat-sidebar:not(.sidebar-hidden) {
-        width: 85% !important;
-        min-width: 85% !important;
-      }
-      
-      /* Hide footer in high zoom mode */
-      .site-footer {
-        display: none !important;
-      }
     }
     
     /* Admin bar toggle button styles */
@@ -664,21 +498,7 @@ function addToggleAnimationCSS() {
       font-size: 13px;
     }
     
-    /* Hide label text at high zoom levels (250%+) following WordPress patterns */
-    @media screen and (min-resolution: 2.5dppx) {
-      #wp-admin-bar-sidebar-toggle .ab-item .ab-label {
-        display: none;
-      }
-    }
-    
-    /* Alternative media query for browsers that don't support dppx */
-    @media screen and (-webkit-min-device-pixel-ratio: 2.5) {
-      #wp-admin-bar-sidebar-toggle .ab-item .ab-label {
-        display: none;
-      }
-    }
-    
-    /* Ensure icon remains visible at all zoom levels */
+    /* Ensure icon remains visible at all viewport sizes */
     #wp-admin-bar-sidebar-toggle .ab-item .dashicons {
       display: inline-block !important;
       visibility: visible !important;
@@ -691,31 +511,49 @@ function addToggleAnimationCSS() {
 }
 
 /**
+ * Update toggle button icon and text based on sidebar visibility state
+ * Generic function that can handle both mobile and desktop toggle buttons
+ *
+ * @param {HTMLElement|null} iconElement - The icon element (optional, will auto-detect if not provided)
+ * @param {HTMLElement|null} labelElement - The label element (optional, will auto-detect if not provided)
+ * @param {boolean|null} isVisible - Override visibility state (optional, uses current state if not provided)
+ */
+export function updateToggleButton(iconElement = null, labelElement = null, isVisible = null) {
+  // Use provided visibility state or current sidebar state
+  const sidebarVisible = isVisible !== null ? isVisible : sidebarState.isVisible;
+  
+  // Auto-detect elements if not provided (for backward compatibility)
+  const toggleIcon = iconElement || document.querySelector('#wp-admin-bar-sidebar-toggle .dashicons');
+  const toggleLabel = labelElement || document.querySelector('#wp-admin-bar-sidebar-toggle .ab-label');
+  
+  if (!toggleIcon || !toggleLabel) {
+    console.warn('Toggle button elements not found for state update');
+    return;
+  }
+  
+  // Remove existing arrow classes
+  toggleIcon.classList.remove('dashicons-arrow-left', 'dashicons-arrow-right');
+  
+  // Add appropriate class and text based on sidebar state
+  if (sidebarVisible) {
+    toggleIcon.classList.add('dashicons-arrow-left');
+    toggleIcon.setAttribute('title', 'Close Sidebar');
+    toggleLabel.textContent = 'Close Sidebar';
+  } else {
+    toggleIcon.classList.add('dashicons-arrow-right');
+    toggleIcon.setAttribute('title', 'Open Sidebar');
+    toggleLabel.textContent = 'Open Sidebar';
+  }
+  
+  console.log('Updated toggle button state:', sidebarVisible ? 'arrow-left (close)' : 'arrow-right (open)');
+}
+
+/**
  * Update the toggle button state to reflect current sidebar visibility
+ * Wrapper function for backward compatibility
  */
 function updateToggleButtonState() {
-  const toggleButton = document.querySelector('#wp-admin-bar-sidebar-toggle .dashicons');
-  const toggleLabel = document.querySelector('#wp-admin-bar-sidebar-toggle .ab-label');
-  
-  if (toggleButton && toggleLabel) {
-    // Remove existing arrow classes
-    toggleButton.classList.remove('dashicons-arrow-left', 'dashicons-arrow-right');
-    
-    // Add appropriate class and text based on sidebar state
-    if (sidebarState.isVisible) {
-      toggleButton.classList.add('dashicons-arrow-left');
-      toggleButton.setAttribute('title', 'Close Sidebar');
-      toggleLabel.textContent = 'Close Sidebar';
-    } else {
-      toggleButton.classList.add('dashicons-arrow-right');
-      toggleButton.setAttribute('title', 'Open Sidebar');
-      toggleLabel.textContent = 'Open Sidebar';
-    }
-    
-    console.log('Updated toggle button state:', sidebarState.isVisible ? 'arrow-left (close)' : 'arrow-right (open)');
-  } else {
-    console.warn('Toggle button elements not found for state update');
-  }
+  updateToggleButton();
 }
 
 /**
@@ -766,11 +604,8 @@ export function hideSidebar() {
 export {
   isMobileView,
   isDesktopView,
-  isMobilePortrait,
-  isHighZoomOrMobilePortrait,
   updateResponsiveMode,
-  getSidebarWidth,
-  updateElementVisibility
+  getSidebarWidth
 };
 
 // Export default function for easy importing
@@ -783,9 +618,7 @@ export default {
   hideSidebar,
   isMobileView,
   isDesktopView,
-  isMobilePortrait,
-  isHighZoomOrMobilePortrait,
   updateResponsiveMode,
   getSidebarWidth,
-  updateElementVisibility
+  updateToggleButton
 };

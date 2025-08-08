@@ -1,7 +1,7 @@
 /*
  Theme Name:   A.I. Style
  Description:  A WordPress theme inspired by commercial LLMs like Chat-GPT, Gemini, and Grok
- Version:      29.0.0.0
+ Version:      33.0.0.0
  Author:       General Chicken
  Author URI:   https://generalchicken.guru
  Tags:         ai
@@ -98,13 +98,14 @@ body.admin-bar #chat-container {
     box-sizing: border-box;
     color: #ececf1;
     overflow-y: auto;
-    z-index: 1000; /* Overlay above content */
+    z-index: 50; /* Lower z-index when closed, won't interfere with comment form */
     transition: left 300ms ease-in-out;
 }
 
-/* Mobile: Show sidebar when toggled */
+/* Mobile: Show sidebar when toggled - higher z-index to appear above comment form */
 #chat-sidebar.sidebar-visible {
     left: 0;
+    z-index: 200; /* Higher than comment form (100) to ensure proper layering */
 }
 
 /* Mobile: Account for admin bar */
@@ -200,6 +201,7 @@ body.admin-bar #chat-sidebar {
     position: relative;
     align-items: center;
     overflow-y: visible;
+    z-index: 1; /* Base layer for main content */
 }
 
 @media screen and (min-width: 782px) {
@@ -250,7 +252,7 @@ body.admin-bar #scrollable-content {
     color: #343541; /* Dark text on light background for ChatGPT style */
     width: 100%;
     box-sizing: border-box;
-    max-width: 768px; /* Match fixed-comment-box max-width */
+    max-width: 768px; /* Match fixed-content max-width */
     margin: 0 auto;
     overflow-y: visible; /* Allow content to be visible */
     display: flex;
@@ -497,6 +499,58 @@ body.admin-bar #scrollable-content {
     }
 }
 
+/* High zoom and mobile portrait responsive styles */
+@media screen and (max-width: 480px) and (orientation: portrait) {
+    /* Mobile portrait mode - wider sidebar */
+    #chat-sidebar:not(.sidebar-hidden) {
+        width: 85% !important;
+        min-width: 85% !important;
+    }
+    
+    /* Hide footer in mobile portrait mode */
+    .site-footer {
+        display: none !important;
+    }
+}
+
+/* High zoom level styles (250%+) using resolution-based media queries */
+@media screen and (min-resolution: 2.5dppx) {
+    /* Wider sidebar at high zoom levels */
+    #chat-sidebar:not(.sidebar-hidden) {
+        width: 85% !important;
+        min-width: 85% !important;
+    }
+    
+    /* Hide footer at high zoom levels */
+    .site-footer {
+        display: none !important;
+    }
+    
+    /* Hide admin bar toggle label text at high zoom levels */
+    #wp-admin-bar-sidebar-toggle .ab-item .ab-label {
+        display: none !important;
+    }
+}
+
+/* Alternative media query for browsers that don't support dppx */
+@media screen and (-webkit-min-device-pixel-ratio: 2.5) {
+    /* Wider sidebar at high zoom levels */
+    #chat-sidebar:not(.sidebar-hidden) {
+        width: 85% !important;
+        min-width: 85% !important;
+    }
+    
+    /* Hide footer at high zoom levels */
+    .site-footer {
+        display: none !important;
+    }
+    
+    /* Hide admin bar toggle label text at high zoom levels */
+    #wp-admin-bar-sidebar-toggle .ab-item .ab-label {
+        display: none !important;
+    }
+}
+
 
 /* WordPress Comment Form - ChatGPT Style */
 
@@ -586,7 +640,7 @@ body.admin-bar #scrollable-content {
 }
 
 /* Fixed comment box positioning */
-#fixed-comment-box {
+#fixed-content {
     position: absolute;
     bottom: 0;
     left: 0;
@@ -595,7 +649,7 @@ body.admin-bar #scrollable-content {
     max-width: 768px;
     box-sizing: border-box;
     padding: 0;
-    z-index: 1000; /* Lower than before but still high enough to stay above content */
+    z-index: 100; /* Above main content but below sidebar when visible */
     display: flex;
     justify-content: center; /* Center the comment form horizontally */
     align-items: center; /* Center vertically */
@@ -605,7 +659,7 @@ body.admin-bar #scrollable-content {
 
 /* Desktop: Position comment box above footer */
 @media screen and (min-width: 782px) {
-    #fixed-comment-box {
+    #fixed-content {
         bottom: 74px; /* Position comment box just above footer with proper spacing */
     }
 }
@@ -635,7 +689,7 @@ body.admin-bar #scrollable-content {
     width: 100%;
     transition: none;
     box-sizing: border-box;
-    z-index: 1001; /* Ensure it's above the fixed-comment-box */
+    z-index: 1001; /* Ensure it's above the fixed-content */
 }
 
 /* Comment form input row */
@@ -1376,7 +1430,7 @@ body.admin-bar .site-footer {
 }
 
 #commentform {
-    z-index: 1001; /* Slightly higher than fixed-comment-box but much lower than before */
+    z-index: 1001; /* Slightly higher than fixed-content but much lower than before */
 }
 
 

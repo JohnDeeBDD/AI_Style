@@ -260,222 +260,205 @@ function r(r, e, n) {
         return r.json();
     }) : Promise.reject(Error('Cannot archive conversation: Missing post_id or nonce'));
 }
-var i = {
+function overrideHoverBehavior(n) {
+    var o, e, t, r = (e = (o = n).cloneNode(!0), o.parentNode.replaceChild(e, o), e);
+    return (t = document.createElement('style')).textContent = "\n      #wp-admin-bar-new-content .ab-sub-wrapper {\n        display: none !important;\n      }\n      #wp-admin-bar-new-content:hover .ab-sub-wrapper {\n        display: none !important;\n      }\n    ", document.head.appendChild(t), r;
+}
+function overrideClickBehavior(n) {
+    var o, e = ((o = n.querySelector('a.ab-item')) || console.warn('Admin bar "New" button link not found'), o);
+    e && e.addEventListener('click', t2);
+}
+function t2(t) {
+    t.preventDefault(), t.stopPropagation(), console.log('New button clicked'), clearMessages();
+    var r1, a, i, c = t1.getPostId(), d = AIStyleSettings.nonce;
+    console.log("nonce:", d), c && d ? (r1 = c, a = d, (i = new FormData()).append('post_id', r1), i.append('nonce', a), r(r1, i, "/wp-json/cacbot/v1/unlink-conversation").then(function(n) {
+        console.log('Archive conversation response:', n), window.location.reload();
+    }).catch(function(n) {
+        console.error('Error archiving conversation:', n);
+    })) : console.warn('Cannot archive conversation: Missing post_id or nonce');
+}
+function r1() {
+    if (!document.body.classList.contains('wp-admin')) {
+        console.log(AIStyleSettings), console.log('Customizing admin bar "New" button behavior');
+        var n = document.getElementById('wp-admin-bar-new-content');
+        if (!n) return void console.warn('Admin bar "New" button not found');
+        overrideClickBehavior(overrideHoverBehavior(n));
+    }
+}
+var e2 = {
     isVisible: !0,
     isAnimating: !1,
     originalWidth: '377px',
-    zoomLevel: 100,
-    isHighZoomOrMobilePortrait: !1,
     isMobileView: !1,
     isDesktopView: !0,
     resizeTimeout: null
-}, e2 = 'ai_style_sidebar_visible';
-function t2() {
+}, i = 'ai_style_sidebar_visible';
+function t3() {
     try {
-        localStorage.setItem(e2, i.isVisible.toString()), console.log('Sidebar state saved to localStorage:', i.isVisible);
-    } catch (i) {
-        console.warn('Failed to save sidebar state to localStorage:', i);
+        localStorage.setItem(i, e2.isVisible.toString()), console.log('Sidebar state saved to localStorage:', e2.isVisible);
+    } catch (e) {
+        console.warn('Failed to save sidebar state to localStorage:', e);
     }
 }
 function initToggleSidebar() {
-    console.log('Initializing toggle sidebar functionality'), n1(), d(), console.log('Responsive modes detected:', {
-        isMobileView: i.isMobileView,
-        isDesktopView: i.isDesktopView,
-        isHighZoomOrMobilePortrait: i.isHighZoomOrMobilePortrait
-    }), function(e) {
-        var o, n, s = document.getElementById('chat-sidebar');
-        if (!s) return console.warn('Sidebar element not found');
-        i.originalWidth = window.getComputedStyle(s).width, null !== e ? console.log('Using saved sidebar state:', n = e) : console.log('Using zoom level logic for sidebar state:', n = i.zoomLevel < 175, 'at zoom level:', i.zoomLevel + '%'), i.isVisible = n, n ? function(e) {
-            if (e.classList.remove('sidebar-hidden'), i.isMobileView) e.classList.add('sidebar-visible'), e.style.left = '0';
+    console.log('Initializing toggle sidebar functionality'), a(), console.log('Responsive modes detected:', {
+        isMobileView: e2.isMobileView,
+        isDesktopView: e2.isDesktopView
+    }), function(i) {
+        var s, n, o = document.getElementById('chat-sidebar');
+        if (!o) return console.warn('Sidebar element not found');
+        e2.originalWidth = window.getComputedStyle(o).width, null !== i ? console.log('Using saved sidebar state:', n = i) : console.log('Using responsive logic for sidebar state:', n = e2.isDesktopView, 'Mode:', e2.isDesktopView ? 'desktop' : 'mobile'), e2.isVisible = n, n ? function(i) {
+            if (i.classList.remove('sidebar-hidden'), e2.isMobileView) i.classList.add('sidebar-visible'), i.style.left = '0';
             else {
-                var t = b();
-                e.style.width = t, e.style.minWidth = t, e.style.paddingLeft = '16px', e.style.paddingRight = '16px', c(!1);
+                var t = l();
+                i.style.width = t, i.style.minWidth = t, i.style.paddingLeft = '16px', i.style.paddingRight = '16px', b(!1);
             }
-            e.style.overflow = 'auto', p();
-        }(s) : (o = s, i.isMobileView ? (o.classList.remove('sidebar-visible'), o.style.left = '-100%') : (o.style.width = '0', o.style.minWidth = '0', o.style.paddingLeft = '0', o.style.paddingRight = '0', o.classList.add('sidebar-hidden'), c(!0)), o.style.overflow = 'hidden', p()), t2();
+            i.style.overflow = 'auto';
+        }(o) : (s = o, e2.isMobileView ? (s.classList.remove('sidebar-visible'), s.style.left = '-100%') : (s.style.width = '0', s.style.minWidth = '0', s.style.paddingLeft = '0', s.style.paddingRight = '0', s.classList.add('sidebar-hidden'), b(!0)), s.style.overflow = 'hidden'), t3();
     }(function() {
         try {
-            var i = localStorage.getItem(e2);
-            if (null !== i) {
-                var t = 'true' === i;
+            var e = localStorage.getItem(i);
+            if (null !== e) {
+                var t = 'true' === e;
                 return console.log('Sidebar state loaded from localStorage:', t), t;
             }
-        } catch (i) {
-            console.warn('Failed to load sidebar state from localStorage:', i);
+        } catch (e) {
+            console.warn('Failed to load sidebar state from localStorage:', e);
         }
         return null;
     }()), function() {
         if (!document.getElementById('sidebar-toggle-styles')) {
-            var i = document.createElement('style');
-            i.id = 'sidebar-toggle-styles', i.textContent = "\n    /* Sidebar toggle animation styles */\n    #chat-sidebar.sidebar-transitioning {\n      transition: width 300ms ease-in-out,\n                  min-width 300ms ease-in-out,\n                  padding-left 300ms ease-in-out,\n                  padding-right 300ms ease-in-out;\n    }\n    \n    #chat-sidebar.sidebar-hidden {\n      width: 0 !important;\n      min-width: 0 !important;\n      padding-left: 0 !important;\n      padding-right: 0 !important;\n      overflow: hidden !important;\n      border-right: none !important;\n    }\n    \n    /* Ensure main content expands when sidebar is hidden */\n    #chat-sidebar.sidebar-hidden + #chat-main {\n      width: 100% !important;\n      max-width: 100% !important;\n    }\n    \n    /* Add smooth transition for footer position changes */\n    .site-footer {\n      transition: left 300ms ease-in-out, display 300ms ease-in-out;\n    }\n    \n    /* Add smooth transition for comment form visibility */\n    #fixed-comment-box {\n      transition: display 300ms ease-in-out;\n    }\n    \n    /* Mobile portrait and high zoom responsive styles */\n    @media screen and (max-width: 480px) and (orientation: portrait) {\n      /* Mobile portrait mode */\n      #chat-sidebar:not(.sidebar-hidden) {\n        width: 85% !important;\n        min-width: 85% !important;\n      }\n      \n      /* Hide footer in mobile portrait mode */\n      .site-footer {\n        display: none !important;\n      }\n    }\n    \n    /* High zoom level styles (250%+) */\n    @media screen and (min-resolution: 2.5dppx) {\n      #chat-sidebar:not(.sidebar-hidden) {\n        width: 85% !important;\n        min-width: 85% !important;\n      }\n      \n      /* Hide footer in high zoom mode */\n      .site-footer {\n        display: none !important;\n      }\n    }\n    \n    /* Alternative media query for browsers that don't support dppx */\n    @media screen and (-webkit-min-device-pixel-ratio: 2.5) {\n      #chat-sidebar:not(.sidebar-hidden) {\n        width: 85% !important;\n        min-width: 85% !important;\n      }\n      \n      /* Hide footer in high zoom mode */\n      .site-footer {\n        display: none !important;\n      }\n    }\n    \n    /* Admin bar toggle button styles */\n    #wp-admin-bar-sidebar-toggle .ab-item {\n      display: flex !important;\n      align-items: center;\n      gap: 4px;\n    }\n    \n    #wp-admin-bar-sidebar-toggle .ab-item .dashicons {\n      font-size: 24px !important;\n      width: 24px !important;\n      height: 24px !important;\n      line-height: 1 !important;\n      vertical-align: middle !important;\n      margin: 0 !important;\n      padding: 0 !important;\n      display: inline-block !important;\n    }\n    \n    #wp-admin-bar-sidebar-toggle .ab-item .ab-label {\n      font-size: 13px;\n    }\n    \n    /* Hide label text at high zoom levels (250%+) following WordPress patterns */\n    @media screen and (min-resolution: 2.5dppx) {\n      #wp-admin-bar-sidebar-toggle .ab-item .ab-label {\n        display: none;\n      }\n    }\n    \n    /* Alternative media query for browsers that don't support dppx */\n    @media screen and (-webkit-min-device-pixel-ratio: 2.5) {\n      #wp-admin-bar-sidebar-toggle .ab-item .ab-label {\n        display: none;\n      }\n    }\n    \n    /* Ensure icon remains visible at all zoom levels */\n    #wp-admin-bar-sidebar-toggle .ab-item .dashicons {\n      display: inline-block !important;\n      visibility: visible !important;\n      opacity: 1 !important;\n    }\n  ", document.head.appendChild(i), console.log('Added sidebar toggle animation CSS with responsive styles');
+            var e = document.createElement('style');
+            e.id = 'sidebar-toggle-styles', e.textContent = "\n    /* Sidebar toggle animation styles */\n    #chat-sidebar.sidebar-transitioning {\n      transition: width 300ms ease-in-out,\n                  min-width 300ms ease-in-out,\n                  padding-left 300ms ease-in-out,\n                  padding-right 300ms ease-in-out;\n    }\n    \n    #chat-sidebar.sidebar-hidden {\n      width: 0 !important;\n      min-width: 0 !important;\n      padding-left: 0 !important;\n      padding-right: 0 !important;\n      overflow: hidden !important;\n      border-right: none !important;\n    }\n    \n    /* Ensure main content expands when sidebar is hidden */\n    #chat-sidebar.sidebar-hidden + #chat-main {\n      width: 100% !important;\n      max-width: 100% !important;\n    }\n    \n    /* Add smooth transition for footer position changes */\n    .site-footer {\n      transition: left 300ms ease-in-out, display 300ms ease-in-out;\n    }\n    \n    /* Add smooth transition for comment form visibility */\n    #fixed-content {\n      transition: display 300ms ease-in-out;\n    }\n    \n    /* Admin bar toggle button styles */\n    #wp-admin-bar-sidebar-toggle .ab-item {\n      display: flex !important;\n      align-items: center;\n      gap: 4px;\n    }\n    \n    #wp-admin-bar-sidebar-toggle .ab-item .dashicons {\n      font-size: 24px !important;\n      width: 24px !important;\n      height: 24px !important;\n      line-height: 1 !important;\n      vertical-align: middle !important;\n      margin: 0 !important;\n      padding: 0 !important;\n      display: inline-block !important;\n    }\n    \n    #wp-admin-bar-sidebar-toggle .ab-item .ab-label {\n      font-size: 13px;\n    }\n    \n    /* Ensure icon remains visible at all viewport sizes */\n    #wp-admin-bar-sidebar-toggle .ab-item .dashicons {\n      display: inline-block !important;\n      visibility: visible !important;\n      opacity: 1 !important;\n    }\n  ", document.head.appendChild(e), console.log('Added sidebar toggle animation CSS with responsive styles');
         }
-    }(), p(), window.addEventListener('resize', o), console.log('Toggle sidebar initialized with state:', i);
+    }(), window.addEventListener('resize', s), console.log('Toggle sidebar initialized with state:', e2);
 }
-function o() {
-    clearTimeout(i.resizeTimeout), i.resizeTimeout = setTimeout(function() {
-        if (n1(), d()) {
+function s() {
+    clearTimeout(e2.resizeTimeout), e2.resizeTimeout = setTimeout(function() {
+        if (a()) {
             console.log('Responsive mode changed on resize:', {
-                isMobileView: i.isMobileView,
-                isDesktopView: i.isDesktopView,
-                isHighZoomOrMobilePortrait: i.isHighZoomOrMobilePortrait
+                isMobileView: e2.isMobileView,
+                isDesktopView: e2.isDesktopView
             });
-            var e = document.getElementById('chat-sidebar');
-            if (e) if (i.isMobileView) console.log('Switching to mobile overlay mode'), i.isVisible ? (e.classList.add('sidebar-visible'), e.style.left = '0') : (e.classList.remove('sidebar-visible'), e.style.left = '-100%'), e.style.width = '', e.style.minWidth = '', e.style.position = '';
-            else if (console.log('Switching to desktop push/shrink mode'), e.classList.remove('sidebar-visible'), e.style.left = '', i.isVisible) {
-                var t = b();
-                e.style.width = t, e.style.minWidth = t, e.classList.remove('sidebar-hidden');
-            } else e.style.width = '0', e.style.minWidth = '0', e.classList.add('sidebar-hidden');
-            p();
+            var i = document.getElementById('chat-sidebar');
+            if (i) if (e2.isMobileView) console.log('Switching to mobile overlay mode'), e2.isVisible ? (i.classList.add('sidebar-visible'), i.style.left = '0') : (i.classList.remove('sidebar-visible'), i.style.left = '-100%'), i.style.width = '', i.style.minWidth = '', i.style.position = '';
+            else if (console.log('Switching to desktop push/shrink mode'), i.classList.remove('sidebar-visible'), i.style.left = '', e2.isVisible) {
+                var t = l();
+                i.style.width = t, i.style.minWidth = t, i.classList.remove('sidebar-hidden');
+            } else i.style.width = '0', i.style.minWidth = '0', i.classList.add('sidebar-hidden');
         }
     }, 250);
 }
 function n1() {
-    var e = window.devicePixelRatio || 1, t = screen.width / window.outerWidth, o = Math.round(100 * e);
-    return 100 === o && t > 1 && (o = Math.round(100 * t)), i.zoomLevel = o, console.log('Detected zoom level:', o + '%'), o;
-}
-function s() {
     return window.innerWidth < 782;
 }
-function a() {
+function o() {
     return window.innerWidth >= 782;
 }
-function r1() {
-    var i = window.innerWidth, e = window.innerHeight;
-    return i <= 480 && e > i;
+function a() {
+    var i = e2.isMobileView, t = e2.isDesktopView;
+    e2.isMobileView = n1(), e2.isDesktopView = o();
+    var s = i !== e2.isMobileView || t !== e2.isDesktopView;
+    return console.log('Responsive mode updated:', {
+        isMobileView: e2.isMobileView,
+        isDesktopView: e2.isDesktopView,
+        modeChanged: s
+    }), s;
 }
 function l() {
-    var e = i.zoomLevel, t = r1();
-    return console.log('Zoom level:', e + '%', 'Mobile portrait:', t), e >= 250 || t;
-}
-function d() {
-    var e = i.isMobileView, t = i.isDesktopView;
-    i.isMobileView = s(), i.isDesktopView = a(), i.isHighZoomOrMobilePortrait = l();
-    var o = e !== i.isMobileView || t !== i.isDesktopView;
-    return console.log('Responsive mode updated:', {
-        isMobileView: i.isMobileView,
-        isDesktopView: i.isDesktopView,
-        isHighZoomOrMobilePortrait: i.isHighZoomOrMobilePortrait,
-        modeChanged: o
-    }), o;
-}
-function b() {
-    return i.isHighZoomOrMobilePortrait ? '85%' : i.originalWidth;
+    return e2.originalWidth;
 }
 function toggleSidebarVisibility() {
-    if (i.isAnimating) return void console.log('Sidebar animation in progress, ignoring toggle request');
-    var e = document.getElementById('chat-sidebar');
-    if (!e) return void console.warn('Sidebar element not found');
-    i.isAnimating = !0, d(), i.isVisible ? m(e) : g(e), i.isVisible = !i.isVisible, t2(), h(), console.log('Toggled sidebar visibility. New state:', i.isVisible ? 'visible' : 'hidden', 'Mode:', i.isMobileView ? 'mobile' : 'desktop');
+    if (e2.isAnimating) return void console.log('Sidebar animation in progress, ignoring toggle request');
+    var i = document.getElementById('chat-sidebar');
+    if (!i) return void console.warn('Sidebar element not found');
+    e2.isAnimating = !0, a(), e2.isVisible ? d(i) : r2(i), e2.isVisible = !e2.isVisible, t3(), updateToggleButton(), console.log('Toggled sidebar visibility. New state:', e2.isVisible ? 'visible' : 'hidden', 'Mode:', e2.isMobileView ? 'mobile' : 'desktop');
 }
-function m(e) {
-    e.classList.add('sidebar-transitioning'), i.isMobileView ? (e.classList.remove('sidebar-visible'), e.style.left = '-100%') : (e.style.width = '0', e.style.minWidth = '0', e.style.paddingLeft = '0', e.style.paddingRight = '0', c(!0)), e.style.overflow = 'hidden', p(), setTimeout(function() {
-        e.classList.remove('sidebar-transitioning'), i.isMobileView || e.classList.add('sidebar-hidden'), i.isAnimating = !1;
+function d(i) {
+    i.classList.add('sidebar-transitioning'), e2.isMobileView ? (i.classList.remove('sidebar-visible'), i.style.left = '-100%') : (i.style.width = '0', i.style.minWidth = '0', i.style.paddingLeft = '0', i.style.paddingRight = '0', b(!0)), i.style.overflow = 'hidden', setTimeout(function() {
+        i.classList.remove('sidebar-transitioning'), e2.isMobileView || i.classList.add('sidebar-hidden'), e2.isAnimating = !1;
     }, 300);
 }
-function g(e) {
-    if (e.classList.remove('sidebar-hidden'), e.classList.add('sidebar-transitioning'), i.isMobileView) e.classList.add('sidebar-visible'), e.style.left = '0';
+function r2(i) {
+    if (i.classList.remove('sidebar-hidden'), i.classList.add('sidebar-transitioning'), e2.isMobileView) i.classList.add('sidebar-visible'), i.style.left = '0';
     else {
-        var t = b();
-        e.style.width = t, e.style.minWidth = t, e.style.paddingLeft = '16px', e.style.paddingRight = '16px', c(!1);
+        var t = l();
+        i.style.width = t, i.style.minWidth = t, i.style.paddingLeft = '16px', i.style.paddingRight = '16px', b(!1);
     }
-    e.style.overflow = 'hidden', p(), setTimeout(function() {
-        e.classList.remove('sidebar-transitioning'), e.style.overflow = 'auto', i.isAnimating = !1;
+    i.style.overflow = 'hidden', setTimeout(function() {
+        i.classList.remove('sidebar-transitioning'), i.style.overflow = 'auto', e2.isAnimating = !1;
     }, 300);
 }
-function p() {
-    var e = document.getElementById('fixed-comment-box'), t = document.querySelector('.site-footer');
-    i.isHighZoomOrMobilePortrait ? i.isVisible ? (e && (e.style.display = 'none', console.log('Comment form hidden (sidebar open in high zoom/mobile portrait)')), t && (t.style.display = 'none', console.log('Footer hidden (sidebar open in high zoom/mobile portrait)'))) : (e && (e.style.display = 'block', console.log('Comment form shown (sidebar closed in high zoom/mobile portrait)')), t && (t.style.display = 'none', console.log('Footer remains hidden (high zoom/mobile portrait mode)'))) : (e && (e.style.display = 'block', console.log('Comment form shown (normal mode)')), t && (t.style.display = 'block', console.log('Footer shown (normal mode)')));
+function b(e) {
+    var i = document.querySelector('.site-footer');
+    if (!i) return void console.warn('Footer element not found');
+    e ? (i.style.left = '0px', console.log('Footer position updated: left = 0px (sidebar hidden)')) : (i.style.left = '377px', console.log('Footer position updated: left = 377px (sidebar visible)'));
 }
-function c(i) {
-    var e = document.querySelector('.site-footer');
-    if (!e) return void console.warn('Footer element not found');
-    i ? (e.style.left = '0px', console.log('Footer position updated: left = 0px (sidebar hidden)')) : (e.style.left = '377px', console.log('Footer position updated: left = 377px (sidebar visible)'));
-}
-function h() {
-    var e = document.querySelector('#wp-admin-bar-sidebar-toggle .dashicons'), t = document.querySelector('#wp-admin-bar-sidebar-toggle .ab-label');
-    e && t ? (e.classList.remove('dashicons-arrow-left', 'dashicons-arrow-right'), i.isVisible ? (e.classList.add('dashicons-arrow-left'), e.setAttribute('title', 'Close Sidebar'), t.textContent = 'Close Sidebar') : (e.classList.add('dashicons-arrow-right'), e.setAttribute('title', 'Open Sidebar'), t.textContent = 'Open Sidebar'), console.log('Updated toggle button state:', i.isVisible ? 'arrow-left (close)' : 'arrow-right (open)')) : console.warn('Toggle button elements not found for state update');
+function updateToggleButton() {
+    var i = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : null, t = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : null, s = arguments.length > 2 && void 0 !== arguments[2] ? arguments[2] : null, n = null !== s ? s : e2.isVisible, o = i || document.querySelector('#wp-admin-bar-sidebar-toggle .dashicons'), a = t || document.querySelector('#wp-admin-bar-sidebar-toggle .ab-label');
+    if (!o || !a) return void console.warn('Toggle button elements not found for state update');
+    o.classList.remove('dashicons-arrow-left', 'dashicons-arrow-right'), n ? (o.classList.add('dashicons-arrow-left'), o.setAttribute('title', 'Close Sidebar'), a.textContent = 'Close Sidebar') : (o.classList.add('dashicons-arrow-right'), o.setAttribute('title', 'Open Sidebar'), a.textContent = 'Open Sidebar'), console.log('Updated toggle button state:', n ? 'arrow-left (close)' : 'arrow-right (open)');
 }
 function isSidebarVisible() {
-    return i.isVisible;
+    return e2.isVisible;
 }
 function showSidebar() {
-    if (!i.isVisible) {
-        var e = document.getElementById('chat-sidebar');
-        e && (g(e), i.isVisible = !0, t2(), h());
+    if (!e2.isVisible) {
+        var i = document.getElementById('chat-sidebar');
+        i && (r2(i), e2.isVisible = !0, t3(), updateToggleButton());
     }
 }
 function hideSidebar() {
-    if (i.isVisible) {
-        var e = document.getElementById('chat-sidebar');
-        e && (m(e), i.isVisible = !1, t2(), h());
+    if (e2.isVisible) {
+        var i = document.getElementById('chat-sidebar');
+        i && (d(i), e2.isVisible = !1, t3(), updateToggleButton());
     }
-}
-function overrideHoverBehavior(e) {
-    var n = e.cloneNode(!0);
-    e.parentNode.replaceChild(n, e);
-    var o = document.createElement('style');
-    return o.textContent = "\n    #wp-admin-bar-new-content .ab-sub-wrapper {\n      display: none !important;\n    }\n    #wp-admin-bar-new-content:hover .ab-sub-wrapper {\n      display: none !important;\n    }\n  ", document.head.appendChild(o), n;
-}
-function overrideClickBehavior(t) {
-    var a = t.querySelector('a.ab-item');
-    if (!a) return void console.warn('Admin bar "New" button link not found');
-    a.addEventListener('click', function(t) {
-        t.preventDefault(), t.stopPropagation(), console.log('New button clicked'), clearMessages();
-        var a = t1.getPostId(), r1 = AIStyleSettings.nonce;
-        if (console.log("nonce:", r1), a && r1) {
-            var i = new FormData();
-            i.append('post_id', a), i.append('nonce', r1), r(a, i, "/wp-json/cacbot/v1/unlink-conversation").then(function(e) {
-                console.log('Archive conversation response:', e), window.location.reload();
-            }).catch(function(e) {
-                console.error('Error archiving conversation:', e);
-            });
-        } else console.warn('Cannot archive conversation: Missing post_id or nonce');
-    });
-}
-function addSidebarToggleButton() {
-    var e = document.getElementById('wp-admin-bar-root-default');
-    if (!e) return void console.warn('Admin bar root element not found');
-    var n = document.getElementById('wp-admin-bar-new-content');
-    if (!n) return void console.warn('Cannot position sidebar toggle: New button not found');
-    var o = document.createElement('li');
-    o.id = 'wp-admin-bar-sidebar-toggle', o.className = 'menupop';
-    var a = document.createElement('a');
-    a.className = 'ab-item', a.href = '#', a.setAttribute('aria-label', 'Toggle Sidebar');
-    var r = document.createElement('span');
-    r.className = 'dashicons';
-    var i = document.createElement('span');
-    i.className = 'ab-label', updateToggleButton(r, i), a.appendChild(r), a.appendChild(i), o.appendChild(a);
-    var d = n.nextSibling;
-    d ? e.insertBefore(o, d) : e.appendChild(o), a.addEventListener('click', function(e) {
-        e.preventDefault(), e.stopPropagation(), console.log('Sidebar toggle button clicked'), toggleSidebarVisibility(), updateToggleButton(r, i);
-    }), console.log('Added sidebar toggle button to admin bar');
 }
 function addMobileHamburgerIcon() {
-    var e = document.getElementById('wp-admin-bar-root-default');
-    if (!e) return void console.warn('Admin bar root element not found');
-    var n = document.createElement('li');
-    n.id = 'wp-admin-bar-mobile-hamburger', n.className = 'menupop';
+    var a = document.getElementById('wp-admin-bar-root-default');
+    if (!a) return void console.warn('Admin bar root element not found');
+    var t = document.createElement('li');
+    t.id = 'wp-admin-bar-mobile-hamburger', t.className = 'menupop';
     var o = document.createElement('a');
     o.className = 'ab-item', o.href = '#', o.setAttribute('aria-label', 'Toggle Sidebar');
-    var a = document.createElement('span');
-    a.className = 'dashicons dashicons-menu', a.setAttribute('title', 'Toggle Sidebar'), o.appendChild(a), n.appendChild(o);
-    var r = e.firstChild;
-    r ? e.insertBefore(n, r) : e.appendChild(n), o.addEventListener('click', function(e) {
-        e.preventDefault(), e.stopPropagation(), console.log('Mobile hamburger icon clicked'), toggleSidebarVisibility();
+    var r = document.createElement('span');
+    r.className = 'dashicons dashicons-menu', r.setAttribute('title', 'Toggle Sidebar'), o.appendChild(r), t.appendChild(o);
+    var n = a.firstChild;
+    n ? a.insertBefore(t, n) : a.appendChild(t), o.addEventListener('click', function(a) {
+        a.preventDefault(), a.stopPropagation(), console.log('Mobile hamburger icon clicked'), toggleSidebarVisibility();
     }), console.log('Added mobile hamburger icon to admin bar');
 }
-function updateToggleButton(e, n) {
-    e && n && (e.classList.remove('dashicons-arrow-left', 'dashicons-arrow-right'), isSidebarVisible() ? (e.classList.add('dashicons-arrow-left'), e.setAttribute('title', 'Close Sidebar'), n.textContent = 'Close Sidebar') : (e.classList.add('dashicons-arrow-right'), e.setAttribute('title', 'Open Sidebar'), n.textContent = 'Open Sidebar'));
+var o1 = {
+    button: null,
+    icon: null,
+    label: null,
+    isInitialized: !1
+};
+function initializeArrowToggleButton() {
+    if (console.log('Initializing desktop arrow toggle button'), o1.isInitialized) return void console.log('Arrow toggle button already initialized');
+    var e = document.getElementById('wp-admin-bar-root-default');
+    if (!e) return void console.warn('Admin bar root element not found');
+    var t = document.getElementById('wp-admin-bar-new-content');
+    if (!t) return void console.warn('Cannot position sidebar toggle: New button not found');
+    var l = document.createElement('li');
+    l.id = 'wp-admin-bar-sidebar-toggle', l.className = 'menupop';
+    var i = document.createElement('a');
+    i.className = 'ab-item', i.href = '#', i.setAttribute('aria-label', 'Toggle Sidebar');
+    var r = document.createElement('span');
+    r.className = 'dashicons';
+    var a = document.createElement('span');
+    a.className = 'ab-label', o1.button = l, o1.icon = r, o1.label = a, i.appendChild(r), i.appendChild(a), l.appendChild(i);
+    var u = t.nextSibling;
+    u ? e.insertBefore(l, u) : e.appendChild(l), i.addEventListener('click', n2), o1.isInitialized = !0, updateArrowToggleButton(), console.log('Desktop arrow toggle button initialized successfully');
 }
-function r2() {
-    if (!document.body.classList.contains('wp-admin')) {
-        console.log(AIStyleSettings), console.log('Customizing admin bar "New" button behavior');
-        var e = document.getElementById('wp-admin-bar-new-content');
-        if (!e) return void console.warn('Admin bar "New" button not found');
-        overrideClickBehavior(overrideHoverBehavior(e)), addSidebarToggleButton(), addMobileHamburgerIcon();
-    }
+function n2(e) {
+    e.preventDefault(), e.stopPropagation(), console.log('Desktop arrow toggle button clicked'), toggleSidebarVisibility(), updateArrowToggleButton();
 }
-function o1(o) {
+function updateArrowToggleButton() {
+    if (!o1.isInitialized || !o1.icon || !o1.label) return void console.warn('Arrow toggle button not initialized or elements missing');
+    updateToggleButton(o1.icon, o1.label), console.log('Desktop arrow toggle button state updated');
+}
+function o2(o) {
     if ((o = parseInt(o, 10)) === parseInt(t1.get('linked_post_id'), 10)) return void console.log('Clicked post is already the current linked post');
     var e = t1.getPostId(), i = AIStyleSettings.nonce, c = new FormData();
     c.append('nonce', i), c.append('post_id', e), c.append('linked_post_id', o), r(e, c, "/wp-json/cacbot/v1/link-conversation").then(function(t) {
@@ -487,7 +470,7 @@ function o1(o) {
 function initSidebarClickListeners() {
     console.log("initSidebarClickListerners"), document.querySelectorAll('.anchor-post-list li a').forEach(function(t) {
         t.addEventListener('click', function(t) {
-            t.preventDefault(), o1(this.closest('li').getAttribute('data-post-id'));
+            t.preventDefault(), o2(this.closest('li').getAttribute('data-post-id'));
         });
     });
 }
@@ -530,7 +513,7 @@ function e3() {
         }), console.log('Focus set to last comment:', e);
     } else console.log('No comments found on the page');
 }
-function t3(t) {
+function t4(t) {
     var n, e;
     return Promise.all([
         (n = t, fetch("/wp-json/wp/v2/posts/".concat(n)).then(function(t) {
@@ -590,7 +573,7 @@ function updatePostUI(t) {
         }), c.querySelector('.comment-list') || c.appendChild(r);
     }
 }
-function o2() {
+function o3() {
     console.log("setupPostNavigation()"), document.addEventListener('click', function(o) {
         var e = o.target.closest('a');
         if (!e) return;
@@ -602,7 +585,7 @@ function o2() {
                 if (!isNaN(a)) {
                     o.preventDefault();
                     var s = document.querySelector('.entry-content');
-                    s && (s.innerHTML = '<div class="loading">Loading post content...</div>'), t3(a).then(function(t) {
+                    s && (s.innerHTML = '<div class="loading">Loading post content...</div>'), t4(a).then(function(t) {
                         updatePostUI(t), window.scrollTo(0, 0);
                     }).catch(function(t) {
                         console.error('Error navigating to post:', t), s && (s.innerHTML = '<div class="error">Error loading post: '.concat(t.message, "</div>"));
@@ -611,7 +594,7 @@ function o2() {
             }
         }
     }), window.addEventListener('popstate', function(o) {
-        o.state && o.state.postId && t3(o.state.postId).then(updatePostUI).catch(function(t) {
+        o.state && o.state.postId && t4(o.state.postId).then(updatePostUI).catch(function(t) {
             console.error('Error handling history navigation:', t);
         });
     });
@@ -623,5 +606,5 @@ document.addEventListener('DOMContentLoaded', function() {
     } catch (o) {
         console.error("Failed to initialize cacbotData:", o);
     }
-    window.addInterlocutorMessage = addInterlocutorMessage, window.addRespondentMessage = addRespondentMessage, window.clearMessages = clearMessages, console.log('Chat message functions are available globally:'), console.log('- addInterlocutorMessage(message)'), console.log('- addRespondentMessage(message)'), console.log('- clearMessages()'), initToggleSidebar(), window.toggleSidebarVisibility = toggleSidebarVisibility, window.isSidebarVisible = isSidebarVisible, window.showSidebar = showSidebar, window.hideSidebar = hideSidebar, r2(), o2(), initSidebarClickListeners(), console.log('Toggle sidebar functions are available globally:'), console.log('- toggleSidebarVisibility()'), console.log('- isSidebarVisible()'), console.log('- showSidebar()'), console.log('- hideSidebar()'), console.log('Admin bar customization functions are available globally:'), console.log('- overrideHoverBehavior(newButton)'), console.log('- overrideClickBehavior(newButton)'), console.log('- addSidebarToggleButton()'), console.log('- updateToggleButton(iconElement, labelElement)'), console.log('- initializeZoomDetection()'), e3();
+    window.addInterlocutorMessage = addInterlocutorMessage, window.addRespondentMessage = addRespondentMessage, window.clearMessages = clearMessages, console.log('Chat message functions are available globally:'), console.log('- addInterlocutorMessage(message)'), console.log('- addRespondentMessage(message)'), console.log('- clearMessages()'), initToggleSidebar(), window.toggleSidebarVisibility = toggleSidebarVisibility, window.isSidebarVisible = isSidebarVisible, window.showSidebar = showSidebar, window.hideSidebar = hideSidebar, r1(), initializeArrowToggleButton(), addMobileHamburgerIcon(), o3(), initSidebarClickListeners(), console.log('Toggle sidebar functions are available globally:'), console.log('- toggleSidebarVisibility()'), console.log('- isSidebarVisible()'), console.log('- showSidebar()'), console.log('- hideSidebar()'), console.log('Admin bar customization functions are available globally:'), console.log('- overrideHoverBehavior(newButton)'), console.log('- overrideClickBehavior(newButton)'), console.log('Toggle button functions initialized:'), console.log('- Desktop arrow toggle button initialized'), console.log('- Mobile hamburger button initialized'), e3();
 });

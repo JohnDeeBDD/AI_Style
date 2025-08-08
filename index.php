@@ -1,4 +1,6 @@
-<?php get_header(); ?>
+<?php 
+    include_once(get_stylesheet_directory() . "/src/AI_Style/autoloader.php");
+    get_header(); ?>
     <div id="chat-container">
         <div id="chat-sidebar">
         <?php dynamic_sidebar('sidebar-1');?>
@@ -10,7 +12,8 @@
                 the_post(); 
                 ?>
                     <div class="post-content" id="post-content-1">
-                        <?php the_content(); ?>
+                        <?php   the_content();
+                        ?>
                     </div> <!-- end: #post-content-1 -->
                 <div id="chat-messages">
                 <?php
@@ -28,16 +31,14 @@
                     }
                 }
                 $respondent_user_id = get_post_meta($post_id, "_cacbot_respondent_user_id", true);
+                $interlocutor_user_id = get_post_meta($post_id, "_cacbot_interlocutor_user_id", true);
+    
                 $comments = get_comments(array('post_id' => $post_id, 'status' => 'approve'));
                 $comments = array_reverse($comments); // Reverse the order of comments
                 foreach ($comments as $comment) {
-                    $class = "interlocutor-message";
-                    if($respondent_user_id){
-                        if($respondent_user_id === $comment->user_id){
-                            $class = "respondent-message";
-                        }else{
-                            $class = "interlocutor-message";
-                        }
+                    $class = "respondent-message"; // Default to respondent-message
+                    if ($interlocutor_user_id && $comment->user_id == $interlocutor_user_id) {
+                        $class = "interlocutor-message";
                     }
                     echo '<div class="message ' . $class . '" id="message-' . $comment->comment_ID . '">';
                     // Process markdown if mmd plugin is available
@@ -62,15 +63,11 @@
                 </div> <!-- end: #chat-messages -->
             </div> <!-- end: #scrollable-content -->
             <?php endif; ?>
-            <div id="fixed-comment-box">
-                <div class="comment-box-inner">
-                    <div class="comment-input-row">
-                        <div id="chat-input">
-                            <?php comment_form(); ?>
-                        </div> <!-- end: #chat-input -->
-                    </div> <!-- end: .comment-input-row -->
-                </div> <!-- end: .comment-box-inner -->
-            </div> <!-- end: #fixed-comment-box -->
+            <div id="fixed-content">
+                <?php
+                    \AI_Style\CommentForm::doEchoCommentForm();
+                ?>
+            </div> <!-- end: #fixed-content -->
         </div> <!-- end: #chat-main -->
     </div> <!-- end: #chat-container -->
 <?php get_footer(); ?>

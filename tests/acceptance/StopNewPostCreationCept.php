@@ -14,9 +14,16 @@
 $I = new AcceptanceTester($scenario);
 
 $I->wantToTest('Prevention of new post creation from test post page');
+
+// Create test post for testing new post creation prevention
+$I->comment('Creating test post for new post creation prevention testing');
+$postContent = '<p>This is a test post for verifying that the "New" button in the admin bar does not redirect when clicked from a test post page.</p>';
+$postId = $I->cUrlWP_SiteToCreatePost('testpost', $postContent);
+$I->comment('✓ Test post created with ID: ' . $postId);
+
 $I->amOnUrl(AcceptanceConfig::BASE_URL);
 $I->loginAsAdmin();
-$I->amOnPage(AcceptanceConfig::TEST_POST_PAGE);
+$I->amOnPage("/?p=" . $postId);
 
 // Configuration-driven approach: Test behavior adapts based on current device configuration
 // The window size and device mode are determined by the suite configuration in acceptance.suite.yml
@@ -65,5 +72,10 @@ $I->seeElement(AcceptanceConfig::ADMIN_BAR_NEW_CONTENT);
 
 // Add a comment to explain console log verification limitation
 $I->comment('Note: Console log verification requires manual inspection or browser extension');
+
+// Cleanup test data
+$I->comment('Cleaning up test post');
+$I->cUrlWP_SiteToDeletePost($postId);
+$I->comment('✓ Test post deleted successfully');
 
 // Run this test with the command: "bin/codecept run acceptance StopNewPostCreationCept.php -vvv --html"

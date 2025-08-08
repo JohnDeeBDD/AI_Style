@@ -19,15 +19,10 @@ function enqueue_chat_scripts() {
 add_action('wp_enqueue_scripts', 'enqueue_chat_scripts');
 
 
-
 /**
  * Modify the comment form textarea to be 1 row vertically
  */
-function ai_style_comment_form_defaults($defaults) {
-    $defaults['comment_field'] = str_replace('rows="8"', 'rows="1"', $defaults['comment_field']);
-    return $defaults;
-}
-add_filter('comment_form_defaults', 'ai_style_comment_form_defaults');
+add_filter('comment_form_defaults', ['AI_Style\CommentForm', 'modifyCommentFormDefaults']);
 
 /**
  * Register widget area for the sidebar
@@ -110,7 +105,7 @@ function ai_style_create_cacbot_conversation($request) {
 
 
 add_action('admin_bar_menu', function($wp_admin_bar) {
-    if (!is_admin()) {
+   // if (!is_admin()) {
         $wp_admin_bar->remove_node('wp-logo');
     
         // Remove Customize button
@@ -121,7 +116,7 @@ add_action('admin_bar_menu', function($wp_admin_bar) {
         
         // Remove Search icon
       //  $wp_admin_bar->remove_node('search');
-    }
+   // }
 }, 999);
 
 require_once(plugin_dir_path(__FILE__) . 'src/plugin-update-checker/plugin-update-checker.php');
@@ -168,3 +163,16 @@ function ai_style_process_markdown($content) {
     
 }
 
+//add_filter('comment_form_defaults', ['AI_Style\CommentForm', 'addLoginPrompt']);
+
+add_action('template_redirect', function () {
+    if ( is_singular() ) {
+        $post_id = get_queried_object_id();
+        $forced_login = get_post_meta($post_id, 'ai_style_force_user_login', true);
+
+        if ( $forced_login && $forced_login == '1' && !is_user_logged_in() ) {
+            wp_redirect( wp_login_url( get_permalink($post_id) ) );
+            exit;
+        }
+    }
+});

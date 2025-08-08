@@ -14,9 +14,16 @@
 $I = new AcceptanceTester($scenario);
 
 $I->wantToTest("Chat message functions in chatMessages.js");
+
+// Create test post with ChatGPT interface content
+$I->comment('Creating test post for chat messages testing');
+$postContent = '<p>This is a test post for chat message functionality verification. The theme will automatically generate the chat interface with message handling capabilities.</p>';
+$postId = $I->cUrlWP_SiteToCreatePost('testpost', $postContent);
+$I->comment('✓ Test post created with ID: ' . $postId);
+
 $I->amOnUrl(AcceptanceConfig::BASE_URL);
 $I->loginAsAdmin();
-$I->amOnPage(AcceptanceConfig::TEST_POST_PAGE);
+$I->amOnPage("/?p=" . $postId);
 
 // Configuration-driven approach: Test behavior adapts based on current device configuration
 // The window size and device mode are determined by the suite configuration in acceptance.suite.yml
@@ -59,5 +66,10 @@ $I->dontSeeElement(AcceptanceConfig::RESPONDENT_MESSAGE);
 // Take a screenshot of the final state
 $I->makeScreenshot('chat-messages-test');
 $I->comment("Screen shot <a href = 'http://localhost/wp-content/themes/ai_style/tests/_output/debug/chat-messages-test.png' target = '_blank'>available here</a>");
+
+// Cleanup test data
+$I->comment('Cleaning up test post');
+$I->cUrlWP_SiteToDeletePost($postId);
+$I->comment('✓ Test post deleted successfully');
 
 // Run this test with the command: "bin/codecept run acceptance ChatMessagesCept.php -vvv --html"

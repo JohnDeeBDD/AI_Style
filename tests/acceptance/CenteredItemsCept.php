@@ -103,7 +103,7 @@ $I->comment('Collecting precise positioning data for all relevant UI elements to
 $positions = $I->executeJS("
     // Get references to the three key elements we need to analyze
     const scrollableContent = document.querySelector('#scrollable-content');
-    const fixedCommentBox = document.querySelector('#fixed-comment-box');
+    const fixedCommentBox = document.querySelector('#fixed-content');
     const chatMessages = document.querySelector('#chat-messages');
     
     // Verify all elements exist before proceeding
@@ -155,7 +155,7 @@ $I->comment('Red line = Chat messages left edge | Blue line = Fixed comment box 
 $alignmentTestResult = $I->executeJS("
     // Get fresh references to the elements
     const chatMessages = document.querySelector('#chat-messages');
-    const fixedCommentBox = document.querySelector('#fixed-comment-box');
+    const fixedCommentBox = document.querySelector('#fixed-content');
     
     if (!chatMessages || !fixedCommentBox) {
         return { success: false, error: 'Required elements not found' };
@@ -235,7 +235,7 @@ $I->comment('Executing the definitive alignment test to determine pass/fail stat
 $finalAlignmentCheck = $I->executeJS("
     // Get fresh element references for final verification
     const chatMessages = document.querySelector('#chat-messages');
-    const fixedCommentBox = document.querySelector('#fixed-comment-box');
+    const fixedCommentBox = document.querySelector('#fixed-content');
     
     if (!chatMessages || !fixedCommentBox) {
         return {

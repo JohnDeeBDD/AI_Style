@@ -99,6 +99,12 @@
 			"vendor/php-stubs/wordpress-stubs/",
 			"../../../wp-includes/",
 			"../../../wp-admin/includes/"
-		]
+		],
+		"taskExplorer.excludeTask": [
+			"pre-launch[0-9]{2}\\.r(?:b|c)",
+			"Codeception Build",
+			"Codeception Clean"
+		],
+		"liveServer.settings.multiRootWorkspaceName": "ai_style"
 	}
 }

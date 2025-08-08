@@ -9,11 +9,13 @@ import justifyOneLiner from "./justifyOneLiner";
 import chatMessages, { addInterlocutorMessage, addRespondentMessage, clearMessages } from "./chatMessages";
 import adminBarCustomization, {
   overrideHoverBehavior,
-  overrideClickBehavior,
-  addSidebarToggleButton,
-  updateToggleButton,
-  initializeZoomDetection
+  overrideClickBehavior
 } from "./adminBarCustomization";
+import { addMobileHamburgerIcon } from "./HamburgerButton";
+import {
+  initializeArrowToggleButton,
+  updateArrowToggleButton
+} from "./ArrowToggleButton";
 import cacbotData from "./cacbotData";
 import fetchPost, { updatePostUI } from "./fetchPost";
 import sidebarAnchorPostLinkClick, { initSidebarClickListeners } from "./sidebarAnchorPostLinkClick";
@@ -64,8 +66,14 @@ document.addEventListener('DOMContentLoaded', function() {
   window.showSidebar = showSidebar;
   window.hideSidebar = hideSidebar;
   
-  // Initialize admin bar customization (includes sidebar toggle button)
+  // Initialize admin bar customization (New button only)
   adminBarCustomization();
+  
+  // Initialize desktop arrow toggle button
+  initializeArrowToggleButton();
+  
+  // Initialize mobile hamburger button
+  addMobileHamburgerIcon();
   
   // Set up event listeners for post navigation
   setupPostNavigation();
@@ -82,9 +90,11 @@ document.addEventListener('DOMContentLoaded', function() {
   console.log('Admin bar customization functions are available globally:');
   console.log('- overrideHoverBehavior(newButton)');
   console.log('- overrideClickBehavior(newButton)');
-  console.log('- addSidebarToggleButton()');
-  console.log('- updateToggleButton(iconElement, labelElement)');
-  console.log('- initializeZoomDetection()');
+  
+  // Log that the toggle button functions are available
+  console.log('Toggle button functions initialized:');
+  console.log('- Desktop arrow toggle button initialized');
+  console.log('- Mobile hamburger button initialized');
   
   // Set focus to the last comment on page load
   focusLastComment();

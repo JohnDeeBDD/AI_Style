@@ -3,6 +3,7 @@
 // npm i -D @swc/cli @swc/core
 
 const { config } = require('@swc/core/spack')
+const path = require('path');
 
 const args = process.argv;
 
@@ -21,10 +22,10 @@ args.forEach(function(arg){
 //let entryPointName = returnFileNameFromFullPathWithoutFileExtension(entryPoint);
 let configFile = {
   entry: {
-    [returnFileNameFromFullPathWithoutFileExtension(entryPoint)]: __dirname + entryPoint,
+    [returnFileNameFromFullPathWithoutFileExtension(entryPoint)]: path.join(__dirname, entryPoint),
   },
   output: {
-    path: __dirname + outputDir
+    path: path.join(__dirname, outputDir)
   },
   module: {},
   //Enable minification

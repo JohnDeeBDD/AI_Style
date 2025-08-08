@@ -9,6 +9,13 @@
 $I = new AcceptanceTester($scenario);
 
 $I->wantToTest('Compare sidebar toggle icon with other admin bar icons');
+
+// Create test post for admin bar icon comparison testing
+$I->comment('Creating test post for admin bar icon comparison testing');
+$postContent = '<p>This is a test post for comparing admin bar icons. The theme will automatically generate the chat interface with admin bar customizations.</p>';
+$postId = $I->cUrlWP_SiteToCreatePost('testpost', $postContent);
+$I->comment('✓ Test post created with ID: ' . $postId);
+
 $I->amOnUrl(AcceptanceConfig::BASE_URL);
 $I->loginAsAdmin();
 $I->amOnPage(AcceptanceConfig::TEST_POST_PAGE);
@@ -200,3 +207,8 @@ foreach ($coreAdminBarStyles as $iconInfo) {
     $I->comment("    Height: " . $iconInfo['height']);
     $I->comment("    Classes: " . $iconInfo['classes']);
 }
+
+// Cleanup test data
+$I->comment('Cleaning up test post');
+$I->cUrlWP_SiteToDeletePost($postId);
+$I->comment('✓ Test post deleted successfully');

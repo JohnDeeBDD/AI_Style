@@ -45,7 +45,7 @@ class AcceptanceConfig
     const CHAT_MESSAGES = '#chat-messages';
     const CHAT_INPUT = '#chat-input';
     const POST_CONTENT = '.post-content';
-    const FIXED_COMMENT_BOX = '#fixed-comment-box';
+    const FIXED_COMMENT_BOX = '#fixed-content';
     const SCROLLABLE_CONTENT = '#scrollable-content';
     const INTERLOCUTOR_MESSAGE = '.interlocutor-message';
     const RESPONDENT_MESSAGE = '.respondent-message';

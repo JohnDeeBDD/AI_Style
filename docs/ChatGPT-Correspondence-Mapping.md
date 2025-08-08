@@ -32,7 +32,7 @@ Elements that have direct structural equivalents in ChatGPT's interface:
 WordPress elements that achieve ChatGPT-like appearance through different implementation:
 
 #### Comment Box Visual Structure
-- **ChatGPT Input Container** → **AI-Style**: `#fixed-comment-box`
+- **ChatGPT Input Container** → **AI-Style**: `#fixed-content`
   - Fixed bottom positioning with proper z-index
   - ChatGPT-like background and spacing
 

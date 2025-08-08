@@ -71,7 +71,7 @@ $I->comment('✓ Test post created with ID: ' . $postId);
     // Cleanup test data - this will always run, even if the test fails
     $I->comment('Cleaning up test post');
     try {
-        //$I->cUrlWP_SiteToDeletePost($postId);
+        $I->cUrlWP_SiteToDeletePost($postId);
         $I->comment('✓ Test post deleted successfully');
     } catch (Exception $cleanupException) {
         $I->comment('⚠ Warning: Failed to delete test post with ID: ' . $postId . '. Error: ' . $cleanupException->getMessage());
@@ -111,7 +111,7 @@ function executeDesktopFooterPositioningTests($I) {
     
     // Test that comment box is positioned correctly relative to footer
     $commentBoxBottom = $I->executeJS("
-        const commentBox = document.getElementById('fixed-comment-box');
+        const commentBox = document.getElementById('fixed-content');
         if (!commentBox) return null;
         const rect = commentBox.getBoundingClientRect();
         return rect.bottom;
@@ -171,7 +171,7 @@ function executeMobileFooterPositioningTests($I) {
     
     // Test that comment box is positioned at the bottom of the viewport with no space
     $commentBoxBottom = $I->executeJS("
-        const commentBox = document.getElementById('fixed-comment-box');
+        const commentBox = document.getElementById('fixed-content');
         if (!commentBox) return null;
         const rect = commentBox.getBoundingClientRect();
         return rect.bottom;

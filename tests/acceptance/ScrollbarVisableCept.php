@@ -18,12 +18,13 @@ $I->expectTo("Not see a scrollbar when content is small enough");
 // Create test post with ChatGPT interface content
 $I->comment('Creating test post for scrollbar visibility testing');
 $postContent = '<p>This is a test post for scrollbar visibility verification. The theme will automatically generate the chat interface with proper scrollbar behavior.</p>';
-$postId = $I->cUrlWP_SiteToCreatePost('testpost', $postContent);
-$I->comment('✓ Test post created with ID: ' . $postId);
+$postSlug = 'scrollbar-test-' . time(); // Create unique slug to avoid conflicts
+$postId = $I->cUrlWP_SiteToCreatePost($postSlug, $postContent);
+$I->comment('✓ Test post created with ID: ' . $postId . ' and slug: ' . $postSlug);
 
 $I->amOnUrl(AcceptanceConfig::BASE_URL);
 $I->loginAsAdmin();
-$I->amOnPage(AcceptanceConfig::TEST_POST_PAGE);
+$I->amOnPage('/' . $postSlug); // Navigate to the specific post we just created
 
 // Configuration-driven approach: Test behavior adapts based on current device configuration
 // The window size and device mode are determined by the suite configuration in acceptance.suite.yml

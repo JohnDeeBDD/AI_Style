@@ -296,7 +296,7 @@ function testMobileSidebarZIndexLayering($I) {
     
     // Analyze z-index values in closed state
     $sidebarZIndexClosed = getElementZIndex($I, '#chat-sidebar');
-    $commentFormZIndex = getElementZIndex($I, '#fixed-comment-box');
+    $commentFormZIndex = getElementZIndex($I, '#fixed-content');
     $chatMainZIndex = getElementZIndex($I, '#chat-main');
     
     $I->comment("Z-index values (sidebar closed):");
@@ -335,7 +335,7 @@ function testMobileSidebarZIndexLayering($I) {
     
     // Analyze z-index values in open state
     $sidebarZIndexOpen = getElementZIndex($I, '#chat-sidebar');
-    $commentFormZIndexOpen = getElementZIndex($I, '#fixed-comment-box');
+    $commentFormZIndexOpen = getElementZIndex($I, '#fixed-content');
     $chatMainZIndexOpen = getElementZIndex($I, '#chat-main');
     
     $I->comment("Z-index values (sidebar open):");
@@ -350,7 +350,7 @@ function testMobileSidebarZIndexLayering($I) {
     // Analyze layering between sidebar and comment form
     $I->comment("--- PHASE 3: LAYERING ANALYSIS ---");
     
-    $layeringAnalysis = analyzeElementLayering($I, '#chat-sidebar', '#fixed-comment-box');
+    $layeringAnalysis = analyzeElementLayering($I, '#chat-sidebar', '#fixed-content');
     
     $I->comment("Layering analysis (sidebar vs comment form):");
     $I->comment("- Sidebar z-index: " . $layeringAnalysis['topZIndex']);
@@ -396,7 +396,7 @@ function testMobileSidebarZIndexLayering($I) {
     // Comprehensive visual layering test
     $visualLayeringTest = $I->executeJS("
         const sidebar = document.getElementById('chat-sidebar');
-        const commentForm = document.getElementById('fixed-comment-box');
+        const commentForm = document.getElementById('fixed-content');
         const chatMain = document.getElementById('chat-main');
         
         if (!sidebar || !commentForm) {
