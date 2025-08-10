@@ -507,10 +507,7 @@ body.admin-bar #scrollable-content {
         min-width: 85% !important;
     }
     
-    /* Hide footer in mobile portrait mode */
-    .site-footer {
-        display: none !important;
-    }
+    /* Footer visibility now handled by main .site-footer rules */
 }
 
 /* High zoom level styles (250%+) using resolution-based media queries */
@@ -521,10 +518,7 @@ body.admin-bar #scrollable-content {
         min-width: 85% !important;
     }
     
-    /* Hide footer at high zoom levels */
-    .site-footer {
-        display: none !important;
-    }
+    /* Footer visibility now handled by main .site-footer rules */
     
     /* Hide admin bar toggle label text at high zoom levels */
     #wp-admin-bar-sidebar-toggle .ab-item .ab-label {
@@ -540,10 +534,7 @@ body.admin-bar #scrollable-content {
         min-width: 85% !important;
     }
     
-    /* Hide footer at high zoom levels */
-    .site-footer {
-        display: none !important;
-    }
+    /* Footer visibility now handled by main .site-footer rules */
     
     /* Hide admin bar toggle label text at high zoom levels */
     #wp-admin-bar-sidebar-toggle .ab-item .ab-label {
@@ -639,28 +630,38 @@ body.admin-bar #scrollable-content {
     align-items: flex-start;
 }
 
-/* Fixed comment box positioning */
+/* Fixed comment box positioning - Mobile First */
 #fixed-content {
-    position: absolute;
+    position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
     width: 100%;
     max-width: 768px;
     box-sizing: border-box;
-    padding: 0;
+    padding: 16px;
     z-index: 100; /* Above main content but below sidebar when visible */
     display: flex;
     justify-content: center; /* Center the comment form horizontally */
     align-items: center; /* Center vertically */
-    border-top: none; /* Removed border that was causing the white line */
     margin: 0 auto; /* Center within chat-main area */
+    
+    /* Rounded corners and border styling inspired by Gemini */
+    border-radius: 24px 24px 0 0; /* Rounded top corners only on mobile */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Thin white border like Gemini */
+    border-bottom: none; /* No bottom border on mobile since it's at viewport bottom */
+    background: #303030; /* Ensure background matches comment form */
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15); /* Subtle shadow for emphasis */
 }
 
-/* Desktop: Position comment box above footer */
+/* Desktop: Position comment box above footer with full rounded corners */
 @media screen and (min-width: 782px) {
     #fixed-content {
-        bottom: 74px; /* Position comment box just above footer with proper spacing */
+        position: absolute; /* Change to absolute positioning relative to footer */
+        bottom: 44px; /* Position above footer (30px footer height + 14px spacing) */
+        border-radius: 24px; /* Full rounded corners on desktop */
+        border: 1px solid rgba(255, 255, 255, 0.2); /* Full border on desktop */
+        margin-bottom: 8px; /* Additional spacing from footer */
     }
 }
 
@@ -1049,29 +1050,32 @@ body.admin-bar #scrollable-content {
 }
 
 
-/* Mobile First Footer - ChatGPT style */
+/* Mobile First Footer - Hidden on mobile, visible on desktop */
 .site-footer {
-    position: absolute;
-    bottom: 0;
-    left: 0; /* Mobile: Full width footer */
-    right: 0;
-    width: auto;
-    background-color: #202123;
-    color: #acacbe;
-    text-align: center;
-    padding: 4px 0;
-    font-size: 12px;
-    border-top: 1px solid #444654;
-    box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1);
-    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-    letter-spacing: 0.2px;
-    height: 30px;
-    z-index: 2000;
+    /* Mobile: Hidden footer */
+    display: none;
 }
 
 @media screen and (min-width: 782px) {
     .site-footer {
+        /* Desktop: Show footer */
+        display: block;
+        position: absolute;
+        bottom: 0;
         left: 377px; /* Desktop: Align with chat-main after sidebar */
+        right: 0;
+        width: auto;
+        background-color: #202123;
+        color: #acacbe;
+        text-align: center;
+        padding: 4px 0;
+        font-size: 12px;
+        border-top: 1px solid #444654;
+        box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1);
+        font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+        letter-spacing: 0.2px;
+        height: 30px;
+        z-index: 2000;
     }
 }
 

@@ -10,7 +10,7 @@
 
 ?>
 		<footer id="colophon" class="site-footer">
-		Cacbots can make mistakes. Check important info.
+		Catbox can make mistakes, check important info.
 		</footer><!-- .site-footer -->
 </div><!-- .site -->
 
