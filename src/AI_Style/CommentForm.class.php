@@ -12,15 +12,15 @@ class CommentForm {
     public static function doEchoCommentForm() {
         // Add wrapper div with specific ID for JavaScript targeting
         echo '<div class="comment-box-inner">
-                <div class="comment-input-row">
+
                     <div id="chat-input" class="comment-form-container">';
         
         // Show the same comment form for both logged-in and non-logged-in users
         // Remove name, email, and website fields to match logged-in user experience
         $comment_form_args = array(
             'logged_in_as' => '', // Remove logged-in message
-            'comment_notes_before' => '', // Remove notes before form
-            'comment_notes_after' => '', // Remove notes after form
+           // 'comment_notes_before' => '', // Remove notes before form
+            //'comment_notes_after' => '', // Remove notes after form
             'must_log_in' => '', // Remove must log in message
             'title_reply' => '', // Remove reply title
             'title_reply_to' => '', // Remove reply to title
@@ -36,7 +36,7 @@ class CommentForm {
         comment_form($comment_form_args);
         
         echo '    </div> <!-- end: #chat-input -->
-                </div> <!-- end: .comment-input-row -->
+       
             </div> <!-- end: .comment-box-inner -->';
         
         // Add JavaScript for non-logged-in users

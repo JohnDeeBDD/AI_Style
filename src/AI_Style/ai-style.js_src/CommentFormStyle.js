@@ -22,7 +22,7 @@ export default function commentBoxStyle() {
         });
         
         // Create action buttons container
-        //createActionButtonsContainer(commentForm);
+        createActionButtonsContainer(commentForm);
         
         // Adjust submit button position
         adjustSubmitButtonPosition();

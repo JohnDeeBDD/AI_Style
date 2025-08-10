@@ -783,31 +783,6 @@ body.admin-bar #scrollable-content {
     transform: scale(0.95); /* Slight press effect */
 }
 
-/* Add action buttons (similar to the + button, search, etc.) */
-/* Plus button */
-#commentform::before {
-    content: "";
-    display: inline-block;
-    width: 32px;
-    height: 32px;
-    background-color: #40414f;
-    border-radius: 50%; 
-    margin-right: 8px;
-    position: relative;
-    cursor: pointer;
-    flex-shrink: 0;
-    
-    /* Plus icon */
-    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='12' y1='5' x2='12' y2='19'%3E%3C/line%3E%3Cline x1='5' y1='12' x2='19' y2='12'%3E%3C/line%3E%3C/svg%3E");
-    mask-size: 16px;
-    mask-position: center;
-    mask-repeat: no-repeat;
-    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='12' y1='5' x2='12' y2='19'%3E%3C/line%3E%3Cline x1='5' y1='12' x2='19' y2='12'%3E%3C/line%3E%3C/svg%3E");
-    -webkit-mask-size: 16px;
-    -webkit-mask-position: center;
-    -webkit-mask-repeat: no-repeat;
-}
-
 /* Responsive adjustments */
 @media (max-width: 700px) {
     #commentform {
@@ -863,14 +838,7 @@ body.admin-bar #scrollable-content {
 
 /* Special styling for the first action button (plus icon) */
 .action-bubble:first-child {
-    padding: 5px;
-    border-radius: 50%;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: transparent;
+
 }
 
 .action-bubble:first-child .dashicons {

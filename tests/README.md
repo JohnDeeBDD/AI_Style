@@ -56,11 +56,6 @@ When any Codeception acceptance test is executed, the JavaScript files are autom
    ./bin/codecept run acceptance ZoomEnforcementValidationCept
    ```
 
-3. **Run tests with debug output:**
-   ```bash
-   ./bin/codecept run acceptance --debug
-   ```
-
 ## Test Structure
 
 ```
@@ -74,6 +69,19 @@ tests/
 ├── acceptance.suite.yml       # Codeception configuration
 └── codeception.yml           # Main Codeception config
 ```
+
+## CSS and UI Architecture
+
+### Breakpoint System
+The theme uses a **single main breakpoint at 782px** to distinguish between mobile and desktop layouts:
+- **Mobile**: Below 782px
+- **Desktop**: 782px and above
+- **Minor breakpoints**: Additional smaller breakpoints exist within the mobile and desktop ranges
+
+### Device-Specific UI Elements
+- **Admin Bar Height**: Different heights between mobile and desktop layouts
+- **Footer**: Only displayed on desktop - **no footer on mobile devices**
+
 ## Key Features
 
 ### Configuration-Driven Testing Approach
@@ -87,29 +95,12 @@ The test suite now uses a **configuration-driven approach** for device and windo
 - **[`AcceptanceConfig::isTablet()`](tests/_support/AcceptanceConfig.php:177)** - Check if running in tablet mode (portrait or landscape)
 - **[`AcceptanceConfig::isMobile()`](tests/_support/AcceptanceConfig.php:189)** - Check if running in mobile mode (portrait or landscape)
 
-#### Legacy Helper Methods (Deprecated)
-- ~~`ensureDesktop100Zoom()`~~ - **DEPRECATED**: Use configuration-driven approach instead
-- ~~`setZoomLevel($level)`~~ - **DEPRECATED**: Use static YAML configuration instead
-- ~~`resetZoom()`~~ - **DEPRECATED**: No longer needed with static configuration
-- ~~`verifyZoomLevel($expected)`~~ - **DEPRECATED**: Use AcceptanceConfig methods instead
-
-#### API Helper Methods (Still Available)
+#### API Helper Methods 
 - `cUrlWP_SiteToCreatePost()` - Create WordPress posts via API
 - `cUrlWP_SiteToDeletePost()` - Delete WordPress posts via API
 - `switchBetweenLinkedAnchorPosts()` - Navigate between linked posts
 
 ### Device Configuration Management
-
-#### Supported Device Modes
-Configure different device modes in [`acceptance.suite.yml`](tests/acceptance.suite.yml):
-
-| Device Mode | Window Size | Configuration |
-|-------------|-------------|---------------|
-| `desktop` | 1920x1080 | `window_size: 1920x1080`<br>`device_mode: desktop` |
-| `tablet_portrait` | 768x1024 | `window_size: 768x1024`<br>`device_mode: tablet_portrait` |
-| `tablet_landscape` | 1024x768 | `window_size: 1024x768`<br>`device_mode: tablet_landscape` |
-| `mobile_portrait` | 375x667 | `window_size: 375x667`<br>`device_mode: mobile_portrait` |
-| `mobile_landscape` | 667x375 | `window_size: 667x375`<br>`device_mode: mobile_landscape` |
 
 ### TDD Test Development Pattern
 
@@ -155,57 +146,12 @@ $I->click('Some element');
 $I->see('Expected result');
 ```
 
-### Legacy Test Template (Deprecated)
-
-```php
-<?php
-// OLD APPROACH - DO NOT USE IN NEW TESTS
-$I = new AcceptanceTester($scenario);
-$I->wantTo('describe what this test does');
-
-$I->amOnPage(AcceptanceConfig::TEST_POST_PAGE);
-$I->loginAsAdmin();
-
-// DEPRECATED: These methods are no longer used
-// $I->ensureDesktop100Zoom();
-// $I->setZoomLevel(1.5);
-// $I->resetZoom();
-
-// Use AcceptanceConfig methods instead
-```
-
 ## Configuration
 
 ### Environment Setup
 - **WordPress URL**: `http://localhost`
 - **Admin Credentials**: Username: `Codeception`, Password: `password`
-- **Test Database**: `wordpress_unit_test`
 - **Browser**: Chrome with device-specific configurations
-
-### Device Configuration (New Approach)
-Configure device modes and window sizes in [`acceptance.suite.yml`](tests/acceptance.suite.yml):
-
-```yaml
-modules:
-  config:
-    WPWebDriver:
-      window_size: 1920x1080    # Static window size
-      device_mode: desktop      # Device mode identifier
-```
-
-#### Available Device Configurations:
-- **Desktop**: `window_size: 1920x1080`, `device_mode: desktop`
-- **Tablet Portrait**: `window_size: 768x1024`, `device_mode: tablet_portrait`
-- **Tablet Landscape**: `window_size: 1024x768`, `device_mode: tablet_landscape`
-- **Mobile Portrait**: `window_size: 375x667`, `device_mode: mobile_portrait`
-- **Mobile Landscape**: `window_size: 667x375`, `device_mode: mobile_landscape`
-
-### Legacy Zoom Configuration (Deprecated)
-- ~~**Default Zoom**: 100% (enforced via browser settings and helper methods)~~
-- ~~**Available Levels**: 25%, 50%, 75%, 100%, 150%, 200%~~
-- ~~**Enforcement**: Manual (must call helper methods after navigation)~~
-
-**Note**: Zoom management is now handled statically via browser configuration. Dynamic zoom changes during test execution are no longer supported.
 
 ## Common Test Scenarios
 
@@ -236,7 +182,7 @@ if (AcceptanceConfig::isMobile()) {
 }
 ```
 
-### Multi-Device Testing (New Approach)
+### Multi-Device Testing
 ```php
 $I->amOnPage('/responsive-page');
 
@@ -256,47 +202,6 @@ switch ($deviceMode) {
         break;
 }
 ```
-
-### Legacy Multi-Zoom Testing (Deprecated)
-```php
-// OLD APPROACH - DO NOT USE
-// $I->amOnPage('/responsive-page');
-// $I->ensureDesktop100Zoom();
-// $I->setZoomLevel(AcceptanceConfig::ZOOM_LEVEL_75);
-// $I->see('Content at 75%');
-// $I->resetZoom();
-```
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Configuration not detected properly**
-   - **Cause**: YAML configuration not properly set in [`acceptance.suite.yml`](tests/acceptance.suite.yml)
-   - **Solution**: Verify `window_size` and `device_mode` are correctly configured
-
-2. **Device-specific tests failing**
-   - **Cause**: Test logic not adapted for current device mode
-   - **Solution**: Use [`AcceptanceConfig::isDesktop()`](tests/_support/AcceptanceConfig.php:167), [`isTablet()`](tests/_support/AcceptanceConfig.php:177), or [`isMobile()`](tests/_support/AcceptanceConfig.php:189) methods
-
-3. **Legacy zoom methods causing errors**
-   - **Cause**: Using deprecated zoom helper methods
-   - **Solution**: Remove calls to `ensureDesktop100Zoom()`, `resetZoom()`, `setZoomLevel()` and use configuration-driven approach
-
-### Legacy Issues (No Longer Applicable)
-- ~~**"WebDriver not available" errors**: Zoom methods before navigation~~
-- ~~**Inconsistent test results**: Tests not starting at consistent zoom~~
-- ~~**Zoom not taking effect**: Insufficient wait time~~
-
-**Note**: These issues have been eliminated by the configuration-driven approach.
-
-### Debug Mode
-Run tests with `--debug` flag to see detailed output including configuration detection messages:
-
-```bash
-./bin/codecept run acceptance --debug
-```
-
 ## Screenshots and Visual Testing
 
 Tests can capture screenshots for visual verification:
@@ -316,28 +221,3 @@ The test suite includes helpers for WordPress API operations:
 - **Manage categories**: `$I->cUrlWP_SiteToGetOrCreateCategory($slug, $name)`
 
 These require `localhost_wordpress_api_config.json` configuration file.
-
-## Contributing
-
-When adding new tests following the TDD methodology:
-
-1. **Create tests first** before implementing features
-2. **Use configuration-driven device detection** instead of dynamic zoom changes
-3. Use configuration constants from [`AcceptanceConfig.php`](tests/_support/AcceptanceConfig.php)
-4. Add appropriate comments and documentation
-5. **Test across multiple device configurations** if UI-related
-6. **Implement device-specific logic** using AcceptanceConfig methods
-7. **Implement JavaScript features as atomic files** in the `ai-style.js_src` directory
-8. **Import and integrate** all new functions in the main `ai-style.js` file
-
-### Configuration-Driven Test Development Guidelines
-
-- Use [`AcceptanceConfig::getDeviceMode()`](tests/_support/AcceptanceConfig.php:138) to get current device mode
-- Use [`AcceptanceConfig::isDesktop()`](tests/_support/AcceptanceConfig.php:167), [`isTablet()`](tests/_support/AcceptanceConfig.php:177), [`isMobile()`](tests/_support/AcceptanceConfig.php:189) for device-specific logic
-- Configure different device modes in [`acceptance.suite.yml`](tests/acceptance.suite.yml)
-- **DO NOT** use deprecated zoom helper methods (`ensureDesktop100Zoom()`, `resetZoom()`, `setZoomLevel()`)
-
-For detailed information about the refactoring approach, see:
-- [RefactoringGuide.md](tests/RefactoringGuide.md) - Implementation guidelines
-- [REFACTORING_SUMMARY.md](tests/REFACTORING_SUMMARY.md) - Complete refactoring overview
-- [FINAL_REFACTORING_COMPLIANCE_REPORT.md](tests/FINAL_REFACTORING_COMPLIANCE_REPORT.md) - Compliance verification

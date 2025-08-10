@@ -21,18 +21,18 @@ export function createActionButtonsContainer(commentForm) {
     // Insert container after the textarea but before the submit button
     const commentTextareaParent = document.querySelector('.comment-form-comment');
     if (commentTextareaParent) {
-        //commentForm.insertBefore(actionButtonsContainer, commentTextareaParent.nextSibling);
+        commentForm.insertBefore(actionButtonsContainer, commentTextareaParent.nextSibling);
         
         // Add example action buttons - similar to commercial implementations
-        //const plusButton = addActionBubble('dashicons-plus', '', actionButtonsContainer); // Plus button like ChatGPT
-       // addActionBubble('dashicons-upload', 'Attach', actionButtonsContainer);
-       // addActionBubble('dashicons-editor-code', 'Code', actionButtonsContainer);
-       // addActionBubble('dashicons-format-image', 'Image', actionButtonsContainer);
+        const plusButton = 
+        addActionBubble('dashicons-plus', 'Attach', actionButtonsContainer); // Plus button like ChatGPT
+        addActionBubble('dashicons-hammer', 'Act', actionButtonsContainer);
+       // addActionBubble('dashicons-format-image', 'Create Image', actionButtonsContainer);
         
         // Add tooltip to plus button
-        //if (plusButton) {
-        //    plusButton.title = "Add attachment";
-       // }
+        if (plusButton) {
+            plusButton.title = "Add attachment";
+        }
     }
     
     return actionButtonsContainer;
