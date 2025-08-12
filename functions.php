@@ -176,3 +176,79 @@ add_action('template_redirect', function () {
         }
     }
 });
+
+function custom_comment_form_text($fields) {
+    // The key 'comment_notes_before' holds the text you want to change.
+    // By default, it includes "<p class=\"comment-notes\">" and the text.
+    // You can replace it with any text or HTML you want.
+
+    $fields['comment_notes_before'] = '';
+
+    // To remove the text entirely, uncomment the line below:
+    // $fields['comment_notes_before'] = '';
+
+    return $fields;
+}
+add_filter('comment_form_defaults', 'custom_comment_form_text');
+
+
+
+add_shortcode('include_file', function ($atts) {
+    $a = shortcode_atts([
+        'path'  => '',      // absolute path required
+        'html'  => 'no',    // yes|no
+        'pre'   => 'yes',   // yes|no
+        'lang'  => '',      // language hint for <code> class
+        'start' => '',      // start line number
+        'end'   => '',      // end line number
+    ], $atts, 'include_file');
+
+    if (empty($a['path'])) {
+        return '<em>[include_file error: missing path]</em>';
+    }
+
+    $full = $a['path'];
+
+    // Must be an existing file
+    if (!is_file($full)) {
+        return '<em>[include_file error: file not found]</em>';
+    }
+
+    // Optional: block PHP-like extensions
+    $ext = strtolower(pathinfo($full, PATHINFO_EXTENSION));
+    $blocked = ['php','phtml','php3','php4','php5','phar'];
+    if (in_array($ext, $blocked, true)) {
+        return '<em>[include_file error: blocked extension]</em>';
+    }
+
+    $contents = @file_get_contents($full);
+    if ($contents === false) {
+        return '<em>[include_file error: unable to read file]</em>';
+    }
+
+    // Line slicing
+    $start = max(1, (int)$a['start']);
+    $end   = (int)$a['end'] > 0 ? (int)$a['end'] : 0;
+    if ($start > 1 || $end > 0) {
+        $lines = preg_split("/\r\n|\n|\r/", $contents);
+        $total = count($lines);
+        $iStart = $start - 1;
+        $iEnd   = $end > 0 ? min($end, $total) - 1 : $total - 1;
+        $contents = $iStart <= $iEnd
+            ? implode("\n", array_slice($lines, $iStart, $iEnd - $iStart + 1))
+            : '';
+    }
+
+    // Escape or allow HTML
+    $out = (strtolower($a['html']) === 'yes')
+        ? wp_kses_post($contents)
+        : esc_html($contents);
+
+    // Optional pre/code block
+    if (strtolower($a['pre']) === 'yes') {
+        $langClass = $a['lang'] ? ' class="language-' . esc_attr($a['lang']) . '"' : '';
+        $out = '<pre><code' . $langClass . '>' . $out . '</code></pre>';
+    }
+
+    return $out;
+});

@@ -27,7 +27,7 @@ export function createActionButtonsContainer(commentForm) {
         const plusButton = 
         addActionBubble('dashicons-plus', 'Attach', actionButtonsContainer); // Plus button like ChatGPT
         addActionBubble('dashicons-hammer', 'Act', actionButtonsContainer);
-       // addActionBubble('dashicons-format-image', 'Create Image', actionButtonsContainer);
+        addActionBubble('dashicons-format-image', 'Create Image', actionButtonsContainer);
         
         // Add tooltip to plus button
         if (plusButton) {
@@ -67,7 +67,8 @@ export function addActionBubble(dashiconClass, text, container) {
     button.addEventListener('click', function(e) {
         e.preventDefault();
         console.log(`Action button clicked: ${text}`);
-        // Here you would implement the actual functionality
+        // Show placeholder alert for now
+        alert('This functionality coming soon');
     });
     
     // Add to container

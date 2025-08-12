@@ -650,7 +650,7 @@ class Acceptance extends \Codeception\Module{
         try {
             $windowWidth = $this->getModule('WPWebDriver')->executeJS("return window.innerWidth;");
             codecept_debug("Window width: {$windowWidth}px");
-            return $windowWidth < 768;
+            return $windowWidth < 784;
         } catch (\Exception $e) {
             codecept_debug("Failed to detect window width, assuming desktop: " . $e->getMessage());
             return false;

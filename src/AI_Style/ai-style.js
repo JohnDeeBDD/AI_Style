@@ -102,22 +102,22 @@ function createActionButtonsContainer(t) {
     var n = document.querySelector('.comment-form-comment');
     if (n) {
         t.insertBefore(e, n.nextSibling);
-        var c = addActionBubble('dashicons-plus', 'Attach', e);
-        addActionBubble('dashicons-hammer', 'Act', e), c && (c.title = "Add attachment");
+        var a = addActionBubble('dashicons-plus', 'Attach', e);
+        addActionBubble('dashicons-hammer', 'Act', e), addActionBubble('dashicons-format-image', 'Create Image', e), a && (a.title = "Add attachment");
     }
     return e;
 }
 function addActionBubble(t, e, n) {
-    var c = document.createElement('button');
-    c.type = 'button', c.className = 'action-bubble';
+    var a = document.createElement('button');
+    a.type = 'button', a.className = 'action-bubble';
     var o = document.createElement('span');
-    if (o.className = "dashicons ".concat(t), c.appendChild(o), e) {
-        var a = document.createElement('span');
-        a.className = 'action-bubble-text', a.textContent = e, c.appendChild(a);
+    if (o.className = "dashicons ".concat(t), a.appendChild(o), e) {
+        var c = document.createElement('span');
+        c.className = 'action-bubble-text', c.textContent = e, a.appendChild(c);
     }
-    return c.addEventListener('click', function(t) {
-        t.preventDefault(), console.log("Action button clicked: ".concat(e));
-    }), n.appendChild(c), c;
+    return a.addEventListener('click', function(t) {
+        t.preventDefault(), console.log("Action button clicked: ".concat(e)), alert('This functionality coming soon');
+    }), n.appendChild(a), a;
 }
 function e() {
     var e = document.getElementById('commentform');

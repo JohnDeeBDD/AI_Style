@@ -10,34 +10,27 @@ class CommentForm {
      * @return void
      */
     public static function doEchoCommentForm() {
-        // Add wrapper div with specific ID for JavaScript targeting
-        echo '<div class="comment-box-inner">
-
-                    <div id="chat-input" class="comment-form-container">';
+        // Single wrapper for targeting and seamless styling with #fixed-content
+        echo '<div id="chat-input" class="comment-form-container">';
         
-        // Show the same comment form for both logged-in and non-logged-in users
-        // Remove name, email, and website fields to match logged-in user experience
+        // Use the same minimal form for all users
         $comment_form_args = array(
-            'logged_in_as' => '', // Remove logged-in message
-           // 'comment_notes_before' => '', // Remove notes before form
-            //'comment_notes_after' => '', // Remove notes after form
-            'must_log_in' => '', // Remove must log in message
-            'title_reply' => '', // Remove reply title
-            'title_reply_to' => '', // Remove reply to title
-            'cancel_reply_link' => '', // Remove cancel reply link
+            'logged_in_as' => '',
+            'must_log_in' => '',
+            'title_reply' => '',
+            'title_reply_to' => '',
+            'cancel_reply_link' => '',
             'label_submit' => 'Post Comment',
             'fields' => array(
-                'author' => '', // Remove name field
-                'email' => '',  // Remove email field
-                'url' => '',    // Remove website field
-            ), // Remove only name, email, and website fields for non-logged-in users
+                'author' => '',
+                'email' => '',
+                'url' => '',
+            ),
         );
         
         comment_form($comment_form_args);
         
-        echo '    </div> <!-- end: #chat-input -->
-       
-            </div> <!-- end: .comment-box-inner -->';
+        echo '</div> <!-- end: #chat-input -->';
         
         // Add JavaScript for non-logged-in users
         self::addLoginRedirectScript();
