@@ -415,6 +415,8 @@ function showSidebarImmediate(sidebar) {
  */
 function updateFooterPosition(sidebarHidden) {
   const footer = document.querySelector('.site-footer');
+  const fixedContent = document.getElementById('fixed-content');
+  
   if (!footer) {
     console.warn('Footer element not found');
     return;
@@ -424,10 +426,22 @@ function updateFooterPosition(sidebarHidden) {
     // When sidebar is hidden, footer should extend to left edge
     footer.style.left = '0px';
     console.log('Footer position updated: left = 0px (sidebar hidden)');
+    
+    // Also update fixed-content to align with footer when sidebar is hidden
+    if (fixedContent) {
+      fixedContent.style.left = '0px';
+      console.log('Fixed-content position updated: left = 0px (sidebar hidden)');
+    }
   } else {
     // When sidebar is visible, footer should start at sidebar width
     footer.style.left = '377px';
     console.log('Footer position updated: left = 377px (sidebar visible)');
+    
+    // Also update fixed-content to align with footer when sidebar is visible
+    if (fixedContent) {
+      fixedContent.style.left = '377px';
+      console.log('Fixed-content position updated: left = 377px (sidebar visible)');
+    }
   }
 }
 

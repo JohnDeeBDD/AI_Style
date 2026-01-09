@@ -5,7 +5,7 @@ modules:
     - \Helper\Acceptance
     - Asserts
     - WPWebDriver
-    - WPLoader
+    #- WPLoader
   config:
     WPWebDriver:
       url: 'http://localhost'
@@ -41,13 +41,13 @@ modules:
           prefs:
             profile.default_zoom_level: 0
             profile.password_manager_enabled: false
-    WPLoader:
-      wpRootFolder: /var/www/html
-      dbName: wordpress_unit_test
-      dbHost: 127.0.0.1
-      dbUser: wordpressuser
-      dbPassword: password
-      tablePrefix: wp_
+#    WPLoader:
+#      wpRootFolder: /var/www/html
+#      dbName: wordpress_unit_test
+#      dbHost: 127.0.0.1
+#      dbUser: wordpressuser
+#      dbPassword: password
+#      tablePrefix: wp_
 env:
   # Phones 📱
   iphone_se:
@@ -241,3 +241,5 @@ env:
          capabilities:
            chromeOptions:
              args: ["--disable-dev-shm-usage"]
+settings:
+    stop_on_fail: true

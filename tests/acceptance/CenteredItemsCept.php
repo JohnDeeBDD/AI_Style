@@ -22,14 +22,14 @@ $I->comment('This test verifies that the fixed comment box maintains proper hori
 
 $I->comment('STEP 1: Create test post with ChatGPT interface content');
 $I->comment('Creating a test post that will render the ChatGPT-like interface');
-$postContent = '<p>This is a test post for the ChatGPT-like interface. The theme will automatically generate the chat container, sidebar, and messaging interface around this content.</p>';
-$postId = $I->cUrlWP_SiteToCreatePost('testpost', $postContent);
+
+$postId = $I->cUrlWP_SiteToCreatePost('CenteredItemsCeptTestPost', 'This test verifies that the fixed comment box maintains proper horizontal alignment with the chat messages container');
 $I->comment('✓ Test post created with ID: ' . $postId);
 
-$I->comment('STEP 2: Navigate to test environment and authenticate');
-$I->comment('Loading the base URL and logging in as admin to access test content');
 $I->amOnUrl(AcceptanceConfig::BASE_URL);
 $I->loginAsAdmin();
+$I->amOnPage("/?p={$postId}");
+
 $I->comment('Successfully authenticated as admin user');
 
 $I->comment('STEP 3: Navigate to the test post page');
@@ -37,12 +37,11 @@ $I->comment('Accessing the specific post page that contains the chat interface')
 $I->amOnPage(AcceptanceConfig::TEST_POST_PAGE);
 
 // Configuration-driven approach: Test behavior adapts based on current device configuration
-// The window size and device mode are determined by the suite configuration in acceptance.suite.yml
-// This eliminates the need for dynamic zoom changes during test execution
-$deviceMode = $I->getDeviceMode();
-$windowSize = $I->getWindowSize();
-$I->comment("Testing centered items for {$deviceMode} mode ({$windowSize})");
-$I->comment("Configuration-driven test: Device mode = {$deviceMode}, Window size = {$windowSize}");
+// Device type determined by breakpoint, eliminating the need for dynamic zoom changes during test execution
+$isMobile = $I->isMobileBreakpoint();
+$deviceType = $isMobile ? 'mobile' : 'desktop';
+$I->comment("Testing centered items for {$deviceType} mode (breakpoint: " . ($isMobile ? '<784px' : '>=784px') . ")");
+$I->comment("Configuration-driven test: Device type = {$deviceType}, Mobile breakpoint = " . ($isMobile ? 'true' : 'false'));
 
 $I->comment('STEP 4: Wait for critical UI elements to load');
 $I->comment('Ensuring all required elements are present before proceeding with alignment tests');

@@ -1,7 +1,7 @@
 /*
  Theme Name:   A.I. Style
  Description:  A WordPress theme inspired by commercial LLMs like Chat-GPT, Gemini, and Grok
- Version:      34.0.0.0
+ Version:      49
  Author:       General Chicken
  Author URI:   https://generalchicken.guru
  Tags:         ai
@@ -657,11 +657,15 @@ body.admin-bar #scrollable-content {
 /* Desktop: Position comment box above footer with full rounded corners */
 @media screen and (min-width: 782px) {
     #fixed-content {
-        position: absolute; /* Change to absolute positioning relative to footer */
-        bottom: 44px; /* Position above footer (30px footer height + 14px spacing) */
+        position: fixed; /* Keep fixed positioning to align with footer */
+        bottom: 30px; /* Position directly above footer (30px footer height) */
+        left: 377px; /* Align with footer and chat-main after sidebar */
+        right: 0; /* Match footer's right positioning */
+        width: auto; /* Let it fill the available space like footer */
+        max-width: 768px; /* Keep the content width constraint */
+        margin: 0 auto; /* Center within the available space */
         border-radius: 24px; /* Full rounded corners on desktop */
         border: 1px solid rgba(255, 255, 255, 0.2); /* Full border on desktop */
-        margin-bottom: 8px; /* Additional spacing from footer */
     }
 }
 
@@ -1087,6 +1091,13 @@ body.admin-bar .site-footer {
     bottom: 0; /* Keep at bottom */
 }
 
+/* Adjust fixed-content for WordPress admin bar on desktop */
+@media screen and (min-width: 782px) {
+    body.admin-bar #fixed-content {
+        bottom: 30px; /* Still 30px above footer, admin bar doesn't affect this */
+    }
+}
+
 
 #cacbot-archive-button{
     display:none !important;
@@ -1464,4 +1475,35 @@ body.admin-bar .site-footer {
     border: none;
     outline: none;
     box-shadow: none;
+}
+
+/* Real-time Comment Animation Styles */
+.message-fade-in {
+    animation: fadeInSlide 0.3s ease-out;
+}
+
+.message-fade-out {
+    animation: fadeOutSlide 0.3s ease-in forwards;
+}
+
+@keyframes fadeInSlide {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOutSlide {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
 }

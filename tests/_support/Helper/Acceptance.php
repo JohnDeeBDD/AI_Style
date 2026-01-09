@@ -85,120 +85,64 @@ class Acceptance extends \Codeception\Module{
     }
 
     /**
-     * Ensures the browser is set to 100% zoom level (desktop default)
-     * This method should be called after navigation in tests to ensure consistent zoom state
-     *
-     * IMPORTANT: Due to WebDriver initialization timing, this CANNOT be called automatically.
-     * Tests must explicitly call this method after amOnPage(), loginAsAdmin(), etc.
-     *
-     * For complete usage guide, see: tests/ZOOM_ENFORCEMENT_GUIDE.md
-     *
-     * @throws \Exception if WebDriver is not available
+     * Get application password credentials from CacbotTester
+     * @param string $username The username to get credentials for (default: "Codeception")
+     * @param string $site_url The site URL (default: "http://localhost")
+     * @return array Array with 'username', 'password', and 'site' keys
      */
-    public function ensureDesktop100Zoom() {
-        if (!\AcceptanceConfig::ZOOM_ENFORCEMENT_ENABLED) {
-            return;
+    private function getCacbotCredentials($username = 'Codeception', $site_url = 'http://localhost') {
+        // Prepare the CacbotTester API endpoint
+        $api_url = rtrim($site_url, '/') . '/wp-json/cacbot-tester/v1/app-password?username=' . urlencode($username);
+        
+        // Initialize cURL to get credentials
+        $ch = curl_init();
+        curl_setopt_array($ch, [
+            CURLOPT_URL => $api_url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_SSL_VERIFYPEER => false, // For localhost testing
+            CURLOPT_SSL_VERIFYHOST => false,  // For localhost testing
+            CURLOPT_TIMEOUT => 30
+        ]);
+        
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curl_error = curl_error($ch);
+        curl_close($ch);
+        
+        if ($curl_error) {
+            throw new \Exception("CacbotTester cURL error: $curl_error");
         }
-
-        $wpWebDriver = $this->getModule('WPWebDriver');
-        if ($wpWebDriver === null) {
-            codecept_debug('Zoom enforcement skipped: WPWebDriver module not available.');
-            return;
+        
+        if ($http_code !== 200) {
+            throw new \Exception("CacbotTester HTTP error $http_code. Response: $response");
         }
-
-        $wpWebDriver->executeJS('
-            // Reset zoom using multiple methods for maximum compatibility
-            document.body.style.zoom = "1.0";
-            //document.body.style.transform = "scale(1.0)";
-            document.documentElement.style.zoom = "1.0";
-            
-            // Also reset any CSS zoom that might be applied
-            const allElements = document.querySelectorAll("*");
-            allElements.forEach(el => {
-                if (el.style.zoom && el.style.zoom !== "1" && el.style.zoom !== "1.0") {
-                    el.style.zoom = "1.0";
-                }
-            });
-        ');
         
-        // Wait for zoom to settle
-        $this->getModule('WPWebDriver')->wait(\AcceptanceConfig::ZOOM_RESET_DELAY / 1000);
-    }
-
-    /**
-     * Sets a specific zoom level for testing
-     * @param float $zoomLevel The zoom level (e.g., 0.75 for 75%, 1.5 for 150%)
-     *
-     * Recommended: Use AcceptanceConfig constants instead of hardcoded values
-     * Example: $I->setZoomLevel(AcceptanceConfig::ZOOM_LEVEL_75);
-     *
-     * For complete usage guide, see: tests/ZOOM_ENFORCEMENT_GUIDE.md
-     */
-    public function setZoomLevel($zoomLevel) {
-        $this->getModule('WPWebDriver')->executeJS("
-            document.body.style.zoom = '$zoomLevel';
-            document.documentElement.style.zoom = '$zoomLevel';
-        ");
-        
-        $this->getModule('WPWebDriver')->wait(\AcceptanceConfig::ZOOM_RESET_DELAY / 1000);
-    }
-
-    /**
-     * Resets zoom to default 100% level
-     *
-     * Should be called after testing at different zoom levels to clean up.
-     * For complete usage guide, see: tests/ZOOM_ENFORCEMENT_GUIDE.md
-     */
-    public function resetZoom() {
-        $this->ensureDesktop100Zoom();
-    }
-
-    /**
-     * Verifies the current zoom level
-     * @param float $expectedZoom Expected zoom level
-     *
-     * Recommended: Use AcceptanceConfig constants for expected values
-     * Example: $I->verifyZoomLevel(AcceptanceConfig::ZOOM_LEVEL_100);
-     *
-     * @throws \Exception if zoom level doesn't match expected value
-     * For complete usage guide, see: tests/ZOOM_ENFORCEMENT_GUIDE.md
-     */
-    public function verifyZoomLevel($expectedZoom) {
-        $currentZoom = $this->getModule('WPWebDriver')->executeJS('
-            return document.body.style.zoom ||
-                   getComputedStyle(document.body).zoom ||
-                   "1";
-        ');
-        
-        // Convert to float for comparison
-        $currentZoomFloat = floatval($currentZoom);
-        $expectedZoomFloat = floatval($expectedZoom);
-        
-        if (abs($currentZoomFloat - $expectedZoomFloat) > 0.01) {
-            throw new \Exception("Zoom level mismatch. Expected: $expectedZoom, Actual: $currentZoom");
+        $response_data = json_decode($response, true);
+        if (!$response_data || !$response_data['ok']) {
+            throw new \Exception("CacbotTester API error: " . ($response_data['message'] ?? 'Unknown error'));
         }
+        
+        return [
+            'username' => $response_data['username'],
+            'password' => $response_data['application_password'],
+            'site' => $site_url
+        ];
     }
 
     public function cUrlWP_SiteToCreatePost($post_title, $post_content){
-        // Read configuration from JSON file
-        $config_file = __DIR__ . '/../../../localhost_wordpress_api_config.json';
-        if (!file_exists($config_file)) {
-            throw new \Exception("Configuration file not found: $config_file");
-        }
-        
-        $config = json_decode(file_get_contents($config_file), true);
-        if (!$config) {
-            throw new \Exception("Failed to parse configuration file");
-        }
+        // Get dynamic credentials from CacbotTester
+        $credentials = $this->getCacbotCredentials();
         
         // Prepare the API endpoint
-        $api_url = rtrim($config['site'], '/') . '/wp-json/wp/v2/posts';
+        $api_url = rtrim($credentials['site'], '/') . '/wp-json/wp/v2/posts';
         
         // Prepare post data
         $post_data = [
             'title' => $post_title,
             'content' => $post_content,
-            'status' => 'publish'
+            'status' => 'publish',
+            'comment_status' => 'open'  // Enable comments on the post
         ];
         
         // Initialize cURL
@@ -212,9 +156,8 @@ class Acceptance extends \Codeception\Module{
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HTTPHEADER => [
                 'Content-Type: application/json',
-                'Authorization: Basic ' . base64_encode($config['username'] . ':' . $config['application_password'])
+                'Authorization: Basic ' . base64_encode($credentials['username'] . ':' . $credentials['password'])
             ],
-            CURLOPT_TIMEOUT => 30,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_SSL_VERIFYPEER => false, // For localhost testing
             CURLOPT_SSL_VERIFYHOST => false  // For localhost testing
@@ -249,19 +192,11 @@ class Acceptance extends \Codeception\Module{
     }
 
     public function cUrlWP_SiteToDeletePost($post_id){
-        // Read configuration from JSON file
-        $config_file = __DIR__ . '/../../../localhost_wordpress_api_config.json';
-        if (!file_exists($config_file)) {
-            throw new \Exception("Configuration file not found: $config_file");
-        }
-        
-        $config = json_decode(file_get_contents($config_file), true);
-        if (!$config) {
-            throw new \Exception("Failed to parse configuration file");
-        }
+        // Get dynamic credentials from CacbotTester
+        $credentials = $this->getCacbotCredentials();
         
         // Prepare the API endpoint for deleting a specific post with force delete
-        $api_url = rtrim($config['site'], '/') . '/wp-json/wp/v2/posts/' . $post_id . '?force=true';
+        $api_url = rtrim($credentials['site'], '/') . '/wp-json/wp/v2/posts/' . $post_id . '?force=true';
         
         // Initialize cURL
         $ch = curl_init();
@@ -273,9 +208,8 @@ class Acceptance extends \Codeception\Module{
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HTTPHEADER => [
                 'Content-Type: application/json',
-                'Authorization: Basic ' . base64_encode($config['username'] . ':' . $config['application_password'])
+                'Authorization: Basic ' . base64_encode($credentials['username'] . ':' . $credentials['password'])
             ],
-            CURLOPT_TIMEOUT => 30,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_SSL_VERIFYPEER => false, // For localhost testing
             CURLOPT_SSL_VERIFYHOST => false  // For localhost testing
@@ -322,19 +256,11 @@ class Acceptance extends \Codeception\Module{
             $category_name = ucfirst($category_slug);
         }
         
-        // Read configuration from JSON file
-        $config_file = __DIR__ . '/../../../localhost_wordpress_api_config.json';
-        if (!file_exists($config_file)) {
-            throw new \Exception("Configuration file not found: $config_file");
-        }
-        
-        $config = json_decode(file_get_contents($config_file), true);
-        if (!$config) {
-            throw new \Exception("Failed to parse configuration file");
-        }
+        // Get dynamic credentials from CacbotTester
+        $credentials = $this->getCacbotCredentials();
         
         // First, try to get existing category by slug
-        $api_url = rtrim($config['site'], '/') . '/wp-json/wp/v2/categories?slug=' . urlencode($category_slug);
+        $api_url = rtrim($credentials['site'], '/') . '/wp-json/wp/v2/categories?slug=' . urlencode($category_slug);
         
         $ch = curl_init();
         curl_setopt_array($ch, [
@@ -342,9 +268,8 @@ class Acceptance extends \Codeception\Module{
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HTTPHEADER => [
                 'Content-Type: application/json',
-                'Authorization: Basic ' . base64_encode($config['username'] . ':' . $config['application_password'])
+                'Authorization: Basic ' . base64_encode($credentials['username'] . ':' . $credentials['password'])
             ],
-            CURLOPT_TIMEOUT => 30,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_SSL_VERIFYHOST => false
@@ -367,7 +292,7 @@ class Acceptance extends \Codeception\Module{
         }
         
         // Category doesn't exist, create it
-        $api_url = rtrim($config['site'], '/') . '/wp-json/wp/v2/categories';
+        $api_url = rtrim($credentials['site'], '/') . '/wp-json/wp/v2/categories';
         $category_data = [
             'name' => $category_name,
             'slug' => $category_slug
@@ -381,9 +306,8 @@ class Acceptance extends \Codeception\Module{
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HTTPHEADER => [
                 'Content-Type: application/json',
-                'Authorization: Basic ' . base64_encode($config['username'] . ':' . $config['application_password'])
+                'Authorization: Basic ' . base64_encode($credentials['username'] . ':' . $credentials['password'])
             ],
-            CURLOPT_TIMEOUT => 30,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_SSL_VERIFYHOST => false
@@ -418,25 +342,18 @@ class Acceptance extends \Codeception\Module{
      * @return int The created post ID
      */
     public function cUrlWP_SiteToCreatePostWithCategories($post_title, $post_content, $category_ids = []) {
-        // Read configuration from JSON file
-        $config_file = __DIR__ . '/../../../localhost_wordpress_api_config.json';
-        if (!file_exists($config_file)) {
-            throw new \Exception("Configuration file not found: $config_file");
-        }
-        
-        $config = json_decode(file_get_contents($config_file), true);
-        if (!$config) {
-            throw new \Exception("Failed to parse configuration file");
-        }
+        // Get dynamic credentials from CacbotTester
+        $credentials = $this->getCacbotCredentials();
         
         // Prepare the API endpoint
-        $api_url = rtrim($config['site'], '/') . '/wp-json/wp/v2/posts';
+        $api_url = rtrim($credentials['site'], '/') . '/wp-json/wp/v2/posts';
         
         // Prepare post data
         $post_data = [
             'title' => $post_title,
             'content' => $post_content,
-            'status' => 'publish'
+            'status' => 'publish',
+            'comment_status' => 'open'  // Enable comments on the post
         ];
         
         // Add categories if provided
@@ -455,9 +372,8 @@ class Acceptance extends \Codeception\Module{
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HTTPHEADER => [
                 'Content-Type: application/json',
-                'Authorization: Basic ' . base64_encode($config['username'] . ':' . $config['application_password'])
+                'Authorization: Basic ' . base64_encode($credentials['username'] . ':' . $credentials['password'])
             ],
-            CURLOPT_TIMEOUT => 30,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_SSL_VERIFYPEER => false, // For localhost testing
             CURLOPT_SSL_VERIFYHOST => false  // For localhost testing
@@ -498,19 +414,11 @@ class Acceptance extends \Codeception\Module{
      * @return int The created comment ID
      */
     public function cUrlWP_SiteToAddComment($postID, $commentData) {
-        // Read configuration from JSON file
-        $config_file = __DIR__ . '/../../../localhost_wordpress_api_config.json';
-        if (!file_exists($config_file)) {
-            throw new \Exception("Configuration file not found: $config_file");
-        }
-        
-        $config = json_decode(file_get_contents($config_file), true);
-        if (!$config) {
-            throw new \Exception("Failed to parse configuration file");
-        }
+        // Get dynamic credentials from CacbotTester
+        $credentials = $this->getCacbotCredentials();
         
         // Prepare the API endpoint
-        $api_url = rtrim($config['site'], '/') . '/wp-json/wp/v2/comments';
+        $api_url = rtrim($credentials['site'], '/') . '/wp-json/wp/v2/comments';
         
         // Prepare comment data with required fields
         $comment_data = [
@@ -536,6 +444,11 @@ class Acceptance extends \Codeception\Module{
             $comment_data['parent'] = $commentData['parent'];
         }
         
+        // Add user_id if provided (for testing different user types)
+        if (isset($commentData['user_id'])) {
+            $comment_data['author'] = $commentData['user_id'];
+        }
+        
         // Initialize cURL
         $ch = curl_init();
         
@@ -547,7 +460,7 @@ class Acceptance extends \Codeception\Module{
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HTTPHEADER => [
                 'Content-Type: application/json',
-                'Authorization: Basic ' . base64_encode($config['username'] . ':' . $config['application_password'])
+                'Authorization: Basic ' . base64_encode($credentials['username'] . ':' . $credentials['password'])
             ],
             CURLOPT_TIMEOUT => 30,
             CURLOPT_FOLLOWLOCATION => true,
@@ -579,82 +492,156 @@ class Acceptance extends \Codeception\Module{
         }
         
         $comment_id = $response_data['id'];
-
+        sleep(2);
         return $comment_id;
     }
 
     /**
-     * Get the current window size from the WPWebDriver module configuration
-     * This method uses the getModule approach to retrieve the window size
-     * from the active WPWebDriver module configuration
-     *
-     * @return string Window size in format "widthxheight" (e.g., "1920x1080")
-     */
-    public function getWindowSize()
-    {
-        $wpWebDriver = $this->getModule('WPWebDriver');
-        $config = $wpWebDriver->_getConfig();
-        
-        if (isset($config['window_size'])) {
-            return $config['window_size'];
-        }
-        
-        // Fallback to default desktop size
-        return '1920x1080';
-    }
-    
-    /**
-     * Get the current device mode from the WPWebDriver module configuration
-     * This method uses the getModule approach to retrieve the device mode
-     * from the active WPWebDriver module configuration
-     *
-     * @return string Device mode (desktop, tablet_portrait, tablet_landscape, mobile_portrait, mobile_landscape)
-     */
-    public function getDeviceMode()
-    {
-        $wpWebDriver = $this->getModule('WPWebDriver');
-        $config = $wpWebDriver->_getConfig();
-        
-        if (isset($config['device_mode'])) {
-            return $config['device_mode'];
-        }
-        
-        // Fallback: determine device mode from window size
-        $windowSize = $this->getWindowSize();
-        
-        // Device window size mappings
-        $deviceWindowSizes = [
-            'desktop' => '1920x1080',
-            'tablet_portrait' => '768x1024',
-            'tablet_landscape' => '1024x768',
-            'mobile_portrait' => '375x667',
-            'mobile_landscape' => '667x375'
-        ];
-        
-        // Map window size to device mode
-        foreach ($deviceWindowSizes as $deviceMode => $size) {
-            if ($windowSize === $size) {
-                return $deviceMode;
-            }
-        }
-        
-        // Default fallback
-        return 'desktop';
-    }
-
-    /**
-     * Determine if we're in mobile breakpoint (window width < 768px)
+     * Determine if we're in mobile breakpoint (window width < 782px)
      * @return bool
      */
     public function isMobileBreakpoint() {
         try {
             $windowWidth = $this->getModule('WPWebDriver')->executeJS("return window.innerWidth;");
             codecept_debug("Window width: {$windowWidth}px");
-            return $windowWidth < 784;
+            return $windowWidth < 782;
         } catch (\Exception $e) {
             codecept_debug("Failed to detect window width, assuming desktop: " . $e->getMessage());
             return false;
         }
     }
 
+    /**
+     * Fetch application password for a user from CacbotTester API
+     * @param string $username The username to fetch the application password for
+     * @param bool $reset Whether to reset/regenerate the password (optional)
+     * @return array The response data containing application password info
+     */
+    public function fetchAppPasswordFromCacbotTester($username, $reset = false) {
+        // Prepare the API endpoint
+        $api_url = \AcceptanceConfig::BASE_URL . '/wp-json/cacbot-tester/v1/app-password?username=' . urlencode($username);
+        
+        if ($reset) {
+            $api_url .= '&reset=true';
+        }
+        
+        // Initialize cURL
+        $ch = curl_init();
+        
+        // Set cURL options for GET request
+        curl_setopt_array($ch, [
+            CURLOPT_URL => $api_url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: application/json'
+            ],
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_SSL_VERIFYPEER => false, // For localhost testing
+            CURLOPT_SSL_VERIFYHOST => false  // For localhost testing
+        ]);
+        
+        // Execute the request
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curl_error = curl_error($ch);
+        
+        curl_close($ch);
+        
+        // Check for cURL errors
+        if ($curl_error) {
+            throw new \Exception("cURL error: $curl_error");
+        }
+        
+        // Check HTTP response code
+        if ($http_code !== 200) {
+            throw new \Exception("HTTP error $http_code. Response: $response");
+        }
+        
+        // Parse response
+        $response_data = json_decode($response, true);
+        if (!$response_data) {
+            throw new \Exception("Invalid response format: $response");
+        }
+        
+        // Check if the API returned an error
+        if (isset($response_data['ok']) && $response_data['ok'] === false) {
+            throw new \Exception("API error: " . ($response_data['message'] ?? 'Unknown error'));
+        }
+        
+        return $response_data;
+    }
+
+
+    public function cUrlWP_SiteToSetCacbotMeta($url, $username, $app_password, $post_id, $key, $data) {
+/*
+EXAMPLE:
+    ─$ curl -X POST "http://localhost/wp-json/cacbot/v1/meta-data" \
+  -u "Codeception:VhRgaijDzLl2pZkZBMrpHMXL" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "post_id": 720,
+    "key": "_cacbot_interlocutor_user_id",
+    "value": "1"
+  }'
+*/
+        
+        // Prepare the API endpoint
+        $api_url = rtrim($url, '/') . '/wp-json/cacbot/v1/meta-data';
+        
+        // Prepare meta data
+        $meta_data = [
+            'post_id' => $post_id,
+            'key' => $key,
+            'value' => $data
+        ];
+        
+        // Initialize cURL
+        $ch = curl_init();
+        
+        // Set cURL options
+        curl_setopt_array($ch, [
+            CURLOPT_URL => $api_url,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => json_encode($meta_data),
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: application/json',
+                'Authorization: Basic ' . base64_encode($username . ':' . $app_password)
+            ],
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_SSL_VERIFYPEER => false, // For localhost testing
+            CURLOPT_SSL_VERIFYHOST => false  // For localhost testing
+        ]);
+        
+        // Execute the request
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curl_error = curl_error($ch);
+        
+        curl_close($ch);
+        
+        // Check for cURL errors
+        if ($curl_error) {
+            throw new \Exception("cURL error: $curl_error");
+        }
+        
+        // Check HTTP response code (200 for successful update, 201 for creation)
+        if ($http_code !== 200 && $http_code !== 201) {
+            throw new \Exception("HTTP error $http_code. Response: $response");
+        }
+        
+        // Parse response if there is content
+        if (!empty($response)) {
+            $response_data = json_decode($response, true);
+            if ($response_data === null) {
+                throw new \Exception("Invalid response format: $response");
+            }
+            return $response_data;
+        }
+        
+        // Return true for successful operation with no content
+        return true;
+    }
+
 }
+

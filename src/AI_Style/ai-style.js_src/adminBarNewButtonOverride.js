@@ -18,19 +18,19 @@ import fetchCacbotLinkAPI from './fetchCacbotLinkAPI';
  *
  * @param {HTMLElement} newButton - The "New" button element
  */
-export function overrideHoverBehavior(newButton) {
-    const newButtonClone = cloneButton(newButton);
-    applyNoHoverStyle();
+export function disableDropdownMenu(newButton) {
+    const newButtonClone = replaceButtonElement(newButton);
+    injectDropdownHidingStyles();
     return newButtonClone;
 }
 
-function cloneButton(button) {
+function replaceButtonElement(button) {
     const buttonClone = button.cloneNode(true);
     button.parentNode.replaceChild(buttonClone, button);
     return buttonClone;
 }
 
-function applyNoHoverStyle() {
+function injectDropdownHidingStyles() {
     const style = document.createElement('style');
     style.textContent = `
       #wp-admin-bar-new-content .ab-sub-wrapper {
@@ -44,18 +44,18 @@ function applyNoHoverStyle() {
 }
 
 /**
- * Overrides the click behavior of the "New" button to redirect to the current URL with model=archive parameter
+ * Overrides the click behavior of the "New" button 
  *
  * @param {HTMLElement} newButton - The "New" button element (or its clone)
  */
-export function overrideClickBehavior(newButton) {
-    const newLink = getNewButtonLink(newButton);
+export function setupArchiveClickHandler(newButton) {
+    const newLink = findNewButtonLink(newButton);
     if (!newLink) return;
 
-    newLink.addEventListener('click', handleNewButtonClick);
+    newLink.addEventListener('click', onArchiveButtonClick);
 }
 
-function getNewButtonLink(newButton) {
+function findNewButtonLink(newButton) {
     const newLink = newButton.querySelector('a.ab-item');
     if (!newLink) {
         console.warn('Admin bar "New" button link not found');
@@ -63,7 +63,7 @@ function getNewButtonLink(newButton) {
     return newLink;
 }
 
-function handleNewButtonClick(event) {
+function onArchiveButtonClick(event) {
     event.preventDefault();
     event.stopPropagation();
     console.log('New button clicked');
@@ -79,6 +79,7 @@ function handleNewButtonClick(event) {
         console.warn('Cannot archive conversation: Missing post_id or nonce');
     }
 }
+
 
 function archiveConversation(postId, nonce) {
     const formData = new FormData();
@@ -101,7 +102,7 @@ function archiveConversation(postId, nonce) {
  * - Prevents hover behavior (no expanded menu)
  * - Overrides click behavior to archive conversations and reload the page
  */
-export default function adminBarCustomization() {
+export default function initializeNewButtonOverride() {
   // Only run on the frontend, not in the WordPress admin area
   if (document.body.classList.contains('wp-admin')) {
     return;
@@ -120,9 +121,9 @@ export default function adminBarCustomization() {
   
   // Override hover behavior - prevent the dropdown menu from appearing
   // This returns the cloned button that replaced the original
-  const newButtonClone = overrideHoverBehavior(newButton);
+  const newButtonClone = disableDropdownMenu(newButton);
   
   // Override click behavior - archive conversations and reload page
   // Use the cloned button that's actually in the DOM
-  overrideClickBehavior(newButtonClone);
+  setupArchiveClickHandler(newButtonClone);
 }

@@ -11,6 +11,9 @@
 			"name": "WordPress Admin",
 			"path": "/var/www/html/wp-admin"
 		},
+		{
+			"path": "../../../TDD_Agent"
+		}
 	],
 	"settings": {
 		"php.suggest.basic": false,

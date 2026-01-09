@@ -22,10 +22,108 @@ $I->wantToTest('Blog roll pagination functionality');
 $I->amOnUrl(AcceptanceConfig::BASE_URL);
 $I->loginAsAdmin();
 
-// Configuration-driven approach: Get current device mode and window size
-$deviceMode = $I->getDeviceMode();
-$windowSize = $I->getWindowSize();
-$I->comment("Testing pagination with device mode: $deviceMode, window size: $windowSize");
+// CRITICAL CHECK: Verify WordPress is configured to show posts (blog roll) on homepage
+$I->comment('=== CHECKING WORDPRESS HOMEPAGE CONFIGURATION ===');
+$I->amOnPage('/wp-admin/options-reading.php');
+$I->waitForElement('input[name="show_on_front"]', 5);
+
+// Check if "Your latest posts" is selected (blog roll mode)
+$showOnFront = $I->executeJS("
+    const latestPostsRadio = document.querySelector('input[name=\"show_on_front\"][value=\"posts\"]');
+    const staticPageRadio = document.querySelector('input[name=\"show_on_front\"][value=\"page\"]');
+    
+    if (latestPostsRadio && latestPostsRadio.checked) {
+        return 'posts';
+    } else if (staticPageRadio && staticPageRadio.checked) {
+        return 'page';
+    }
+    return 'unknown';
+");
+
+$I->comment("WordPress homepage configuration: $showOnFront");
+
+if ($showOnFront === 'page') {
+    $staticPageId = $I->executeJS("
+        const pageOnFrontSelect = document.querySelector('select[name=\"page_on_front\"]');
+        return pageOnFrontSelect ? pageOnFrontSelect.value : 'unknown';
+    ");
+    
+    $blogPageId = $I->executeJS("
+        const pageForPostsSelect = document.querySelector('select[name=\"page_for_posts\"]');
+        return pageForPostsSelect ? pageForPostsSelect.value : 'unknown';
+    ");
+    
+    $I->comment("Static page ID set as homepage: $staticPageId");
+    $I->comment("Blog page ID (Posts page): $blogPageId");
+    
+    // Get page titles for better error messaging
+    $staticPageTitle = 'Unknown';
+    $blogPageTitle = 'Unknown';
+    
+    if ($staticPageId !== 'unknown' && $staticPageId !== '0') {
+        $staticPageTitle = $I->executeJS("
+            const option = document.querySelector('select[name=\"page_on_front\"] option[value=\"$staticPageId\"]');
+            return option ? option.textContent : 'Unknown';
+        ");
+    }
+    
+    if ($blogPageId !== 'unknown' && $blogPageId !== '0') {
+        $blogPageTitle = $I->executeJS("
+            const option = document.querySelector('select[name=\"page_for_posts\"] option[value=\"$blogPageId\"]');
+            return option ? option.textContent : 'Unknown';
+        ");
+    }
+    
+    // Build detailed failure message
+    $failureMessage = "PAGINATION TEST FAILED: WordPress is configured to show a static page as the homepage instead of the blog roll.\n\n";
+    $failureMessage .= "Current Reading Settings configuration:\n";
+    $failureMessage .= "- Homepage displays: A static page\n";
+    $failureMessage .= "- Homepage (static page): $staticPageTitle (ID: $staticPageId)\n";
+    
+    if ($blogPageId !== 'unknown' && $blogPageId !== '0') {
+        $failureMessage .= "- Posts page (blog roll): $blogPageTitle (ID: $blogPageId)\n\n";
+        $failureMessage .= "ALTERNATIVE SOLUTION: If you want to keep the static homepage,\n";
+        $failureMessage .= "you can modify this test to check pagination on the posts page instead:\n";
+        $failureMessage .= "- Change the test to navigate to the posts page URL\n";
+        $failureMessage .= "- The posts page should be accessible and show the blog roll with pagination\n\n";
+    } else {
+        $failureMessage .= "- Posts page (blog roll): Not configured\n\n";
+    }
+    
+    $failureMessage .= "To fix this issue (Option 1 - Recommended for this test):\n";
+    $failureMessage .= "1. Go to WordPress Admin > Settings > Reading\n";
+    $failureMessage .= "2. Select 'Your latest posts' under 'Your homepage displays'\n";
+    $failureMessage .= "3. Save changes and re-run this test\n\n";
+    
+    $failureMessage .= "Alternative fix (Option 2 - Keep static homepage):\n";
+    $failureMessage .= "1. Ensure a 'Posts page' is selected in Settings > Reading\n";
+    $failureMessage .= "2. Modify this test to check pagination on that posts page instead of homepage\n\n";
+    
+    $failureMessage .= "This test requires access to the blog roll to properly test pagination functionality.";
+    
+    // Fail the test with the detailed explanation
+    $I->fail($failureMessage);
+}
+
+if ($showOnFront !== 'posts') {
+    $I->fail(
+        "PAGINATION TEST FAILED: Unable to determine WordPress homepage configuration.\n" .
+        "Expected: 'Your latest posts' should be selected in Settings > Reading.\n" .
+        "Current configuration: $showOnFront\n\n" .
+        "Please verify WordPress is properly configured to show the blog roll on the homepage."
+    );
+}
+
+$I->comment('✓ WordPress is correctly configured to show blog roll on homepage');
+$I->comment('✓ Proceeding with pagination tests...');
+
+// Return to the main site for testing
+$I->amOnUrl(AcceptanceConfig::BASE_URL);
+
+// Configuration-driven approach: Get current device type using breakpoint
+$isMobile = $I->isMobileBreakpoint();
+$deviceType = $isMobile ? 'mobile' : 'desktop';
+$I->comment("Testing pagination with device type: $deviceType (breakpoint: " . ($isMobile ? '<784px' : '>=784px') . ")");
 
 // Setup: Create test posts for pagination testing
 $I->comment('=== SETUP: Creating test posts for pagination ===');
@@ -52,21 +150,18 @@ try {
     $I->comment('=== TEST 1: Pagination appears on multi-page category ===');
     $I->amOnPage('/category/test/');
     
-    // Configuration-aware testing: Adapt behavior based on device mode
-    if (strpos($deviceMode, 'mobile') !== false) {
+    // Configuration-aware testing: Adapt behavior based on device type
+    if ($deviceType === 'mobile') {
         $I->comment('Mobile mode: Testing pagination with touch-friendly interface');
         // Mobile devices may have different pagination layouts or behaviors
         $waitTime = 3; // Longer wait for mobile rendering
-    } elseif (strpos($deviceMode, 'tablet') !== false) {
-        $I->comment('Tablet mode: Testing pagination with medium screen layout');
-        $waitTime = 2;
     } else {
         $I->comment('Desktop mode: Testing pagination with full desktop layout');
         $waitTime = 2;
     }
     
     $I->waitForElement('.blog-roll-container', $waitTime);
-    $I->makeScreenshot("pagination-category-test-{$deviceMode}");
+    $I->makeScreenshot("pagination-category-test-{$deviceType}");
 
     try {
         $I->seeElement('.blog-roll-pagination');
@@ -78,15 +173,12 @@ try {
         $I->comment("Current page: $currentPageText");
 
         // Device-aware pagination navigation testing
-        $I->comment("--- Testing pagination navigation for $deviceMode ---");
+        $I->comment("--- Testing pagination navigation for $deviceType ---");
         
         // Adjust interaction method based on device type
-        if (strpos($deviceMode, 'mobile') !== false) {
+        if ($deviceType === 'mobile') {
             $I->comment('Mobile: Testing touch-based pagination navigation');
             $clickDelay = 1000; // Add delay for mobile touch interactions
-        } elseif (strpos($deviceMode, 'tablet') !== false) {
-            $I->comment('Tablet: Testing tablet-optimized pagination navigation');
-            $clickDelay = 500;
         } else {
             $I->comment('Desktop: Testing mouse-based pagination navigation');
             $clickDelay = 0;
@@ -103,10 +195,10 @@ try {
             }
             $I->click('.pagination-list .next-page a');
             
-            // Longer wait times for mobile/tablet due to potential slower rendering
-            $waitTime = strpos($deviceMode, 'mobile') !== false ? 5 : 3;
+            // Longer wait times for mobile due to potential slower rendering
+            $waitTime = $deviceType === 'mobile' ? 5 : 3;
             $I->waitForElementChange('.current-page', function($el) use ($currentPageText) {
-                return $el->text() !== $currentPageText;
+                return $el->getText() !== $currentPageText;
             }, $waitTime);
 
             $newPageText = $I->grabTextFrom('.current-page');
@@ -115,7 +207,7 @@ try {
 
             $newPosts = $I->grabMultiple('.blog-roll-item .blog-roll-title', 'textContent');
             $I->assertNotEquals($currentPosts, $newPosts, 'Different posts should be displayed on different pages');
-            $I->comment("✓ Next page navigation working correctly in $deviceMode mode");
+            $I->comment("✓ Next page navigation working correctly in $deviceType mode");
 
             try {
                 $I->seeElement('.pagination-list .prev-page');
@@ -125,7 +217,7 @@ try {
                 }
                 $I->click('.pagination-list .prev-page a');
                 $I->waitForText($currentPageText, $waitTime, '.current-page');
-                $I->comment("✓ Previous page navigation working correctly in $deviceMode mode");
+                $I->comment("✓ Previous page navigation working correctly in $deviceType mode");
             } catch (\Exception $e) {
                 $I->comment('ℹ Previous page button not available (expected on first page)');
             }
@@ -136,8 +228,8 @@ try {
         // Device-aware page number testing
         $pageNumbers = $I->grabMultiple('.pagination-list .page-number a', 'textContent');
         if (!empty($pageNumbers)) {
-            $I->comment("Testing direct page number navigation in $deviceMode mode");
-            if (strpos($deviceMode, 'mobile') !== false) {
+            $I->comment("Testing direct page number navigation in $deviceType mode");
+            if ($deviceType === 'mobile') {
                 $I->comment('Mobile: Ensuring page numbers are touch-friendly');
                 // On mobile, we might want to test that page numbers are large enough for touch
                 $I->seeElement('.pagination-list .page-number');
@@ -148,7 +240,7 @@ try {
             }
             $I->click('.pagination-list .page-number a');
             $I->waitForElement('.blog-roll-pagination', $waitTime);
-            $I->comment("✓ Direct page number navigation working in $deviceMode mode");
+            $I->comment("✓ Direct page number navigation working in $deviceType mode");
         }
     } catch (\Exception $e) {
         $I->comment('ℹ No pagination found - this may be expected if there\'s only one page of posts');
@@ -159,10 +251,12 @@ try {
     $I->amOnPage('/');
     
     // Device-aware pagination testing on home page
-    $I->comment("Testing home page pagination in $deviceMode mode");
+    $I->comment("Testing home page pagination in $deviceType mode");
     
+    // Set wait time for this test section
+    $waitTime = $deviceType === 'mobile' ? 5 : 3;
     $I->waitForElement('.blog-roll-container', $waitTime);
-    $I->makeScreenshot("pagination-home-page-{$deviceMode}");
+    $I->makeScreenshot("pagination-home-page-{$deviceType}");
 
     try {
         $I->seeElement('.blog-roll-pagination');
@@ -177,8 +271,10 @@ try {
     $I->amOnPage('/category/test/');
     
     // Device-specific CSS and styling verification
-    $I->comment("Verifying pagination CSS structure for $deviceMode mode");
+    $I->comment("Verifying pagination CSS structure for $deviceType mode");
     
+    // Set wait time for this test section
+    $waitTime = $deviceType === 'mobile' ? 5 : 3;
     $I->waitForElement('.blog-roll-pagination', $waitTime);
 
     $I->seeElement('nav.blog-roll-pagination');
@@ -186,11 +282,11 @@ try {
 
     // Device-specific CSS structure verification
     $paginationItems = $I->grabMultiple('.pagination-list li', 'class');
-    $I->comment("Found pagination item classes for $deviceMode: " . implode(', ', $paginationItems));
+    $I->comment("Found pagination item classes for $deviceType: " . implode(', ', $paginationItems));
     $I->assertTrue(in_array('current-page', $paginationItems), 'Current page class should exist');
 
     // Verify pagination structure is appropriate for device type
-    if (strpos($deviceMode, 'mobile') !== false) {
+    if ($deviceType === 'mobile') {
         $I->comment('Mobile: Verifying touch-friendly pagination structure');
         // On mobile, pagination items should be large enough for touch interaction
         $paginationHeight = $I->executeJS("
@@ -198,15 +294,13 @@ try {
             return pagination ? window.getComputedStyle(pagination).height : '0px';
         ");
         $I->comment("Mobile pagination link height: $paginationHeight");
-    } elseif (strpos($deviceMode, 'tablet') !== false) {
-        $I->comment('Tablet: Verifying medium-screen pagination layout');
     } else {
         $I->comment('Desktop: Verifying full-size pagination layout');
     }
 
     $currentPageHasLink = $I->executeJS("return document.querySelector('.pagination-list .current-page a') !== null;");
     $I->assertFalse($currentPageHasLink, 'Current page should not be clickable');
-    $I->comment("✓ Current page is properly marked as non-clickable in $deviceMode mode");
+    $I->comment("✓ Current page is properly marked as non-clickable in $deviceType mode");
 
     $otherLinksClickable = $I->executeJS("
         const otherItems = document.querySelectorAll('.pagination-list li:not(.current-page)');
@@ -220,10 +314,12 @@ try {
     $I->amOnPage('/?s=test');
     
     // Search results pagination testing with device awareness
-    $I->comment("Testing search results pagination in $deviceMode mode");
+    $I->comment("Testing search results pagination in $deviceType mode");
     
+    // Set wait time for this test section
+    $waitTime = $deviceType === 'mobile' ? 5 : 3;
     $I->waitForElement('.blog-roll-container', $waitTime);
-    $I->makeScreenshot("pagination-search-results-{$deviceMode}");
+    $I->makeScreenshot("pagination-search-results-{$deviceType}");
 
     try {
         $I->seeElement('.blog-roll-pagination');
@@ -237,15 +333,15 @@ try {
     $I->amOnPage('/category/test/');
     
     // Device-aware accessibility testing
-    $I->comment("Testing pagination accessibility for $deviceMode mode");
-    if (strpos($deviceMode, 'mobile') !== false) {
+    $I->comment("Testing pagination accessibility for $deviceType mode");
+    if ($deviceType === 'mobile') {
         $I->comment('Mobile: Verifying touch-friendly pagination controls');
-    } elseif (strpos($deviceMode, 'tablet') !== false) {
-        $I->comment('Tablet: Verifying medium-screen accessibility features');
     } else {
         $I->comment('Desktop: Verifying full keyboard and mouse accessibility');
     }
     
+    // Set wait time for this test section
+    $waitTime = $deviceType === 'mobile' ? 5 : 3;
     $I->waitForElement('.blog-roll-pagination', $waitTime);
 
     $I->seeElement('.blog-roll-pagination[role="navigation"]');
@@ -253,10 +349,10 @@ try {
 
     $linkTexts = $I->grabMultiple('.pagination-list a', 'textContent');
     $I->assertTrue(count($linkTexts) > 0, 'Pagination links should have readable text');
-    $I->comment("Pagination link texts for $deviceMode: " . implode(', ', $linkTexts));
+    $I->comment("Pagination link texts for $deviceType: " . implode(', ', $linkTexts));
 
     // Device-specific accessibility checks
-    if (strpos($deviceMode, 'mobile') !== false) {
+    if ($deviceType === 'mobile') {
         $I->comment('Mobile: Verifying touch accessibility features');
         // Check if pagination links have adequate touch targets
         $touchTargetSize = $I->executeJS("
@@ -274,7 +370,7 @@ try {
     try {
         $prevText = $I->grabTextFrom('.pagination-list .prev-page a');
         $I->assertStringContainsString('Previous', $prevText, 'Previous link should contain "Previous" text');
-        $I->comment("✓ Previous link text for $deviceMode: $prevText");
+        $I->comment("✓ Previous link text for $deviceType: $prevText");
     } catch (\Exception $e) {
         $I->comment('ℹ Previous link not available (expected on first page)');
     }
@@ -282,14 +378,14 @@ try {
     try {
         $nextText = $I->grabTextFrom('.pagination-list .next-page a');
         $I->assertStringContainsString('Next', $nextText, 'Next link should contain "Next" text');
-        $I->comment("✓ Next link text for $deviceMode: $nextText");
+        $I->comment("✓ Next link text for $deviceType: $nextText");
     } catch (\Exception $e) {
         $I->comment('ℹ Next link not available (expected on last page)');
     }
 
-    $I->comment("✓ Pagination accessibility tests completed for $deviceMode mode");
+    $I->comment("✓ Pagination accessibility tests completed for $deviceType mode");
     $I->comment('=== PAGINATION TESTS COMPLETED ===');
-    $I->comment("All pagination functionality has been tested for $deviceMode mode including:");
+    $I->comment("All pagination functionality has been tested for $deviceType mode including:");
     $I->comment('- Device-aware pagination presence/absence based on post count');
     $I->comment('- Configuration-driven navigation functionality (next/previous/page numbers)');
     $I->comment('- Device-specific CSS classes and HTML structure verification');
@@ -305,6 +401,7 @@ try {
     $I->comment('- Improved screenshot naming to include device mode for better test tracking');
 
 } finally {
+    
     // Cleanup: Delete all created test posts (runs even if test fails)
     $I->comment('=== CLEANUP: Deleting created test posts ===');
     foreach ($createdPostIds as $postId) {
@@ -316,4 +413,5 @@ try {
         }
     }
     $I->comment("Cleanup completed - deleted " . count($createdPostIds) . " test posts");
+    
 }

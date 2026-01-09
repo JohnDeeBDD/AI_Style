@@ -19,21 +19,29 @@
 $I = new AcceptanceTester($scenario);
 
 $I->wantToTest('Admin bar sidebar toggle icon sizing consistency');
+
+// Create test post with content for admin bar testing
+$I->comment('Creating test post for admin bar sidebar toggle icon sizing testing');
+$postContent = '<p>This is a test post for admin bar sidebar toggle icon sizing verification. The theme will automatically generate the interface with customized admin bar.</p>';
+$postId = $I->cUrlWP_SiteToCreatePost('AdminBarSidebarToggleIconSizeTestPost', $postContent);
+$I->comment('✓ Test post created with ID: ' . $postId);
+
 $I->amOnUrl(AcceptanceConfig::BASE_URL);
 $I->loginAsAdmin();
-$I->amOnPage(AcceptanceConfig::TEST_POST_PAGE);
+$I->amOnPage("/");
+$I->amOnPage("/?p={$postId}");
 
 // Configuration-driven approach: Test behavior adapts based on current device configuration
 // The window size and device mode are determined by the suite configuration in acceptance.suite.yml
 // This eliminates the need for dynamic zoom changes during test execution
-$deviceMode = $I->getDeviceMode();
-$windowSize = $I->getWindowSize();
-$I->comment("Testing admin bar sidebar toggle icon sizing for {$deviceMode} mode ({$windowSize})");
-$I->comment("Configuration-driven test: Device mode = {$deviceMode}, Window size = {$windowSize}");
+$isMobile = $I->isMobileBreakpoint();
+$deviceType = $isMobile ? 'mobile' : 'desktop';
+$I->comment("Testing admin bar sidebar toggle icon sizing for {$deviceType} mode (breakpoint: " . ($isMobile ? '<784px' : '>=784px') . ")");
+$I->comment("Configuration-driven test: Device type = {$deviceType}, Mobile breakpoint = " . ($isMobile ? 'true' : 'false'));
 
 // Mobile/Desktop detection switch
 // Current logic is for desktop only - mobile testing not yet implemented
-if (strtolower($deviceMode) === 'mobile') {
+if ($isMobile) {
     $I->comment('Mobile mode detected - skipping detailed assertions (mobile testing not yet implemented)');
     $I->comment('Mobile test will pass automatically until mobile-specific logic is implemented');
     
@@ -42,13 +50,19 @@ if (strtolower($deviceMode) === 'mobile') {
     
     // Basic verification that elements exist (minimal mobile test)
     $I->comment('Performing basic mobile verification - checking element presence only');
-    $I->seeElement(AcceptanceConfig::ADMIN_BAR_SIDEBAR_TOGGLE);
+    $I->seeElement(AcceptanceConfig::ADMIN_BAR_MOBILE_HAMBURGER);
     
     // Take a screenshot for mobile documentation
     $I->makeScreenshot('admin-bar-sidebar-toggle-mobile-mode');
     $I->comment("Mobile mode screenshot: <a href='http://localhost/wp-content/themes/ai_style/tests/_output/debug/admin-bar-sidebar-toggle-mobile-mode.png' target='_blank'>available here</a>");
     
     $I->comment('Mobile test completed successfully - detailed mobile testing to be implemented later');
+    
+    // Cleanup test data for mobile mode
+    $I->comment('Cleaning up test post');
+    $I->cUrlWP_SiteToDeletePost($postId);
+    $I->comment('✓ Test post deleted successfully');
+    
     return; // Exit early for mobile mode
 }
 
@@ -175,3 +189,8 @@ $I->makeScreenshot('admin-bar-sidebar-toggle-after-size-check');
 $I->comment("Final screenshot after size verification: <a href='http://localhost/wp-content/themes/ai_style/tests/_output/debug/admin-bar-sidebar-toggle-after-size-check.png' target='_blank'>available here</a>");
 
 $I->comment('Desktop test completed. All assertions should pass if the sidebar toggle icon sizing matches WordPress admin bar standards.');
+
+// Cleanup test data
+$I->comment('Cleaning up test post');
+$I->cUrlWP_SiteToDeletePost($postId);
+$I->comment('✓ Test post deleted successfully');

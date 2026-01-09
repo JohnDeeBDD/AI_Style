@@ -1,6 +1,7 @@
 <?php
 require_once("/var/www/html/wp-content/plugins/cacbot/src/Cacbot/autoloader.php");
-require_once("/var/www/html/wp-content/plugins/cacbot-mother/src/CacbotMothership/autoloader.php");
+require_once("/var/www/html/wp-content/plugins/cacbot-mother/vendor/autoload.php");
+
 // Create users
 $user_id1 = wp_create_user('Codeception', 'password', 'codeception@email.com');
 $user_id2 = wp_create_user('Ion', 'password', 'jiminac@aol.com');

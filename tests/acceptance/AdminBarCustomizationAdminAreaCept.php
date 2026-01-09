@@ -10,17 +10,20 @@ $I->expect('the New button dropdown to be hidden on frontend but visible in admi
 $I->comment('=== FRONTEND TESTING: Admin bar customizations should be active ===');
 
 $I->amGoingTo('navigate to the frontend test page as an admin user');
+
+
+$postId = $I->cUrlWP_SiteToCreatePost('AdminBarCustomizationAdminAreaCept', "AdminBarCustomizationAdminAreaCeptTestContent");
 $I->amOnUrl(AcceptanceConfig::BASE_URL);
 $I->loginAsAdmin();
-$I->amOnPage(AcceptanceConfig::TEST_POST_PAGE);
+$I->amOnPage("/");
+$I->amOnPage("/?p={$postId}");
 
 // Configuration-driven approach: Test behavior adapts based on current device configuration
-// The window size and device mode are determined by the suite configuration in acceptance.suite.yml
-// This eliminates the need for dynamic zoom changes during test execution
-$deviceMode = $I->getDeviceMode();
-$windowSize = $I->getWindowSize();
-$I->comment("Testing admin bar customization in admin area for {$deviceMode} mode ({$windowSize})");
-$I->comment("Configuration-driven test: Device mode = {$deviceMode}, Window size = {$windowSize}");
+// Device type determined by breakpoint, eliminating the need for dynamic zoom changes during test execution
+$isMobile = $I->isMobileBreakpoint();
+$deviceType = $isMobile ? 'mobile' : 'desktop';
+$I->comment("Testing admin bar customization in admin area for {$deviceType} mode (breakpoint: " . ($isMobile ? '<784px' : '>=784px') . ")");
+$I->comment("Configuration-driven test: Device type = {$deviceType}, Mobile breakpoint = " . ($isMobile ? 'true' : 'false'));
 
 $I->expect('the admin bar to be fully loaded and visible');
 $I->waitForElement(AcceptanceConfig::ADMIN_BAR, 10);
@@ -55,3 +58,7 @@ $I->comment('=== ADMIN AREA TESTING: Admin bar customizations should be disabled
 
 $I->amGoingTo('test multiple admin pages to ensure customizations are not applied in admin area');
 $I->expect('the New button dropdown to be visible and functional in all admin pages');
+// Cleanup test data
+$I->comment('Cleaning up test post');
+$I->cUrlWP_SiteToDeletePost($postId);
+$I->comment('✓ Test post deleted successfully');

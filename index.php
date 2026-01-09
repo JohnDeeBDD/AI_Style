@@ -8,22 +8,37 @@
         <div id="chat-main">
             <?php if (is_singular()) : ?>
             <div id="scrollable-content">
+                <div id = "scrollable-content-header">
+
                 <?php 
-                the_post(); 
+                the_post();
+                $post_id = get_the_ID(); 
                 ?>
-                    <div class="post-content" id="post-content-1">
-                        <?php   the_content();
+                    <div id="">
+                    <?php
+                    
+                    if (class_exists('\AIPluginDev\FrontendViewBuilder') && method_exists('\AIPluginDev\FrontendViewBuilder', 'get_header_content') && \is_singular('ai-plugin')) {
+                        echo \AIPluginDev\FrontendViewBuilder::get_header_content($post_id);
+                    }
+                    ?>
+                    </div>
+                    <div class="post-content" id="entry-content" >
+
+                        <?php   
+                        the_content();
                         ?>
-                    </div> <!-- end: #post-content-1 -->
+
+                    </div> 
                 <div id="chat-messages">
                 <?php
                 $respondent_user_id = 0;
-                $post_id = get_the_ID();
+
                 if(get_post_meta($post_id, "_cacbot_anchor_post", true) === "1"){
                     // Check for Cacbot Anchor Post status
                     if(
-                        function_exists('is_user_logged_in') && 
+                        function_exists('is_user_logged_in') &&
                         is_user_logged_in() &&
+                        class_exists('\Cacbot\AnchorPost') &&
                         method_exists('\Cacbot\AnchorPost', 'filter_for_linked_post_id')
                     ) {
                         $current_user_id = get_current_user_id();
@@ -57,15 +72,25 @@
                 ?>
                 <div id="chat-messages">
                 <?php
-                // Comments are only displayed on singular pages (posts/pages)
-                // Non-singular pages (like category pages, blog roll) should not show comments
+
                 ?>
                 </div> <!-- end: #chat-messages -->
             </div> <!-- end: #scrollable-content -->
             <?php endif; ?>
             <div id="fixed-content">
                 <?php
-                    \AI_Style\CommentForm::doEchoCommentForm();
+                                // Comments are only displayed on singular pages (posts/pages)
+                // Non-singular pages (like category pages, blog roll) should not show comments
+                if (is_singular()){
+                    $linked_Post_id = $post_id; // Default to current post ID
+                    if (class_exists('\Cacbot\AnchorPost') && method_exists('\Cacbot\AnchorPost', 'filter_for_linked_post_id')) {
+                        $linked_Post_id = \Cacbot\AnchorPost::filter_for_linked_post_id($post_id, \get_current_user_id());
+                    }
+                    if ( comments_open( $linked_Post_id ) ) {
+                        \AI_Style\CommentForm::doEchoCommentForm();
+                    } 
+                }
+
                 ?>
             </div> <!-- end: #fixed-content -->
         </div> <!-- end: #chat-main -->

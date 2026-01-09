@@ -26,12 +26,12 @@ $I->loginAsAdmin();
 $I->amOnPage("/?p=" . $postId);
 
 // Configuration-driven approach: Test behavior adapts based on current device configuration
-// The window size and device mode are determined by the suite configuration in acceptance.suite.yml
+// The breakpoint detection is determined by the current window width
 // This eliminates the need for dynamic zoom changes during test execution
-$deviceMode = $I->getDeviceMode();
-$windowSize = $I->getWindowSize();
-$I->comment("Testing startup focus position for {$deviceMode} mode ({$windowSize})");
-$I->comment("Configuration-driven test: Device mode = {$deviceMode}, Window size = {$windowSize}");
+$isMobile = $I->isMobileBreakpoint();
+$deviceType = $isMobile ? 'mobile' : 'desktop';
+$I->comment("Testing startup focus position for {$deviceType} breakpoint");
+$I->comment("Configuration-driven test: Device type = {$deviceType}, Mobile breakpoint = " . ($isMobile ? 'true' : 'false'));
 
 // Test post contains comments/chat interface
 // If cacbotData.comment_count > 0 then the #scrollable-content should be scrolled to the bottom for the user upon page load.

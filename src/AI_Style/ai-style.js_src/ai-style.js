@@ -4,13 +4,18 @@ npx spack entry=/src/AI_Style/ai-style.js_src/ai-style.js output=/src/AI_Style
 */
 /* global cacbot_data */
 
-import commentBoxStyle from "./CommentFormStyle";
+import commentBoxStyle, { resetCommentSubmitButton } from "./CommentFormStyle";
+import {
+    addActionBubble,
+    createActionButtonsContainer,
+    refreshButtonVisibility
+} from "./CommentFormButtons";
 import justifyOneLiner from "./justifyOneLiner";
 import chatMessages, { addInterlocutorMessage, addRespondentMessage, clearMessages } from "./chatMessages";
-import adminBarCustomization, {
-  overrideHoverBehavior,
-  overrideClickBehavior
-} from "./adminBarCustomization";
+import initializeNewButtonOverride, {
+  disableDropdownMenu,
+  setupArchiveClickHandler
+} from "./adminBarNewButtonOverride";
 import { addMobileHamburgerIcon } from "./HamburgerButton";
 import {
   initializeArrowToggleButton,
@@ -67,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
   window.hideSidebar = hideSidebar;
   
   // Initialize admin bar customization (New button only)
-  adminBarCustomization();
+  initializeNewButtonOverride();
   
   // Initialize desktop arrow toggle button
   initializeArrowToggleButton();
@@ -88,15 +93,28 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Log that the admin bar customization functions are available
   console.log('Admin bar customization functions are available globally:');
-  console.log('- overrideHoverBehavior(newButton)');
-  console.log('- overrideClickBehavior(newButton)');
+  console.log('- disableDropdownMenu(newButton)');
+  console.log('- setupArchiveClickHandler(newButton)');
   
   // Log that the toggle button functions are available
   console.log('Toggle button functions initialized:');
   console.log('- Desktop arrow toggle button initialized');
   console.log('- Mobile hamburger button initialized');
   
+  // Make comment form functions available globally
+  window.resetCommentSubmitButton = resetCommentSubmitButton;
+  window.addActionBubble = addActionBubble;
+  window.createActionButtonsContainer = createActionButtonsContainer;
+  window.refreshButtonVisibility = refreshButtonVisibility;
+  
   // Set focus to the last comment on page load
   focusLastComment();
+  
+  // Log that comment form functions are available
+  console.log('Comment form functions are available globally:');
+  console.log('- resetCommentSubmitButton()');
+  console.log('- addActionBubble(dashiconClass, text, container, options)');
+  console.log('- createActionButtonsContainer(commentForm)');
+  console.log('- refreshButtonVisibility(data)');
 });
 

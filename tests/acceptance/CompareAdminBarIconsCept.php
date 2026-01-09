@@ -13,20 +13,20 @@ $I->wantToTest('Compare sidebar toggle icon with other admin bar icons');
 // Create test post for admin bar icon comparison testing
 $I->comment('Creating test post for admin bar icon comparison testing');
 $postContent = '<p>This is a test post for comparing admin bar icons. The theme will automatically generate the chat interface with admin bar customizations.</p>';
-$postId = $I->cUrlWP_SiteToCreatePost('testpost', $postContent);
+$postId = $I->cUrlWP_SiteToCreatePost('CompareAdminBarIconsCept', $postContent);
 $I->comment('✓ Test post created with ID: ' . $postId);
 
 $I->amOnUrl(AcceptanceConfig::BASE_URL);
 $I->loginAsAdmin();
-$I->amOnPage(AcceptanceConfig::TEST_POST_PAGE);
+$I->amOnPage("/"); // Go to the homepage first
+$I->amOnPage("/?p={$postId}");
 
 // Configuration-driven approach: Test behavior adapts based on current device configuration
-// The window size and device mode are determined by the suite configuration in acceptance.suite.yml
-// This eliminates the need for dynamic zoom changes during test execution
-$deviceMode = $I->getDeviceMode();
-$windowSize = $I->getWindowSize();
-$I->comment("Comparing admin bar icons for {$deviceMode} mode ({$windowSize})");
-$I->comment("Configuration-driven test: Device mode = {$deviceMode}, Window size = {$windowSize}");
+// Device type determined by breakpoint, eliminating the need for dynamic zoom changes during test execution
+$isMobile = $I->isMobileBreakpoint();
+$deviceType = $isMobile ? 'mobile' : 'desktop';
+$I->comment("Comparing admin bar icons for {$deviceType} mode (breakpoint: " . ($isMobile ? '<784px' : '>=784px') . ")");
+$I->comment("Configuration-driven test: Device type = {$deviceType}, Mobile breakpoint = " . ($isMobile ? 'true' : 'false'));
 
 // Wait for the admin bar to be fully loaded
 $I->waitForElement(AcceptanceConfig::ADMIN_BAR, 10);

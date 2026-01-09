@@ -39,10 +39,8 @@
 
 $I = new AcceptanceTester($scenario);
 
-$I->wantToTest("Z-index layering when sidebar is open in mobile view - sidebar should be above chat main elements (TEST DESIGNED TO FAIL WHEN BUG IS PRESENT)");
-
 // Create test post with ChatGPT interface content
-$I->comment('Creating test post for mobile z-index layering testing');
+
 $postContent = '<p>This is a test post for mobile z-index layering verification. The theme will automatically generate the chat interface with all required UI divisions for z-index testing.</p>';
 $postId = $I->cUrlWP_SiteToCreatePost('testpost-mobile-zindex', $postContent);
 $I->comment('✓ Test post created with ID: ' . $postId);
@@ -71,10 +69,9 @@ if ($isAdmin) {
 }
 
 // Check if this is a mobile breakpoint - if not, skip the test
-$windowSize = $I->getWindowSize();
-$I->comment("Testing mobile z-index layering with window size: {$windowSize}");
-
 $isMobile = $I->isMobileBreakpoint();
+$deviceType = $isMobile ? 'mobile' : 'desktop';
+$I->comment("Testing mobile z-index layering for {$deviceType} mode (breakpoint: " . ($isMobile ? '<784px' : '>=784px') . ")");
 if (!$isMobile) {
     $I->comment("This is a desktop breakpoint (>= 768px). Skipping mobile z-index tests.");
     // Cleanup test data before exiting

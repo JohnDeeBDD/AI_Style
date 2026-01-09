@@ -4,12 +4,19 @@ paths:
     data: tests/_data
     support: tests/_support
     envs: tests/_envs
+
 actor_suffix: Tester
+
 extensions:
-    enabled:
-        - Codeception\Extension\RunFailed
+    config:
+        Codeception\Extension\RunFailed:
+            fail-fast: true
+
 coverage:
     enabled: true
     include:
         - src/AI_Style/*
-    exclude:
+    exclude: []
+
+settings:
+    stop_on_fail: true

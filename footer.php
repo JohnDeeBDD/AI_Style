@@ -10,7 +10,7 @@
 
 ?>
 		<footer id="colophon" class="site-footer">
-		Cacbots can make mistakes, check important info.
+		<a href = "https://cacbot.com" target="_blank">Cacbots</a> can make mistakes, check important info.
 		</footer><!-- .site-footer -->
 </div><!-- .site -->
 

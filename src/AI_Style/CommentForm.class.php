@@ -110,6 +110,8 @@ class CommentForm {
                     });
                 }
             });
+            // console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+            jQuery(".comment-form-cookies-consent").hide();
             </script>
             <?php
         }

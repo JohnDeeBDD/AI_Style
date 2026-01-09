@@ -16,20 +16,20 @@ $I->wantToTest('Admin bar customization functionality');
 // Create test post with ChatGPT interface content
 $I->comment('Creating test post for admin bar customization testing');
 $postContent = '<p>This is a test post for admin bar customization verification. The theme will automatically generate the chat interface with customized admin bar.</p>';
-$postId = $I->cUrlWP_SiteToCreatePost('testpost', $postContent);
-$I->comment('✓ Test post created with ID: ' . $postId);
+ 
 
+$postId = $I->cUrlWP_SiteToCreatePost('AdminBarCustomizationCeptTestPost', $postContent);
 $I->amOnUrl(AcceptanceConfig::BASE_URL);
 $I->loginAsAdmin();
-$I->amOnPage(AcceptanceConfig::TEST_POST_PAGE);
+$I->amOnPage("/");
+$I->amOnPage("/?p={$postId}");
 
 // Configuration-driven approach: Test behavior adapts based on current device configuration
-// The window size and device mode are determined by the suite configuration in acceptance.suite.yml
-// This eliminates the need for dynamic zoom changes during test execution
-$deviceMode = $I->getDeviceMode();
-$windowSize = $I->getWindowSize();
-$I->comment("Testing admin bar customization for {$deviceMode} mode ({$windowSize})");
-$I->comment("Configuration-driven test: Device mode = {$deviceMode}, Window size = {$windowSize}");
+// Device type determined by breakpoint, eliminating the need for dynamic zoom changes during test execution
+$isMobile = $I->isMobileBreakpoint();
+$deviceType = $isMobile ? 'mobile' : 'desktop';
+$I->comment("Testing admin bar customization for {$deviceType} mode (breakpoint: " . ($isMobile ? '<784px' : '>=784px') . ")");
+$I->comment("Configuration-driven test: Device type = {$deviceType}, Mobile breakpoint = " . ($isMobile ? 'true' : 'false'));
 
 // Wait for the admin bar to be fully loaded
 $I->waitForElement(AcceptanceConfig::ADMIN_BAR, 10);

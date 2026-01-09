@@ -18,33 +18,50 @@ $I = new AcceptanceTester($scenario);
 
 $I->wantToTest('ChatGPT color scheme implementation');
 
+// REFACTORED: This test now uses custom JavaScript functions from toggleSidebarVisible.js
+// Functions used:
+// - initToggleSidebar() - Initialize sidebar functionality
+// - isMobileView() - Detect mobile viewport
+// - isDesktopView() - Detect desktop viewport
+// - isSidebarVisible() - Check sidebar visibility state
+// - getSidebarState() - Get complete sidebar state object
+// - getSidebarWidth() - Get appropriate sidebar width
+// - showSidebar() - Show sidebar with animation
+// - hideSidebar() - Hide sidebar with animation
+// - updateToggleButton() - Update toggle button state
+// - updateResponsiveMode() - Update responsive mode detection
+
 // Create test post with ChatGPT interface content
 $I->comment('Creating test post for ChatGPT color scheme testing');
 $postContent = '<p>This is a test post for ChatGPT color scheme verification. The theme will automatically generate the chat interface with proper color styling.</p>';
-$postId = $I->cUrlWP_SiteToCreatePost('testpost', $postContent);
+$postId = $I->cUrlWP_SiteToCreatePost('ChatGPTColorSchemeCeptTestpost', $postContent);
 $I->comment('✓ Test post created with ID: ' . $postId);
 
 $I->amOnUrl(AcceptanceConfig::BASE_URL);
 $I->loginAsAdmin();
-$I->amOnPage(AcceptanceConfig::TEST_POST_PAGE);
+$I->amOnPage("/");
+$I->amOnPage("/?p={$postId}");
 
 // Configuration-driven approach: Test behavior adapts based on current device configuration
-// The window size and device mode are determined by the suite configuration in acceptance.suite.yml
-// This eliminates the need for dynamic zoom changes during test execution
-$deviceMode = $I->getDeviceMode();
-$windowSize = $I->getWindowSize();
-$I->comment("Testing ChatGPT color scheme for {$deviceMode} mode ({$windowSize})");
-$I->comment("Configuration-driven test: Device mode = {$deviceMode}, Window size = {$windowSize}");
+// Device type determined by breakpoint, eliminating the need for dynamic zoom changes during test execution
+$isMobile = $I->executeJS("
+    // Initialize toggle sidebar functionality to ensure functions are available
+    if (typeof initToggleSidebar === 'function') {
+        initToggleSidebar();
+    }
+    // Use custom function to detect mobile view
+    return typeof isMobileView === 'function' ? isMobileView() : window.innerWidth < 782;
+");
+$deviceType = $isMobile ? 'mobile' : 'desktop';
+$I->comment("Testing ChatGPT color scheme for {$deviceType} mode (breakpoint: " . ($isMobile ? '<784px' : '>=784px') . ")");
+$I->comment("Configuration-driven test: Device type = {$deviceType}, Mobile breakpoint = " . ($isMobile ? 'true' : 'false'));
 
 // Wait for the page to be fully loaded
 $I->waitForElement(AcceptanceConfig::CHAT_CONTAINER, 10);
 
-// ChatGPT Color Constants (based on actual deployed dark theme implementation)
-// Dark sidebar: #171717 (rgb(23, 23, 23) - very dark gray)
-// Main area: #212121 (rgb(33, 33, 33) - dark gray)
-// Sidebar text: #8e8e8e (rgb(142, 142, 142) - medium gray text on dark)
-// Message interlocutor: #303030 (rgb(48, 48, 48) - slightly lighter than main)
-// Comment form: transparent background (rgba(0, 0, 0, 0))
+// Initialize custom sidebar functions and add missing helper functions
+$I->executeJS("showSidebar();");
+sleep(1); // Allow time for sidebar to show
 
 $I->comment('=== Testing ChatGPT Color Scheme Implementation ===');
 
@@ -293,6 +310,19 @@ $I->executeJS("
 $I->comment('Testing overall color harmony and contrast ratios');
 
 $I->executeJS("
+    // Use custom functions to get sidebar state and responsive mode information
+    const currentSidebarState = typeof getSidebarState === 'function' ? getSidebarState() : null;
+    const isMobile = typeof isMobileView === 'function' ? isMobileView() : window.innerWidth < 782;
+    const isDesktop = typeof isDesktopView === 'function' ? isDesktopView() : window.innerWidth >= 782;
+    const sidebarWidth = typeof getSidebarWidth === 'function' ? getSidebarWidth() : '377px';
+    
+    console.log('Sidebar state from custom functions:', {
+        state: currentSidebarState,
+        isMobile: isMobile,
+        isDesktop: isDesktop,
+        width: sidebarWidth
+    });
+    
     // Test contrast between sidebar and main area
     const sidebar = document.querySelector('" . AcceptanceConfig::CHAT_SIDEBAR . "');
     const mainArea = document.querySelector('" . AcceptanceConfig::CHAT_MAIN . "');
@@ -349,6 +379,15 @@ $I->executeJS("
     // - Text on dark: #ececf1 (light gray) ✓
     // - Text on light: #343541 (dark gray) ✓
     // - Submit button: #10a37f (ChatGPT green) ✓
+    
+    // Log final state using custom functions
+    if (typeof getSidebarState === 'function') {
+        console.log('Final sidebar state:', getSidebarState());
+    }
+    if (typeof updateToggleButton === 'function') {
+        updateToggleButton();
+        console.log('Toggle button updated');
+    }
     
     const referenceImagePath = '/wp-content/themes/ai_style/tests/_data/openai.png';
     console.log('Reference image path:', referenceImagePath);

@@ -19,13 +19,11 @@ $I->comment('✓ localStorage cleared');
 $I->wait(2);
 $I->amOnPage("/?p=" . $postId);
 
-// Determine device mode based on window width (782px is the breakpoint)
-$windowSize = $I->getWindowSize();
-$windowWidth = (int) explode('x', $windowSize)[0];
-$isMobile = $windowWidth < 782;
-$deviceMode = $isMobile ? 'mobile' : 'desktop';
+// Determine device mode using simplified breakpoint approach
+$isMobile = $I->isMobileBreakpoint();
+$deviceType = $isMobile ? 'mobile' : 'desktop';
 
-$I->comment("Testing sidebar toggle for {$deviceMode} mode ({$windowSize})");
+$I->comment("Testing sidebar toggle for {$deviceType} mode (breakpoint: " . ($isMobile ? '<784px' : '>=784px') . ")");
 
 // Wait for the page to be fully loaded
 $I->waitForElement(AcceptanceConfig::ADMIN_BAR, 10);
@@ -40,7 +38,7 @@ $toggleButtonSelector = $isMobile
 $I->comment("Using toggle button selector: {$toggleButtonSelector}");
 
 // Wait for sidebar and toggle button
-if ($deviceMode === 'desktop') {
+if ($deviceType === 'desktop') {
     $I->waitForElement(AcceptanceConfig::CHAT_SIDEBAR, 10);
 } else {
     // On mobile, sidebar might be hidden initially, so just wait for page load
@@ -89,7 +87,7 @@ $initialSidebarVisible = $I->executeJS('
 $I->comment("Initial sidebar visibility state: " . ($initialSidebarVisible ? 'visible' : 'hidden'));
 
 // Check initial sidebar state based on device mode
-if ($deviceMode === 'desktop') {
+if ($deviceType === 'desktop') {
     sleep(2);
     // EXPECTED: Desktop sidebar should be VISIBLE initially (arrow points left to hide it)
     $I->seeElement('#wp-admin-bar-sidebar-toggle .dashicons-arrow-left');
@@ -116,7 +114,7 @@ $I->comment("Initial state screenshot available");
 // === TEST 2: TOGGLE BUTTON PRESENCE ===
 $I->comment('=== TEST 2: Verifying toggle button presence ===');
 
-if ($deviceMode === 'desktop') {
+if ($deviceType === 'desktop') {
     $I->seeElement(AcceptanceConfig::ADMIN_BAR_SIDEBAR_TOGGLE);
     $I->seeElement(AcceptanceConfig::ADMIN_BAR_SIDEBAR_TOGGLE . ' .ab-item');
     $I->comment('✓ Desktop: Sidebar toggle button is present and properly structured');
@@ -129,7 +127,7 @@ if ($deviceMode === 'desktop') {
 // === TEST 3: TOGGLE FUNCTIONALITY ===
 $I->comment('=== TEST 3: Testing sidebar toggle functionality ===');
 
-if ($deviceMode === 'desktop') {
+if ($deviceType === 'desktop') {
     // Desktop: Start with visible sidebar, test hiding it
     $I->comment('Testing sidebar HIDE functionality (Desktop)');
     
@@ -295,7 +293,7 @@ $I->comment('✓ Rapid clicking handled correctly - sidebar state is consistent'
 $I->comment('=== TEST 5: localStorage persistence ===');
 $I->comment('Testing localStorage persistence functionality');
 
-if ($deviceMode === 'desktop') {
+if ($deviceType === 'desktop') {
     // Ensure sidebar is visible, then hide it using custom functions
     $I->comment('Step 1: Ensuring sidebar is visible, then hiding it');
     
@@ -374,7 +372,7 @@ $I->comment("Final state screenshot available");
 $I->comment('=== FINAL STATE VERIFICATION ===');
 
 // Ensure sidebar ends in expected initial state for device mode using custom functions
-if ($deviceMode === 'desktop') {
+if ($deviceType === 'desktop') {
     // Desktop should end with sidebar visible (as it started)
     $finalState = $I->executeJS('
         if (typeof window.isSidebarVisible !== "function") {

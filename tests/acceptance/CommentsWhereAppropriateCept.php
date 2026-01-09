@@ -42,12 +42,11 @@ $I->amOnPage("/?p=$postId");
 //$I->waitForPageLoad();
 
 // Configuration-driven approach: Test behavior adapts based on current device configuration
-// The window size and device mode are determined by the suite configuration in acceptance.suite.yml
-// This eliminates the need for dynamic zoom changes during test execution
-$deviceMode = $I->getDeviceMode();
-$windowSize = $I->getWindowSize();
-$I->comment("Testing comment visibility for {$deviceMode} mode ({$windowSize})");
-$I->comment("Configuration-driven test: Device mode = {$deviceMode}, Window size = {$windowSize}");
+// Device type determined by breakpoint, eliminating the need for dynamic zoom changes during test execution
+$isMobile = $I->isMobileBreakpoint();
+$deviceType = $isMobile ? 'mobile' : 'desktop';
+$I->comment("Testing comment visibility for {$deviceType} mode (breakpoint: " . ($isMobile ? '<784px' : '>=784px') . ")");
+$I->comment("Configuration-driven test: Device type = {$deviceType}, Mobile breakpoint = " . ($isMobile ? 'true' : 'false'));
 
 // Verify the post title and content are displayed
 $I->see($postContent);
@@ -62,7 +61,7 @@ $I->amOnPage("/category/uncategorized/");
 
 // Configuration-driven approach: Verify comments are not visible on category pages
 // Test behavior adapts to current device configuration without dynamic zoom changes
-$I->comment("Verifying comments are not displayed on category pages for {$deviceMode} mode");
+$I->comment("Verifying comments are not displayed on category pages for {$deviceType} mode");
 
 $I->dontSee($comment1Data['content']);
 $I->dontSee($comment2Data['content']);
