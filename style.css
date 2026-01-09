@@ -14,9 +14,86 @@
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 */
 
+/* ============================================================
+   CSS CUSTOM PROPERTIES (VARIABLES)
+   ============================================================ */
+:root {
+    /* Color Palette */
+    --color-bg-primary: #343541;
+    --color-bg-secondary: #212121;
+    --color-bg-tertiary: #171717;
+    --color-bg-sidebar: #171717;
+    --color-bg-message-ai: #212121;
+    --color-bg-message-user: #303030;
+    --color-bg-input: #f7f7f8;
+    --color-bg-footer: #202123;
+
+    /* Text Colors */
+    --color-text-primary: #ffffff;
+    --color-text-secondary: #ececf1;
+    --color-text-muted: #8e8e8e;
+    --color-text-dark: #343541;
+    --color-text-placeholder: #6b7280;
+    --color-text-footer: #acacbe;
+
+    /* Border Colors */
+    --color-border-primary: #444654;
+    --color-border-secondary: #565869;
+    --color-border-light: rgba(255, 255, 255, 0.1);
+    --color-border-lighter: rgba(255, 255, 255, 0.2);
+
+    /* Accent Colors */
+    --color-accent-green: #19c37d;
+    --color-accent-gray: #808080;
+    --color-hover-light: #e5e7eb;
+    --color-hover-dark: #4d4f5e;
+
+    /* Spacing */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 12px;
+    --spacing-lg: 16px;
+    --spacing-xl: 24px;
+    --spacing-2xl: 32px;
+
+    /* Border Radius */
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
+    --radius-xl: 24px;
+    --radius-full: 50%;
+
+    /* Transitions */
+    --transition-fast: 0.2s ease;
+    --transition-medium: 0.3s ease-in-out;
+
+    /* Z-Index Scale */
+    --z-base: 1;
+    --z-content: 10;
+    --z-sidebar-closed: 50;
+    --z-fixed-form: 100;
+    --z-chat-input: 150;
+    --z-sidebar-open: 200;
+    --z-footer: 2000;
+
+    /* Admin Bar Heights */
+    --admin-bar-mobile: 46px;
+    --admin-bar-desktop: 32px;
+
+    /* Component Dimensions */
+    --sidebar-width-mobile: 280px;
+    --sidebar-width-desktop: 377px;
+    --sidebar-width-max: 435px;
+    --content-max-width: 768px;
+    --footer-height: 30px;
+}
+
+/* ============================================================
+   BASE STYLES
+   ============================================================ */
 body {
-    background-color: #343541;
-    color: #fff;
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
     font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
     margin: 0;
     padding: 0;
@@ -24,36 +101,38 @@ body {
     display: flex;
     flex-direction: column;
     height: 100vh;
-    overflow: hidden; /* Suppress browser's default scrollbar */
+    overflow: hidden;
     font-size: 16px;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* WordPress Admin Bar Adjustments - Mobile First */
+/* ============================================================
+   WORDPRESS ADMIN BAR ADJUSTMENTS
+   ============================================================ */
 body.admin-bar {
-    /* Mobile first: Account for taller admin bar (46px) */
-    height: calc(100vh - 46px);
-    margin-top: 46px;
+    height: calc(100vh - var(--admin-bar-mobile));
+    margin-top: var(--admin-bar-mobile);
 }
 
 @media screen and (min-width: 782px) {
     body.admin-bar {
-        /* Desktop: Account for shorter admin bar (32px) */
-        height: calc(100vh - 32px);
-        margin-top: 32px;
+        height: calc(100vh - var(--admin-bar-desktop));
+        margin-top: var(--admin-bar-desktop);
     }
 }
 
-/* Mobile First Chat Container */
+/* ============================================================
+   CHAT CONTAINER (MOBILE FIRST)
+   ============================================================ */
 #chat-container {
     display: flex;
-    flex-direction: column; /* Mobile: stack vertically */
+    flex-direction: column;
     width: 100%;
     max-width: 100%;
     min-height: 500px;
-    background: #343541;
+    background: var(--color-bg-primary);
     border: none;
     box-sizing: border-box;
     margin: 0;
@@ -67,244 +146,81 @@ body.admin-bar {
     overflow: hidden;
 }
 
-/* Mobile First: Adjust chat container for WordPress admin bar */
 body.admin-bar #chat-container {
-    height: calc(100vh - 46px); /* Mobile: taller admin bar */
-    top: 46px;
+    height: calc(100vh - var(--admin-bar-mobile));
+    top: var(--admin-bar-mobile);
 }
 
 @media screen and (min-width: 782px) {
     #chat-container {
-        flex-direction: row; /* Desktop: side by side layout */
+        flex-direction: row;
     }
-    
+
     body.admin-bar #chat-container {
-        height: calc(100vh - 32px); /* Desktop: shorter admin bar */
-        top: 32px;
+        height: calc(100vh - var(--admin-bar-desktop));
+        top: var(--admin-bar-desktop);
     }
 }
 
-/* Mobile First Sidebar - Overlay System */
+/* ============================================================
+   SIDEBAR (MOBILE FIRST - OVERLAY SYSTEM)
+   ============================================================ */
 #chat-sidebar {
-    /* Mobile: Hidden overlay sidebar */
     position: fixed;
     top: 0;
-    left: -100%; /* Hidden by default */
-    width: 280px; /* Narrower on mobile */
+    left: -100%;
+    width: var(--sidebar-width-mobile);
     height: 100vh;
-    background: #171717;
-    border-right: 1px solid #444654;
-    padding: 16px;
+    background: var(--color-bg-sidebar);
+    border-right: 1px solid var(--color-border-primary);
+    padding: var(--spacing-lg);
     box-sizing: border-box;
-    color: #ececf1;
+    color: var(--color-text-secondary);
     overflow-y: auto;
-    z-index: 50; /* Lower z-index when closed, won't interfere with comment form */
-    transition: left 300ms ease-in-out;
+    z-index: var(--z-sidebar-closed);
+    transition: left var(--transition-medium);
 }
 
-/* Mobile: Show sidebar when toggled - higher z-index to appear above comment form */
+/* Mobile: Show sidebar when toggled */
 #chat-sidebar.sidebar-visible {
     left: 0;
-    z-index: 200; /* Higher than comment form (100) to ensure proper layering */
+    z-index: var(--z-sidebar-open);
 }
 
 /* Mobile: Account for admin bar */
 body.admin-bar #chat-sidebar {
-    top: 46px;
-    height: calc(100vh - 46px);
+    top: var(--admin-bar-mobile);
+    height: calc(100vh - var(--admin-bar-mobile));
 }
 
+/* Desktop: Static positioned sidebar */
 @media screen and (min-width: 782px) {
     #chat-sidebar {
-        /* Desktop: Static positioned sidebar */
         position: static;
         left: auto;
-        width: 377px;
-        min-width: 377px;
-        max-width: 435px;
+        width: var(--sidebar-width-desktop);
+        min-width: var(--sidebar-width-desktop);
+        max-width: var(--sidebar-width-max);
         height: 100%;
         z-index: auto;
-        transition: width 300ms ease-in-out, min-width 300ms ease-in-out, padding-left 300ms ease-in-out, padding-right 300ms ease-in-out;
+        transition: width var(--transition-medium),
+                    min-width var(--transition-medium),
+                    padding-left var(--transition-medium),
+                    padding-right var(--transition-medium);
     }
-    
+
     body.admin-bar #chat-sidebar {
         top: auto;
         height: 100%;
     }
 }
 
-#chat-sidebar h2 {
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 16px;
-    color: #ececf1;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #444654;
-}
-
-#chat-sidebar ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-#chat-sidebar li {
-    padding: 0; /* Remove padding from li, let anchor handle it */
-    margin-bottom: 4px;
-    border-radius: 6px;
-    cursor: pointer;
-    color: #808080; /* Gray color for regular text in sidebar */
-}
-
-/* Sidebar anchor styling */
-#chat-sidebar li a {
-    display: block;
-    padding: 8px 12px;
-    color: #8e8e8e; /* ChatGPT light gray color for sidebar anchors */
-    text-decoration: none; /* Remove underlines */
-    border-radius: 6px; /* Rounded corners */
-    transition: background-color 0.2s ease;
-}
-
-/* Hover effect - faint gray roundbox */
-#chat-sidebar li a:hover {
-    background-color: rgba(128, 128, 128, 0.2); /* Faint gray background on hover */
-}
-
-/* Active/clicked state - darker gray box */
-#chat-sidebar li a:active,
-#chat-sidebar li a:focus {
-    background-color: rgba(128, 128, 128, 0.4); /* Darker gray background on click */
-}
-
-/* Remove hover effect from li when anchor is present */
-#chat-sidebar li:hover {
-    background-color: transparent;
-}
-
-/* Keep hover effect for li without anchors */
-#chat-sidebar li:not(:has(a)):hover {
-    background-color: #343541;
-}
-
-/* Mobile First Chat Main */
-#chat-main {
-    /* Mobile: Full width, no flex calculations needed */
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    padding: 0;
-    padding-bottom: 30px;
-    min-width: 0;
-    background: #212121;
-    height: 100%;
-    position: relative;
-    align-items: center;
-    overflow-y: visible;
-    z-index: 1; /* Base layer for main content */
-}
-
-@media screen and (min-width: 782px) {
-    #chat-main {
-        /* Desktop: Flex to fill remaining space */
-        flex: 1 1 0;
-        width: auto;
-        transition: width 300ms ease-in-out, max-width 300ms ease-in-out;
-    }
-}
-
-/* Create a container for both post content and chat messages */
-/* Mobile First Scrollable Content */
-#scrollable-content {
-    overflow-y: auto;
-    /* Mobile: Account for 46px admin bar + comment form space */
-    height: calc(100vh - 196px);
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    align-items: center;
-    padding-bottom: 140px;
-    max-width: 100%;
-    position: relative;
-    z-index: 10;
-    margin-bottom: 80px;
-}
-
-/* Mobile: Account for admin bar */
-body.admin-bar #scrollable-content {
-    height: calc(100vh - 196px); /* 46px admin bar + 150px for comment form */
-}
-
-@media screen and (min-width: 782px) {
-    #scrollable-content {
-        /* Desktop: Account for 32px admin bar */
-        height: calc(100vh - 150px);
-    }
-    
-    body.admin-bar #scrollable-content {
-        height: calc(100vh - 182px); /* 32px admin bar + 150px for comment form */
-    }
-}
-
-#chat-messages {
-    flex: 1 1 auto;
-    padding: 24px 16px; /* Increased top/bottom padding */
-    color: #343541; /* Dark text on light background for ChatGPT style */
-    width: 100%;
-    box-sizing: border-box;
-    max-width: 768px; /* Match fixed-content max-width */
-    margin: 0 auto;
-    overflow-y: visible; /* Allow content to be visible */
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Center message content */
-}
-
-#chat-input {
-    flex: 0 0 auto;
-    padding: 0;
-    background: #212121; /* Match main area background */
-    border-top: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: sticky;
-    bottom: 0;
-    z-index: 150; /* Higher than content but lower than footer */
-    width: 100%;
-    max-width: 768px; /* Match the width of other elements */
-    margin: 0 auto; /* Center in the chat-main area */
-    left: 0; /* Align with chat-main instead of viewport */
-    transform: none; /* Remove the transform that was centering on viewport */
-    box-sizing: border-box;
-}
-
-@media (max-width: 700px) {
-    #chat-container {
-        flex-direction: column;
-    }
-    #chat-sidebar {
-        width: 100%;
-        max-width: none;
-        border-right: none;
-        border-bottom: 1px solid #ccc;
-        height: 30vh; /* Fixed height for sidebar on mobile */
-        overflow-y: auto;
-    }
-    #chat-main {
-        width: 100%;
-        height: 70vh; /* Remaining height for main content */
-        overflow-y: auto;
-    }
-}
-
-/* Sidebar Toggle Functionality */
-/* Additional styles for sidebar toggle animations and admin bar integration */
+/* Sidebar Toggle Animations */
 #chat-sidebar.sidebar-transitioning {
-    transition: width 300ms ease-in-out,
-                min-width 300ms ease-in-out,
-                padding-left 300ms ease-in-out,
-                padding-right 300ms ease-in-out;
+    transition: width var(--transition-medium),
+                min-width var(--transition-medium),
+                padding-left var(--transition-medium),
+                padding-right var(--transition-medium);
 }
 
 #chat-sidebar.sidebar-hidden {
@@ -322,358 +238,286 @@ body.admin-bar #scrollable-content {
     max-width: 100%;
 }
 
-/* Admin Bar Sidebar Toggle Button Styles */
-#wp-admin-bar-sidebar-toggle .ab-item {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 0 8px;
-    text-decoration: none;
-    color: #a7aaad;
-    font-size: 13px;
-    line-height: 32px;
-    height: 32px;
+/* Sidebar Content Styling */
+#chat-sidebar h2 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: var(--spacing-lg);
+    color: var(--color-text-secondary);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 1px solid var(--color-border-primary);
 }
 
-#wp-admin-bar-sidebar-toggle .ab-item:hover {
-    color: #00a0d2;
-    background-color: #32373c;
+#chat-sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
-#wp-admin-bar-sidebar-toggle .ab-item .dashicons {
-    font-family: dashicons;
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
-    line-height: 1;
-    margin-top: 6px;
-    display: inline-block;
-    text-decoration: inherit;
-    font-weight: normal;
-    font-style: normal;
-    vertical-align: top;
-    text-align: center;
-    -webkit-transition: color .1s ease-in;
-    transition: color .1s ease-in;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+#chat-sidebar li {
+    padding: 0;
+    margin-bottom: var(--spacing-xs);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    color: var(--color-accent-gray);
 }
 
-#wp-admin-bar-sidebar-toggle .ab-item .ab-label {
-    font-size: 13px;
-    font-weight: 400;
-}
-
-/* Base state - label visible */
-#wp-admin-bar-sidebar-toggle .ab-item .ab-label {
-    display: inline-block;
-}
-
-/* Base desktop styles - will be overridden by media queries */
-#wpadminbar #wp-admin-bar-sidebar-toggle {
+#chat-sidebar li a {
     display: block;
-    visibility: visible;
-}
-
-#wpadminbar #wp-admin-bar-sidebar-toggle .ab-item {
-    display: flex;
-    visibility: visible;
-    opacity: 1;
-}
-
-#wpadminbar #wp-admin-bar-sidebar-toggle .ab-item .dashicons {
-    display: inline-block;
-    visibility: visible;
-    opacity: 1;
-}
-
-/* Mobile Hamburger Icon Styles */
-#wp-admin-bar-mobile-hamburger {
-    display: none; /* Hidden by default, shown on mobile */
-}
-
-#wp-admin-bar-mobile-hamburger .ab-item {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 0 8px;
+    padding: var(--spacing-sm) var(--spacing-md);
+    color: var(--color-text-muted);
     text-decoration: none;
-    color: #a7aaad;
-    font-size: 13px;
-    line-height: 32px;
-    height: 32px;
+    border-radius: var(--radius-sm);
+    transition: background-color var(--transition-fast);
 }
 
-#wp-admin-bar-mobile-hamburger .ab-item:hover {
-    color: #00a0d2;
-    background-color: #32373c;
+#chat-sidebar li a:hover {
+    background-color: rgba(128, 128, 128, 0.2);
 }
 
-#wp-admin-bar-mobile-hamburger .ab-item .dashicons {
-    font-family: dashicons;
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
-    line-height: 1;
-    margin-top: 6px;
-    display: inline-block;
-    text-decoration: inherit;
-    font-weight: normal;
-    font-style: normal;
-    vertical-align: top;
-    text-align: center;
-    -webkit-transition: color .1s ease-in;
-    transition: color .1s ease-in;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+#chat-sidebar li a:active,
+#chat-sidebar li a:focus {
+    background-color: rgba(128, 128, 128, 0.4);
 }
 
-/* Mobile responsive behavior for hamburger icon */
-@media screen and (max-width: 782px) {
-    /* Show hamburger icon on mobile */
-    #wp-admin-bar-mobile-hamburger {
-        display: block !important;
-        visibility: visible !important;
-    }
-    
-    #wp-admin-bar-mobile-hamburger .ab-item {
-        line-height: 46px;
-        height: 46px;
-    }
-    
-    #wp-admin-bar-mobile-hamburger .ab-item .dashicons {
-        font-family: dashicons;
-        font-size: 20px;
-        width: 20px;
-        height: 20px;
-        line-height: 1;
-        margin-top: 13px;
-        display: inline-block;
-        text-decoration: inherit;
-        font-weight: normal;
-        font-style: normal;
-        vertical-align: top;
-        text-align: center;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-    }
-    
-    /* Hide the existing arrow toggle on mobile - use higher specificity */
-    #wpadminbar #wp-admin-bar-sidebar-toggle {
-        display: none !important;
-        visibility: hidden !important;
-    }
-    
-    /* Also hide the ab-item specifically */
-    #wpadminbar #wp-admin-bar-sidebar-toggle .ab-item {
-        display: none !important;
-        visibility: hidden !important;
-    }
-    
-    /* Hide the label text on mobile */
-    #wpadminbar #wp-admin-bar-sidebar-toggle .ab-item .ab-label {
-        display: none !important;
-    }
+#chat-sidebar li:hover {
+    background-color: transparent;
 }
 
-/* Desktop responsive behavior - hide hamburger, show arrow toggle */
-@media screen and (min-width: 782px) {
-    #wp-admin-bar-mobile-hamburger {
-        display: none !important;
-    }
-    
-    /* Show arrow toggle on desktop with high specificity */
-    #wpadminbar #wp-admin-bar-sidebar-toggle {
-        display: block !important;
-        visibility: visible !important;
-    }
-    
-    #wpadminbar #wp-admin-bar-sidebar-toggle .ab-item {
-        display: flex !important;
-        visibility: visible !important;
-    }
-    
-    /* Show label text on desktop */
-    #wpadminbar #wp-admin-bar-sidebar-toggle .ab-item .ab-label {
-        display: inline-block !important;
-    }
+#chat-sidebar li:not(:has(a)):hover {
+    background-color: var(--color-bg-primary);
 }
 
-/* High zoom and mobile portrait responsive styles */
-@media screen and (max-width: 480px) and (orientation: portrait) {
-    /* Mobile portrait mode - wider sidebar */
-    #chat-sidebar:not(.sidebar-hidden) {
-        width: 85% !important;
-        min-width: 85% !important;
-    }
-    
-    /* Footer visibility now handled by main .site-footer rules */
-}
-
-/* High zoom level styles (250%+) using resolution-based media queries */
-@media screen and (min-resolution: 2.5dppx) {
-    /* Wider sidebar at high zoom levels */
-    #chat-sidebar:not(.sidebar-hidden) {
-        width: 85% !important;
-        min-width: 85% !important;
-    }
-    
-    /* Footer visibility now handled by main .site-footer rules */
-    
-    /* Hide admin bar toggle label text at high zoom levels */
-    #wp-admin-bar-sidebar-toggle .ab-item .ab-label {
-        display: none !important;
-    }
-}
-
-/* Alternative media query for browsers that don't support dppx */
-@media screen and (-webkit-min-device-pixel-ratio: 2.5) {
-    /* Wider sidebar at high zoom levels */
-    #chat-sidebar:not(.sidebar-hidden) {
-        width: 85% !important;
-        min-width: 85% !important;
-    }
-    
-    /* Footer visibility now handled by main .site-footer rules */
-    
-    /* Hide admin bar toggle label text at high zoom levels */
-    #wp-admin-bar-sidebar-toggle .ab-item .ab-label {
-        display: none !important;
-    }
-}
-
-
-/* WordPress Comment Form - ChatGPT Style */
-
-.comment-respond {
-    margin: 0 auto; /* Center the comment form */
+/* ============================================================
+   CHAT MAIN AREA (MOBILE FIRST)
+   ============================================================ */
+#chat-main {
     width: 100%;
-    max-width: 768px;
-    /* Removed fixed height to allow it to size based on content */
-    box-sizing: border-box;
     display: flex;
-    justify-content: center; /* Center the form horizontally */
-    align-items: center; /* Center vertically */
-    left: 50%;
-    transform: translateX(-50%);
+    flex-direction: column;
+    padding: 0;
+    padding-bottom: var(--footer-height);
+    min-width: 0;
+    background: var(--color-bg-secondary);
+    height: 100%;
     position: relative;
+    align-items: center;
+    overflow-y: visible;
+    z-index: var(--z-base);
 }
 
-/* Message styling for ChatGPT-style UI */
+@media screen and (min-width: 782px) {
+    #chat-main {
+        flex: 1 1 0;
+        width: auto;
+        transition: width var(--transition-medium),
+                    max-width var(--transition-medium);
+    }
+}
+
+/* ============================================================
+   SCROLLABLE CONTENT AREA (MOBILE FIRST)
+   ============================================================ */
+#scrollable-content {
+    overflow-y: auto;
+    height: calc(100vh - 196px);
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+    padding-bottom: 140px;
+    max-width: 100%;
+    position: relative;
+    z-index: var(--z-content);
+    margin-bottom: 80px;
+}
+
+body.admin-bar #scrollable-content {
+    height: calc(100vh - 196px);
+}
+
+@media screen and (min-width: 782px) {
+    #scrollable-content {
+        height: calc(100vh - 150px);
+    }
+
+    body.admin-bar #scrollable-content {
+        height: calc(100vh - 182px);
+    }
+}
+
+/* ============================================================
+   CHAT MESSAGES
+   ============================================================ */
+#chat-messages {
+    flex: 1 1 auto;
+    padding: var(--spacing-xl) var(--spacing-lg);
+    color: var(--color-text-dark);
+    width: 100%;
+    box-sizing: border-box;
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+    overflow-y: visible;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Message Styling */
 .message {
     margin-bottom: 28px;
     width: 100%;
     box-sizing: border-box;
 }
 
-/* AI message styling (respondent) */
+/* AI Message (Respondent) */
 .respondent-message {
     width: 100%;
-    background-color: #212121; /* ChatGPT dark gray for assistant messages */
-    padding: 16px 16px 16px 20px; /* Increased left padding */
+    background-color: var(--color-bg-message-ai);
+    padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-lg) 20px;
     border-radius: 0;
-    margin-bottom: 16px;
+    margin-bottom: var(--spacing-lg);
     box-sizing: border-box;
     border: none;
-    border-left: none; /* Removed green accent */
     position: relative;
 }
 
-/* User message styling (interlocutor) */
+.respondent-message:hover {
+    background-color: #2a2a2a;
+}
+
+/* User Message (Interlocutor) */
 .interlocutor-message {
     width: 70%;
     max-width: 70%;
-    background-color: #303030; /* ChatGPT medium dark gray for user messages */
-    padding: 16px;
-    border-radius: 20px;
-    margin-bottom: 16px;
-    margin-left: auto; /* Push to the right */
+    background-color: var(--color-bg-message-user);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-lg);
+    margin-left: auto;
     box-sizing: border-box;
     border: none;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-/* Add a subtle hover effect to messages */
-.respondent-message:hover {
-    background-color: #2a2a2a; /* Slightly lighter dark gray on hover */
-}
-
 .interlocutor-message:hover {
-    background-color: #3a3a3a; /* Slightly lighter medium dark gray on hover */
+    background-color: #3a3a3a;
 }
 
-/* Message content styling */
+/* Message Content */
 .message-content {
-    color: #ececf1; /* Light text for dark background */
+    color: var(--color-text-secondary);
     font-size: 16px;
     line-height: 1.6;
     letter-spacing: 0.2px;
 }
 
-/* Message actions (copy, like, dislike) */
+/* Message Actions */
 .message-actions {
     display: flex;
-    gap: 8px;
-    margin-top: 8px;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
     opacity: 0;
-    transition: opacity 0.2s ease;
+    transition: opacity var(--transition-fast);
 }
 
 .respondent-message:hover .message-actions {
     opacity: 1;
 }
 
-/* Container for messages to enable right alignment */
-#chat-messages {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+/* Message Animations */
+.message-fade-in {
+    animation: fadeInSlide var(--transition-medium);
 }
 
-/* Fixed comment box positioning - Mobile First */
+.message-fade-out {
+    animation: fadeOutSlide var(--transition-medium) forwards;
+}
+
+@keyframes fadeInSlide {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOutSlide {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}
+
+/* ============================================================
+   WORDPRESS COMMENT FORM (MOBILE FIRST)
+   ============================================================ */
 #fixed-content {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
     width: 100%;
-    max-width: 768px;
+    max-width: var(--content-max-width);
     box-sizing: border-box;
-    padding: 16px;
-    z-index: 100; /* Above main content but below sidebar when visible */
+    padding: var(--spacing-lg);
+    z-index: var(--z-fixed-form);
     display: flex;
-    justify-content: center; /* Center the comment form horizontally */
-    align-items: center; /* Center vertically */
-    margin: 0 auto; /* Center within chat-main area */
-    
-    /* Rounded corners and border styling inspired by Gemini */
-    border-radius: 24px 24px 0 0; /* Rounded top corners only on mobile */
-    border: 1px solid rgba(255, 255, 255, 0.2); /* Thin white border like Gemini */
-    border-bottom: none; /* No bottom border on mobile since it's at viewport bottom */
-    background: #303030; /* Ensure background matches comment form */
-    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15); /* Subtle shadow for emphasis */
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    border: 1px solid var(--color-border-lighter);
+    border-bottom: none;
+    background: var(--color-bg-message-user);
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Desktop: Position comment box above footer with full rounded corners */
+/* Desktop: Position above footer */
 @media screen and (min-width: 782px) {
     #fixed-content {
-        position: fixed; /* Keep fixed positioning to align with footer */
-        bottom: 30px; /* Position directly above footer (30px footer height) */
-        left: 377px; /* Align with footer and chat-main after sidebar */
-        right: 0; /* Match footer's right positioning */
-        width: auto; /* Let it fill the available space like footer */
-        max-width: 768px; /* Keep the content width constraint */
-        margin: 0 auto; /* Center within the available space */
-        border-radius: 24px; /* Full rounded corners on desktop */
-        border: 1px solid rgba(255, 255, 255, 0.2); /* Full border on desktop */
+        position: fixed;
+        bottom: var(--footer-height);
+        left: var(--sidebar-width-desktop);
+        right: 0;
+        width: auto;
+        max-width: var(--content-max-width);
+        margin: 0 auto;
+        border-radius: var(--radius-xl);
+        border: 1px solid var(--color-border-lighter);
+    }
+
+    body.admin-bar #fixed-content {
+        bottom: var(--footer-height);
     }
 }
 
-#respond {
-    background: #303030;
+/* Comment Form Container */
+.comment-respond {
+    margin: 0 auto;
+    width: 100%;
+    max-width: var(--content-max-width);
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    left: 50%;
+    transform: translateX(-50%);
+    position: relative;
 }
 
-/* Hide elements that don't appear in ChatGPT interface */
+#respond {
+    background: var(--color-bg-message-user);
+}
+
+/* Hide elements not in ChatGPT interface */
 .comment-reply-title,
 .logged-in-as,
 .required-field-message,
@@ -681,10 +525,11 @@ body.admin-bar #scrollable-content {
     display: none;
 }
 
+/* Comment Form */
 #commentform {
     background: none;
-    border-radius: 0;
-    padding: 8px 12px;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    padding: 9px;
     display: flex;
     flex-direction: column;
     position: relative;
@@ -694,16 +539,7 @@ body.admin-bar #scrollable-content {
     width: 100%;
     transition: none;
     box-sizing: border-box;
-    z-index: 1001; /* Ensure it's above the fixed-content */
-}
-
-/* Comment form input row */
-.comment-form-comment {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    position: relative;
-    box-sizing: border-box;
+    z-index: 1001;
 }
 
 #commentform:focus-within {
@@ -711,25 +547,29 @@ body.admin-bar #scrollable-content {
 }
 
 .comment-form-comment {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    position: relative;
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
     flex: 1;
-    width: 100%;
-    box-sizing: border-box;
 }
 
+/* Comment Textarea */
 #comment {
     width: 100%;
     background-color: transparent;
     border: none;
-    color: #8e8e8e;
+    color: var(--color-text-muted);
     font-size: 16px;
-    padding: 12px 45px 12px 12px;
+    padding: var(--spacing-md) 45px var(--spacing-md) var(--spacing-md);
     resize: none;
     min-height: 140px;
     line-height: 1.5;
     font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-    margin-right: 32px; /* Make space for the submit button */
+    margin-right: var(--spacing-2xl);
     outline: none;
     box-sizing: border-box;
 }
@@ -739,38 +579,39 @@ body.admin-bar #scrollable-content {
 }
 
 #comment::placeholder {
-    color: #6b7280; /* Medium gray placeholder for light background */
+    color: var(--color-text-placeholder);
     font-size: 16px;
     font-weight: 400;
 }
 
+/* Submit Button */
 .form-submit {
     margin: 0;
     position: absolute;
-    right: 12px;
+    right: var(--spacing-md);
     top: 50%;
     transform: translateY(-50%);
     z-index: 10;
 }
 
-/* Replace text submit button with icon */
 .form-submit input[type="submit"] {
     background-color: white;
     border: none;
-    font-size: 0; /* Hide text content */
-    color: transparent; /* Hide text content */
-    width: 32px;
-    height: 32px;
+    font-size: 0;
+    color: transparent;
+    width: var(--spacing-2xl);
+    height: var(--spacing-2xl);
     cursor: pointer;
-    border-radius: 50%; /* Make it circular like commercial implementations */
+    border-radius: var(--radius-full);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23404040'%3E%3Cpath d='M2.01 21L23 12 2.01 3 2 10l15 2-15 2z'%3E%3C/path%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: center;
     background-size: 16px;
     opacity: 1;
-    transition: background-color 0.2s ease, transform 0.2s ease;
-    text-indent: -9999px; /* Hide text content */
-    overflow: hidden; /* Hide text content */
+    transition: background-color var(--transition-fast),
+                transform var(--transition-fast);
+    text-indent: -9999px;
+    overflow: hidden;
     padding: 0;
     margin: 0;
     display: flex;
@@ -780,652 +621,17 @@ body.admin-bar #scrollable-content {
 }
 
 .form-submit input[type="submit"]:hover {
-    background-color: white; /* Darker green on hover */
-    transform: scale(1.05); /* Slight scale effect on hover */
-}
-
-.form-submit input[type="submit"]:active {
-    transform: scale(0.95); /* Slight press effect */
-}
-
-/* Responsive adjustments */
-@media (max-width: 700px) {
-    #commentform {
-        padding: 10px 12px;
-    }
-    
-    #comment {
-        font-size: 14px;
-    }
-}
-
-/* Action buttons container */
-.action-buttons-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    padding: 6px 0 4px;
-    width: 100%;
-    align-items: center;
-    margin-top: 2px;
-    justify-content: flex-start;
-}
-
-/* Action bubble/button styling */
-.action-bubble {
-    display: inline-flex;
-    align-items: center;
-    background-color: transparent;
-    border: 1px solid #565869;
-    border-radius: 20px;
-    padding: 5px 10px;
-    color: #ececf1;
-    font-size: 13px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    margin-right: 4px;
-    margin-bottom: 2px;
-    height: 28px;
-}
-
-.action-bubble:hover {
-    background-color: #4d4f5e;
-    border-color: #6c6d80;
-}
-
-.action-bubble .dashicons {
-    font-size: 15px;
-    width: 15px;
-    height: 15px;
-    margin-right: 4px;
-    color: #acacbe;
-}
-
-/* Special styling for the first action button (plus icon) */
-.action-bubble:first-child {
-
-}
-
-.action-bubble:first-child .dashicons {
-    margin-right: 0;
-}
-
-/* Add a subtle hover effect to the action buttons */
-.action-bubble:hover .dashicons {
-    color: #fff;
-}
-
-.action-bubble-text {
-    margin-left: 4px;
-}
-
-/* Responsive adjustments for action bubbles */
-@media (max-width: 700px) {
-    .action-bubble {
-        padding: 4px 8px;
-        font-size: 12px;
-    }
-    
-    .action-bubble .dashicons {
-        font-size: 14px;
-        width: 14px;
-        height: 14px;
-    }
-    
-    .action-bubble-text {
-        margin-left: 2px;
-    }
-}
-/* ChatGPT-style unified comment box structure */
-.comment-box-inner {
-    background-color: #f7f7f8; /* ChatGPT light gray background for input area */
-    border-radius: 12px;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-    margin: 0 auto;
-    max-width: 768px;
-    width: 100%;
-    transition: box-shadow 0.2s ease;
-    box-sizing: border-box;
-}
-
-.comment-input-row {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-}
-
-.comment-tools-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    padding: 8px 12px;
-}
-
-.tools-left {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.tools-right {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-/* Mobile First Tool buttons styling */
-.plus-icon,
-.tools-button,
-.microphone-button,
-.submit-arrow {
-    background: none;
-    border: none;
-    color: #6b7280;
-    cursor: pointer;
-    padding: 4px; /* Mobile: Smaller padding */
-    border-radius: 6px;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px; /* Mobile: Smaller font */
-    font-weight: 500;
-}
-
-@media screen and (min-width: 782px) {
-    .plus-icon,
-    .tools-button,
-    .microphone-button,
-    .submit-arrow {
-        padding: 6px; /* Desktop: Larger padding */
-        font-size: 14px; /* Desktop: Larger font */
-    }
-}
-
-.plus-icon:hover,
-.tools-button:hover,
-.microphone-button:hover {
-    background-color: #e5e7eb; /* Light gray hover for light background */
-    color: #374151; /* Darker text on hover */
-}
-
-.submit-arrow {
-    background-color: #19c37d;
-    color: white;
-    width: 28px; /* Mobile: Smaller size */
-    height: 28px;
-    border-radius: 50%;
-    font-size: 14px; /* Mobile: Smaller font */
-    font-weight: bold;
-}
-
-@media screen and (min-width: 782px) {
-    .submit-arrow {
-        width: 32px; /* Desktop: Larger size */
-        height: 32px;
-        font-size: 16px; /* Desktop: Larger font */
-    }
-}
-
-
-.submit-arrow:disabled {
-    background-color: #d1d5db; /* Light gray disabled state for light background */
-    color: #9ca3af; /* Medium gray text for disabled state */
-    cursor: not-allowed;
-}
-
-/* Adjust the comment form to fit the new structure */
-#commentform {
-    border-radius: 12px 12px 0 0; /* Only round top corners */
-    padding: 9px;
-    margin-bottom: 0;
-}
-
-/* Mobile First Tools Layout - Mobile styles as base */
-.tools-left {
-    gap: 8px;
-}
-
-.tools-right {
-    gap: 6px;
-}
-
-.plus-icon,
-.tools-button,
-.microphone-button {
-    padding: 4px;
-    font-size: 12px;
-}
-
-.submit-arrow {
-    width: 28px;
-    height: 28px;
-    font-size: 14px;
-}
-
-@media screen and (min-width: 782px) {
-    .tools-left {
-        gap: 12px;
-    }
-    
-    .tools-right {
-        gap: 8px;
-    }
-    
-    .plus-icon,
-    .tools-button,
-    .microphone-button {
-        padding: 6px;
-        font-size: 14px;
-    }
-    
-    .submit-arrow {
-        width: 32px;
-        height: 32px;
-        font-size: 16px;
-    }
-}
-
-
-/* Post content styling */
-.post-content {
-    width: 100%;
-    padding: 16px;
-    margin: 0 0 24px 0;
-    box-sizing: border-box;
-    color: #ececf1;
-    font-size: 16px;
-    line-height: 1.5;
-    background: none;
-    border: none;
-    overflow-wrap: break-word; /* Ensure text wraps properly */
-}
-
-/* Create a scrollable container for both post content and chat messages */
-#post-content-1 {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 16px;
-}
-
-
-/* Mobile First Footer - Hidden on mobile, visible on desktop */
-.site-footer {
-    /* Mobile: Hidden footer */
-    display: none;
-}
-
-@media screen and (min-width: 782px) {
-    .site-footer {
-        /* Desktop: Show footer */
-        display: block;
-        position: absolute;
-        bottom: 0;
-        left: 377px; /* Desktop: Align with chat-main after sidebar */
-        right: 0;
-        width: auto;
-        background-color: #202123;
-        color: #acacbe;
-        text-align: center;
-        padding: 4px 0;
-        font-size: 12px;
-        border-top: 1px solid #444654;
-        box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1);
-        font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-        letter-spacing: 0.2px;
-        height: 30px;
-        z-index: 2000;
-    }
-}
-
-
-/* These are now handled in the main #scrollable-content section above */
-
-/* Adjust for WordPress admin bar */
-body.admin-bar .site-footer {
-    bottom: 0; /* Keep at bottom */
-}
-
-/* Adjust fixed-content for WordPress admin bar on desktop */
-@media screen and (min-width: 782px) {
-    body.admin-bar #fixed-content {
-        bottom: 30px; /* Still 30px above footer, admin bar doesn't affect this */
-    }
-}
-
-
-#cacbot-archive-button{
-    display:none !important;
-}
-
-/* Blog Roll Styles */
-.blog-roll-container {
-    max-width: 768px;
-    margin: 0 auto;
-    padding: 16px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.blog-roll-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 24px;
-    width: 100%;
-}
-
-.blog-roll-item {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.blog-roll-item:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.blog-roll-link {
-    display: block;
-    text-decoration: none;
-    color: inherit;
-    height: 100%;
-}
-
-.blog-roll-image-container {
-    width: 100%;
-    height: 200px;
-    overflow: hidden;
-    background: rgba(255, 255, 255, 0.03);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.blog-roll-thumbnail {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-}
-
-.blog-roll-item:hover .blog-roll-thumbnail {
+    background-color: white;
     transform: scale(1.05);
 }
 
-.blog-roll-placeholder {
-    font-size: 48px;
-    color: rgba(255, 255, 255, 0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
+.form-submit input[type="submit"]:active {
+    transform: scale(0.95);
 }
 
-.blog-roll-content {
-    padding: 20px;
-}
-
-.blog-roll-title {
-    font-size: 18px;
-    font-weight: 600;
-    margin: 0 0 12px 0;
-    color: #ececf1;
-    line-height: 1.4;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-.blog-roll-meta {
-    margin-bottom: 12px;
-}
-
-.blog-roll-date {
-    font-size: 14px;
-    color: rgba(255, 255, 255, 0.6);
-    font-weight: 400;
-}
-
-.blog-roll-excerpt {
-    font-size: 14px;
-    line-height: 1.5;
-    color: rgba(255, 255, 255, 0.8);
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-.blog-roll-empty {
-    text-align: center;
-    padding: 40px 20px;
-    color: rgba(255, 255, 255, 0.6);
-}
-
-/* Responsive adjustments */
-/* Mobile First Blog Roll */
-.blog-roll-grid {
-    grid-template-columns: 1fr; /* Mobile: Single column */
-    gap: 16px;
-}
-
-.blog-roll-container {
-    padding: 12px;
-}
-
-.blog-roll-image-container {
-    height: 160px; /* Mobile: Smaller images */
-}
-
-.blog-roll-content {
-    padding: 16px;
-}
-
-.blog-roll-title {
-    font-size: 16px;
-}
-
-.blog-roll-excerpt {
-    font-size: 13px;
-}
-
-@media screen and (min-width: 480px) {
-    .blog-roll-image-container {
-        height: 180px; /* Larger mobile: Slightly bigger images */
-    }
-}
-
-@media screen and (min-width: 782px) {
-    .blog-roll-grid {
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Desktop: Multi-column */
-        gap: 24px;
-    }
-    
-    .blog-roll-container {
-        padding: 16px;
-    }
-    
-    .blog-roll-image-container {
-        height: 200px; /* Desktop: Full size images */
-    }
-    
-    .blog-roll-title {
-        font-size: 18px;
-    }
-    
-    .blog-roll-excerpt {
-        font-size: 14px;
-    }
-}
-
-/* Blog Roll Pagination Styles */
-.blog-roll-pagination {
-    margin: 32px 0 120px 0; /* Add significant bottom margin to prevent overlap with comment form */
-    padding: 16px 0;
-    text-align: center;
-    width: 100%;
-    max-width: 768px;
-    margin-left: auto;
-    margin-right: auto;
-    position: relative;
-    z-index: 100; /* Ensure pagination is above other content but below comment form */
-    clear: both; /* Ensure it clears any floated elements */
-}
-
-.pagination-list {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    flex-wrap: wrap;
-}
-
-.pagination-list li {
-    display: inline-block;
-    margin: 0;
-    padding: 0;
-}
-
-.pagination-list a {
-    display: inline-block;
-    padding: 8px 12px;
-    background-color: rgba(255, 255, 255, 0.05);
-    color: #ececf1;
-    text-decoration: none;
-    border-radius: 6px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.2s ease;
-    font-size: 14px;
-    font-weight: 500;
-    min-width: 40px;
-    text-align: center;
-    box-sizing: border-box;
-}
-
-.pagination-list a:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
-    color: #fff;
-    transform: translateY(-1px);
-}
-
-.pagination-list .current-page {
-    display: inline-block;
-    padding: 8px 12px;
-    background-color: #40414f;
-    color: #fff;
-    border-radius: 6px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    font-size: 14px;
-    font-weight: 600;
-    min-width: 40px;
-    text-align: center;
-    box-sizing: border-box;
-}
-
-.pagination-list .prev-page a,
-.pagination-list .next-page a {
-    padding: 8px 16px;
-    font-weight: 500;
-}
-
-.pagination-list .prev-page a:hover,
-.pagination-list .next-page a:hover {
-    background-color: rgba(255, 255, 255, 0.15);
-}
-
-/* Mobile First Pagination */
-.blog-roll-pagination {
-    margin: 20px 0 80px 0; /* Mobile: Compact spacing */
-    padding: 12px 0;
-}
-
-.pagination-list {
-    gap: 4px; /* Mobile: Tight spacing */
-}
-
-.pagination-list a,
-.pagination-list .current-page {
-    padding: 6px 8px; /* Mobile: Compact padding */
-    font-size: 12px;
-    min-width: 32px;
-}
-
-.pagination-list .prev-page a,
-.pagination-list .next-page a {
-    padding: 6px 10px;
-}
-
-@media screen and (min-width: 480px) {
-    .pagination-list {
-        gap: 6px; /* Larger mobile: More spacing */
-    }
-    
-    .pagination-list a,
-    .pagination-list .current-page {
-        padding: 6px 10px;
-        font-size: 13px;
-        min-width: 36px;
-    }
-    
-    .pagination-list .prev-page a,
-    .pagination-list .next-page a {
-        padding: 6px 12px;
-    }
-}
-
-@media screen and (min-width: 782px) {
-    .blog-roll-pagination {
-        margin: 32px 0 120px 0; /* Desktop: More generous spacing */
-        padding: 16px 0;
-    }
-    
-    .pagination-list {
-        gap: 8px; /* Desktop: Full spacing */
-    }
-    
-    .pagination-list a,
-    .pagination-list .current-page {
-        padding: 8px 12px; /* Desktop: Full padding */
-        font-size: 14px;
-        min-width: 40px;
-    }
-    
-    .pagination-list .prev-page a,
-    .pagination-list .next-page a {
-        padding: 8px 16px;
-    }
-}
-
-#commentform {
-    z-index: 1001; /* Slightly higher than fixed-content but much lower than before */
-}
-
-
-/* Ensure blog roll container has proper spacing */
-.blog-roll-container {
-    margin-bottom: 0; /* Remove any bottom margin that might interfere */
-    padding-bottom: 0; /* Remove any bottom padding that might interfere */
-}
-
-/* Comment Form Seamless Integration - Remove visual seams and outlines */
+/* Comment Box Seamless Integration */
 #fixed-content .comment-form-container {
-    background: inherit; /* Inherit background from #fixed-content */
+    background: inherit;
     border: none;
     margin: 0;
     padding: 0;
@@ -1434,7 +640,7 @@ body.admin-bar .site-footer {
 }
 
 #fixed-content .comment-form-container #commentform {
-    background: inherit; /* Inherit background from parent */
+    background: inherit;
     border: none;
     box-shadow: none;
     outline: none;
@@ -1462,10 +668,9 @@ body.admin-bar .site-footer {
 #fixed-content .comment-form-container .form-submit input[type="submit"]:focus {
     outline: none;
     border: none;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); /* Keep only the existing subtle shadow */
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-/* Ensure all nested elements blend seamlessly */
 #fixed-content * {
     box-sizing: border-box;
 }
@@ -1477,33 +682,744 @@ body.admin-bar .site-footer {
     box-shadow: none;
 }
 
-/* Real-time Comment Animation Styles */
-.message-fade-in {
-    animation: fadeInSlide 0.3s ease-out;
+/* ============================================================
+   ACTION BUTTONS / BUBBLES
+   ============================================================ */
+.action-buttons-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    padding: 6px 0 4px;
+    width: 100%;
+    align-items: center;
+    margin-top: 2px;
+    justify-content: flex-start;
 }
 
-.message-fade-out {
-    animation: fadeOutSlide 0.3s ease-in forwards;
+.action-bubble {
+    display: inline-flex;
+    align-items: center;
+    background-color: transparent;
+    border: 1px solid var(--color-border-secondary);
+    border-radius: var(--radius-lg);
+    padding: 5px 10px;
+    color: var(--color-text-secondary);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    margin-right: var(--spacing-xs);
+    margin-bottom: 2px;
+    height: 28px;
 }
 
-@keyframes fadeInSlide {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
+.action-bubble:hover {
+    background-color: var(--color-hover-dark);
+    border-color: #6c6d80;
+}
+
+.action-bubble .dashicons {
+    font-size: 15px;
+    width: 15px;
+    height: 15px;
+    margin-right: var(--spacing-xs);
+    color: #acacbe;
+}
+
+.action-bubble:first-child .dashicons {
+    margin-right: 0;
+}
+
+.action-bubble:hover .dashicons {
+    color: var(--color-text-primary);
+}
+
+.action-bubble-text {
+    margin-left: var(--spacing-xs);
+}
+
+/* Mobile adjustments */
+@media (max-width: 700px) {
+    #commentform {
+        padding: 10px var(--spacing-md);
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
+
+    #comment {
+        font-size: 14px;
+    }
+
+    .action-bubble {
+        padding: 4px var(--spacing-sm);
+        font-size: 12px;
+    }
+
+    .action-bubble .dashicons {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
+    }
+
+    .action-bubble-text {
+        margin-left: 2px;
     }
 }
 
-@keyframes fadeOutSlide {
-    from {
-        opacity: 1;
-        transform: translateY(0);
+/* ============================================================
+   CHATGPT-STYLE UNIFIED COMMENT BOX
+   ============================================================ */
+.comment-box-inner {
+    background-color: var(--color-bg-input);
+    border-radius: var(--radius-md);
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    margin: 0 auto;
+    max-width: var(--content-max-width);
+    width: 100%;
+    transition: box-shadow var(--transition-fast);
+    box-sizing: border-box;
+}
+
+.comment-input-row {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.comment-tools-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: var(--spacing-sm) var(--spacing-md);
+}
+
+.tools-left {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.tools-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Tool Buttons (Mobile First) */
+.plus-icon,
+.tools-button,
+.microphone-button,
+.submit-arrow {
+    background: none;
+    border: none;
+    color: var(--color-text-placeholder);
+    cursor: pointer;
+    padding: var(--spacing-xs);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.plus-icon:hover,
+.tools-button:hover,
+.microphone-button:hover {
+    background-color: var(--color-hover-light);
+    color: #374151;
+}
+
+.submit-arrow {
+    background-color: var(--color-accent-green);
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-full);
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.submit-arrow:disabled {
+    background-color: #d1d5db;
+    color: #9ca3af;
+    cursor: not-allowed;
+}
+
+/* Desktop tool buttons */
+@media screen and (min-width: 782px) {
+    .tools-left {
+        gap: var(--spacing-md);
     }
-    to {
-        opacity: 0;
-        transform: translateY(-10px);
+
+    .tools-right {
+        gap: var(--spacing-sm);
     }
+
+    .plus-icon,
+    .tools-button,
+    .microphone-button {
+        padding: 6px;
+        font-size: 14px;
+    }
+
+    .submit-arrow {
+        width: var(--spacing-2xl);
+        height: var(--spacing-2xl);
+        font-size: 16px;
+    }
+}
+
+/* ============================================================
+   POST CONTENT
+   ============================================================ */
+.post-content {
+    width: 100%;
+    padding: var(--spacing-lg);
+    margin: 0 0 var(--spacing-xl) 0;
+    box-sizing: border-box;
+    color: var(--color-text-secondary);
+    font-size: 16px;
+    line-height: 1.5;
+    background: none;
+    border: none;
+    overflow-wrap: break-word;
+}
+
+#post-content-1 {
+    width: 100%;
+    box-sizing: border-box;
+    padding: var(--spacing-lg);
+}
+
+/* ============================================================
+   FOOTER (MOBILE FIRST - HIDDEN ON MOBILE)
+   ============================================================ */
+.site-footer {
+    display: none;
+}
+
+@media screen and (min-width: 782px) {
+    .site-footer {
+        display: block;
+        position: absolute;
+        bottom: 0;
+        left: var(--sidebar-width-desktop);
+        right: 0;
+        width: auto;
+        background-color: var(--color-bg-footer);
+        color: var(--color-text-footer);
+        text-align: center;
+        padding: 4px 0;
+        font-size: 12px;
+        border-top: 1px solid var(--color-border-primary);
+        box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1);
+        font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+        letter-spacing: 0.2px;
+        height: var(--footer-height);
+        z-index: var(--z-footer);
+    }
+}
+
+body.admin-bar .site-footer {
+    bottom: 0;
+}
+
+/* ============================================================
+   WORDPRESS ADMIN BAR TOGGLE BUTTONS
+   ============================================================ */
+/* Sidebar Toggle Button */
+#wp-admin-bar-sidebar-toggle .ab-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: 0 var(--spacing-sm);
+    text-decoration: none;
+    color: #a7aaad;
+    font-size: 13px;
+    line-height: var(--spacing-2xl);
+    height: var(--spacing-2xl);
+}
+
+#wp-admin-bar-sidebar-toggle .ab-item:hover {
+    color: #00a0d2;
+    background-color: #32373c;
+}
+
+#wp-admin-bar-sidebar-toggle .ab-item .dashicons {
+    font-family: dashicons;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    line-height: 1;
+    margin-top: 6px;
+    display: inline-block;
+    text-decoration: inherit;
+    font-weight: normal;
+    font-style: normal;
+    vertical-align: top;
+    text-align: center;
+    transition: color .1s ease-in;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+#wp-admin-bar-sidebar-toggle .ab-item .ab-label {
+    font-size: 13px;
+    font-weight: 400;
+    display: inline-block;
+}
+
+#wpadminbar #wp-admin-bar-sidebar-toggle {
+    display: block;
+    visibility: visible;
+}
+
+#wpadminbar #wp-admin-bar-sidebar-toggle .ab-item {
+    display: flex;
+    visibility: visible;
+    opacity: 1;
+}
+
+#wpadminbar #wp-admin-bar-sidebar-toggle .ab-item .dashicons {
+    display: inline-block;
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Mobile Hamburger Icon */
+#wp-admin-bar-mobile-hamburger {
+    display: none;
+}
+
+#wp-admin-bar-mobile-hamburger .ab-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: 0 var(--spacing-sm);
+    text-decoration: none;
+    color: #a7aaad;
+    font-size: 13px;
+    line-height: var(--spacing-2xl);
+    height: var(--spacing-2xl);
+}
+
+#wp-admin-bar-mobile-hamburger .ab-item:hover {
+    color: #00a0d2;
+    background-color: #32373c;
+}
+
+#wp-admin-bar-mobile-hamburger .ab-item .dashicons {
+    font-family: dashicons;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    line-height: 1;
+    margin-top: 6px;
+    display: inline-block;
+    text-decoration: inherit;
+    font-weight: normal;
+    font-style: normal;
+    vertical-align: top;
+    text-align: center;
+    transition: color .1s ease-in;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Mobile responsive behavior */
+@media screen and (max-width: 782px) {
+    #wp-admin-bar-mobile-hamburger {
+        display: block !important;
+        visibility: visible !important;
+    }
+
+    #wp-admin-bar-mobile-hamburger .ab-item {
+        line-height: var(--admin-bar-mobile);
+        height: var(--admin-bar-mobile);
+    }
+
+    #wp-admin-bar-mobile-hamburger .ab-item .dashicons {
+        margin-top: 13px;
+    }
+
+    #wpadminbar #wp-admin-bar-sidebar-toggle {
+        display: none !important;
+        visibility: hidden !important;
+    }
+
+    #wpadminbar #wp-admin-bar-sidebar-toggle .ab-item {
+        display: none !important;
+        visibility: hidden !important;
+    }
+
+    #wpadminbar #wp-admin-bar-sidebar-toggle .ab-item .ab-label {
+        display: none !important;
+    }
+}
+
+/* Desktop responsive behavior */
+@media screen and (min-width: 782px) {
+    #wp-admin-bar-mobile-hamburger {
+        display: none !important;
+    }
+
+    #wpadminbar #wp-admin-bar-sidebar-toggle {
+        display: block !important;
+        visibility: visible !important;
+    }
+
+    #wpadminbar #wp-admin-bar-sidebar-toggle .ab-item {
+        display: flex !important;
+        visibility: visible !important;
+    }
+
+    #wpadminbar #wp-admin-bar-sidebar-toggle .ab-item .ab-label {
+        display: inline-block !important;
+    }
+}
+
+/* ============================================================
+   HIGH ZOOM AND MOBILE PORTRAIT RESPONSIVE STYLES
+   ============================================================ */
+@media screen and (max-width: 480px) and (orientation: portrait) {
+    #chat-sidebar:not(.sidebar-hidden) {
+        width: 85% !important;
+        min-width: 85% !important;
+    }
+}
+
+/* High zoom level styles (250%+) */
+@media screen and (min-resolution: 2.5dppx),
+       screen and (-webkit-min-device-pixel-ratio: 2.5) {
+    #chat-sidebar:not(.sidebar-hidden) {
+        width: 85% !important;
+        min-width: 85% !important;
+    }
+
+    #wp-admin-bar-sidebar-toggle .ab-item .ab-label {
+        display: none !important;
+    }
+}
+
+/* ============================================================
+   BLOG ROLL STYLES (MOBILE FIRST)
+   ============================================================ */
+.blog-roll-container {
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+    padding: var(--spacing-md);
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.blog-roll-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
+    width: 100%;
+}
+
+.blog-roll-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--spacing-sm);
+    overflow: hidden;
+    transition: all var(--transition-medium);
+    border: 1px solid var(--color-border-light);
+}
+
+.blog-roll-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--color-border-lighter);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.blog-roll-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    height: 100%;
+}
+
+.blog-roll-image-container {
+    width: 100%;
+    height: 160px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.03);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.blog-roll-thumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-medium);
+}
+
+.blog-roll-item:hover .blog-roll-thumbnail {
+    transform: scale(1.05);
+}
+
+.blog-roll-placeholder {
+    font-size: 48px;
+    color: rgba(255, 255, 255, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.blog-roll-content {
+    padding: var(--spacing-lg);
+}
+
+.blog-roll-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 var(--spacing-md) 0;
+    color: var(--color-text-secondary);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.blog-roll-meta {
+    margin-bottom: var(--spacing-md);
+}
+
+.blog-roll-date {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 400;
+}
+
+.blog-roll-excerpt {
+    font-size: 13px;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.8);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.blog-roll-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Larger mobile screens */
+@media screen and (min-width: 480px) {
+    .blog-roll-image-container {
+        height: 180px;
+    }
+}
+
+/* Desktop blog roll */
+@media screen and (min-width: 782px) {
+    .blog-roll-container {
+        padding: var(--spacing-lg);
+    }
+
+    .blog-roll-grid {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: var(--spacing-xl);
+    }
+
+    .blog-roll-image-container {
+        height: 200px;
+    }
+
+    .blog-roll-content {
+        padding: 20px;
+    }
+
+    .blog-roll-title {
+        font-size: 18px;
+    }
+
+    .blog-roll-excerpt {
+        font-size: 14px;
+    }
+}
+
+/* ============================================================
+   BLOG ROLL PAGINATION (MOBILE FIRST)
+   ============================================================ */
+.blog-roll-pagination {
+    margin: 20px 0 80px 0;
+    padding: var(--spacing-md) 0;
+    text-align: center;
+    width: 100%;
+    max-width: var(--content-max-width);
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    z-index: var(--z-fixed-form);
+    clear: both;
+}
+
+.pagination-list {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-xs);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex-wrap: wrap;
+}
+
+.pagination-list li {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+}
+
+.pagination-list a {
+    display: inline-block;
+    padding: 6px var(--spacing-sm);
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border-light);
+    transition: all var(--transition-fast);
+    font-size: 12px;
+    font-weight: 500;
+    min-width: 32px;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.pagination-list a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: var(--color-border-lighter);
+    color: var(--color-text-primary);
+    transform: translateY(-1px);
+}
+
+.pagination-list .current-page {
+    display: inline-block;
+    padding: 6px var(--spacing-sm);
+    background-color: #40414f;
+    color: var(--color-text-primary);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border-lighter);
+    font-size: 12px;
+    font-weight: 600;
+    min-width: 32px;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.pagination-list .prev-page a,
+.pagination-list .next-page a {
+    padding: 6px 10px;
+    font-weight: 500;
+}
+
+.pagination-list .prev-page a:hover,
+.pagination-list .next-page a:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Larger mobile screens */
+@media screen and (min-width: 480px) {
+    .pagination-list {
+        gap: 6px;
+    }
+
+    .pagination-list a,
+    .pagination-list .current-page {
+        padding: 6px 10px;
+        font-size: 13px;
+        min-width: 36px;
+    }
+
+    .pagination-list .prev-page a,
+    .pagination-list .next-page a {
+        padding: 6px var(--spacing-md);
+    }
+}
+
+/* Desktop pagination */
+@media screen and (min-width: 782px) {
+    .blog-roll-pagination {
+        margin: var(--spacing-2xl) 0 120px 0;
+        padding: var(--spacing-lg) 0;
+    }
+
+    .pagination-list {
+        gap: var(--spacing-sm);
+    }
+
+    .pagination-list a,
+    .pagination-list .current-page {
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: 14px;
+        min-width: 40px;
+    }
+
+    .pagination-list .prev-page a,
+    .pagination-list .next-page a {
+        padding: var(--spacing-sm) var(--spacing-lg);
+    }
+}
+
+/* ============================================================
+   LEGACY / COMPATIBILITY STYLES
+   ============================================================ */
+#chat-input {
+    flex: 0 0 auto;
+    padding: 0;
+    background: var(--color-bg-secondary);
+    border-top: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: sticky;
+    bottom: 0;
+    z-index: var(--z-chat-input);
+    width: 100%;
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+    left: 0;
+    transform: none;
+    box-sizing: border-box;
+}
+
+@media (max-width: 700px) {
+    #chat-container {
+        flex-direction: column;
+    }
+    #chat-sidebar {
+        width: 100%;
+        max-width: none;
+        border-right: none;
+        border-bottom: 1px solid #ccc;
+        height: 30vh;
+        overflow-y: auto;
+    }
+    #chat-main {
+        width: 100%;
+        height: 70vh;
+        overflow-y: auto;
+    }
+}
+
+#cacbot-archive-button {
+    display: none !important;
 }
