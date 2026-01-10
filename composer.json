@@ -1,0 +1,28 @@
+{
+  "require-dev": {
+    "codeception/module-db": "^1.0",
+    "codeception/module-webdriver": "^1.0",
+    "codeception/module-asserts": "^1.2",
+    "codeception/module-cli": "^1.0",
+    "codeception/module-phpbrowser": "^1.0",
+    "codeception/module-rest": "^1.2",
+    "behat/behat": "^3.13",
+    "phpunit/php-code-coverage": "*"
+  },
+  "config": {
+    "bin-dir": "bin",
+    "allow-plugins": {
+      "php-http/discovery": true
+    }
+  },
+  "autoload": {
+    "classmap": [
+      "src/AI_Style"
+    ]
+  },
+  "require": {
+    "guzzlehttp/guzzle": "*",
+    "lucatume/wp-browser": "^3.2",
+    "php-stubs/wordpress-stubs": "^6.0"
+  }
+}

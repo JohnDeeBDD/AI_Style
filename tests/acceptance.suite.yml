@@ -1,0 +1,245 @@
+class_name: AcceptanceTester
+bootstrap: _bootstrap.php
+modules:
+  enabled:
+    - \Helper\Acceptance
+    - Asserts
+    - WPWebDriver
+    #- WPLoader
+  config:
+    WPWebDriver:
+      url: 'http://localhost'
+      url2: 'http://localhost'
+      remoteRoute: wp/v2/posts
+      testPostUrl: /testpost
+      numberOfCalls: 2
+      adminUsername: Codeception
+      adminPassword: password
+      clear_cookies: false
+      adminPath: /wp-admin
+      port: 4444
+      browser: chrome
+      capabilities:
+        chromeOptions:
+          args:
+            - '--disable-blink-features=AutomationControlled'
+            - '--disable-dev-shm-usage'
+            - '--disable-infobars'
+            - '--disable-extensions'
+            - '--incognito'
+            - '--disable-popup-blocking'
+            - '--disable-default-apps'
+            - '--force-device-scale-factor=1'
+            - '--disable-features=TranslateUI'
+            - >-
+              --user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64)
+              AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0
+              Safari/537.36
+          excludeSwitches:
+            - enable-automation
+          useAutomationExtension: false
+          prefs:
+            profile.default_zoom_level: 0
+            profile.password_manager_enabled: false
+#    WPLoader:
+#      wpRootFolder: /var/www/html
+#      dbName: wordpress_unit_test
+#      dbHost: 127.0.0.1
+#      dbUser: wordpressuser
+#      dbPassword: password
+#      tablePrefix: wp_
+env:
+  # Phones 📱
+  iphone_se:
+    modules:
+      config:
+        WPWebDriver:
+          browser: chrome
+          window_size: 375x667
+          capabilities:
+            chromeOptions:
+              args: ["--disable-dev-shm-usage"]
+              mobileEmulation:
+                deviceName: "iPhone SE"
+  
+  iphone_xr:
+    modules:
+      config:
+        WPWebDriver:
+          browser: chrome
+          window_size: 414x896
+          capabilities:
+            chromeOptions:
+              args: ["--disable-dev-shm-usage"]
+              mobileEmulation:
+                deviceName: "iPhone XR"
+  
+  iphone_12_pro:
+    modules:
+      config:
+        WPWebDriver:
+          browser: chrome
+          window_size: 390x844
+          capabilities:
+            chromeOptions:
+              args: ["--disable-dev-shm-usage"]
+              mobileEmulation:
+                deviceName: "iPhone 12 Pro"
+  
+  iphone_14_pro_max:
+    modules:
+      config:
+        WPWebDriver:
+          browser: chrome
+          window_size: 430x932
+          capabilities:
+            chromeOptions:
+              args: ["--disable-dev-shm-usage"]
+              mobileEmulation:
+                deviceName: "iPhone 14 Pro Max"
+  
+  pixel_7:
+    modules:
+      config:
+        WPWebDriver:
+          browser: chrome
+          window_size: 412x915
+          capabilities:
+            chromeOptions:
+              args: ["--disable-dev-shm-usage"]
+              mobileEmulation:
+                deviceName: "Pixel 7"
+  
+  samsung_galaxy_s8_plus:
+    modules:
+      config:
+        WPWebDriver:
+          browser: chrome
+          window_size: 360x740
+          capabilities:
+            chromeOptions:
+              args: ["--disable-dev-shm-usage"]
+              mobileEmulation:
+                deviceName: "Samsung Galaxy S8+"
+  
+  samsung_galaxy_s20_ultra:
+    modules:
+      config:
+        WPWebDriver:
+          browser: chrome
+          window_size: 412x915
+          capabilities:
+            chromeOptions:
+              args: ["--disable-dev-shm-usage"]
+              mobileEmulation:
+                deviceName: "Samsung Galaxy S20 Ultra"
+  
+  galaxy_fold:
+    modules:
+      config:
+        WPWebDriver:
+          browser: chrome
+          window_size: 280x653
+          capabilities:
+            chromeOptions:
+              args: ["--disable-dev-shm-usage"]
+              mobileEmulation:
+                deviceName: "Galaxy Fold"
+  
+  # Tablets 📟
+  ipad_mini:
+    modules:
+      config:
+        WPWebDriver:
+          browser: chrome
+          window_size: 768x1024
+          capabilities:
+            chromeOptions:
+              args: ["--disable-dev-shm-usage"]
+              mobileEmulation:
+                deviceName: "iPad Mini"
+  
+  ipad_air:
+    modules:
+      config:
+        WPWebDriver:
+          browser: chrome
+          window_size: 820x1180
+          capabilities:
+            chromeOptions:
+              args: ["--disable-dev-shm-usage"]
+              mobileEmulation:
+                deviceName: "iPad Air"
+  
+  ipad_pro:
+    modules:
+      config:
+        WPWebDriver:
+          browser: chrome
+          window_size: 1024x1366
+          capabilities:
+            chromeOptions:
+              args: ["--disable-dev-shm-usage"]
+              mobileEmulation:
+                deviceName: "iPad Pro"
+  
+  surface_pro_7:
+    modules:
+      config:
+        WPWebDriver:
+          browser: chrome
+          window_size: 912x1368
+          capabilities:
+            chromeOptions:
+              args: ["--disable-dev-shm-usage"]
+              mobileEmulation:
+                deviceName: "Surface Pro 7"
+  
+  surface_duo:
+    modules:
+      config:
+        WPWebDriver:
+          browser: chrome
+          window_size: 540x720
+          capabilities:
+            chromeOptions:
+              args: ["--disable-dev-shm-usage"]
+              mobileEmulation:
+                deviceName: "Surface Duo"
+  
+  nest_hub:
+    modules:
+      config:
+        WPWebDriver:
+          browser: chrome
+          window_size: 1024x600
+          capabilities:
+            chromeOptions:
+              args: ["--disable-dev-shm-usage"]
+              mobileEmulation:
+                deviceName: "Nest Hub"
+  
+  nest_hub_max:
+    modules:
+      config:
+        WPWebDriver:
+          browser: chrome
+          window_size: 1280x800
+          capabilities:
+            chromeOptions:
+              args: ["--disable-dev-shm-usage"]
+              mobileEmulation:
+                deviceName: "Nest Hub Max"
+ 
+ # Desktop 
+  desktop_full_hd:
+   modules:
+     config:
+       WPWebDriver:
+         browser: chrome
+         window_size: 1920x1080
+         capabilities:
+           chromeOptions:
+             args: ["--disable-dev-shm-usage"]
+settings:
+    stop_on_fail: true

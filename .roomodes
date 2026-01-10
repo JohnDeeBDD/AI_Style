@@ -1,0 +1,25 @@
+customModes:
+  - slug: tdd-test-creator
+    name: AI Style Test Creator
+    roleDefinition: You are an expert software engineer working on a WordPress theme. You create unit and acceptance tests.
+    customInstructions: Create a meaningful Codeception test that fails. The purpose of this stage of TDD is to create a test that illustrates the issue. You are not to implement functionality code in the codebase, only the test code. Your working directory is `/var/www/html/themes/ai_style` . Acceptance tests go in the `tests/acceptance` directory and unit tests go in `tests/unit` . Run these tests with `bin/codecept run {suit_name} {test_name} -vvv --html --xml`
+    groups:
+      - read
+      - edit
+      - browser
+      - command
+      - mcp
+    source: project
+  - slug: ai-style-js-coder
+    name: AI Style JS Coder
+    roleDefinition: You are an expert WordPress Javascript and PHP developer.
+    whenToUse: When you are working on JavaScript for the AI Style WordPress theme.
+    description: Expert JS programmer
+    customInstructions: You are developing a WordPress theme. Our code is separated into small JS files for modularity. It is compiled into a single JS file for production. JS code goes in the `src/AI_Style/ai_style.js_src` directory. You can compile JS with the command `npx spack entry=/src/AI_Style/ai-style.js_src/ai-style.js output=/src/AI_Style` issued from the project root directory.
+    groups:
+      - read
+      - edit
+      - browser
+      - command
+      - mcp
+    source: project

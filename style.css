@@ -1,0 +1,1425 @@
+/*
+ Theme Name:   A.I. Style
+ Description:  A WordPress theme inspired by commercial LLMs like Chat-GPT, Gemini, and Grok
+ Version:      49
+ Author:       General Chicken
+ Author URI:   https://generalchicken.guru
+ Tags:         ai
+ Text Domain:       ai-style
+ Domain Path:       /assets/lang
+ Tested up to:      6.4
+ Requires at least: 6.2
+ Requires PHP:      7.4
+ License:           GNU General Public License v2.0 or later
+License URI:       https://www.gnu.org/licenses/gpl-2.0.html
+*/
+
+/* ============================================================
+   CSS CUSTOM PROPERTIES (VARIABLES)
+   ============================================================ */
+:root {
+    /* Color Palette */
+    --color-bg-primary: #343541;
+    --color-bg-secondary: #212121;
+    --color-bg-tertiary: #171717;
+    --color-bg-sidebar: #171717;
+    --color-bg-message-ai: #212121;
+    --color-bg-message-user: #303030;
+    --color-bg-input: #f7f7f8;
+    --color-bg-footer: #202123;
+
+    /* Text Colors */
+    --color-text-primary: #ffffff;
+    --color-text-secondary: #ececf1;
+    --color-text-muted: #8e8e8e;
+    --color-text-dark: #343541;
+    --color-text-placeholder: #6b7280;
+    --color-text-footer: #acacbe;
+
+    /* Border Colors */
+    --color-border-primary: #444654;
+    --color-border-secondary: #565869;
+    --color-border-light: rgba(255, 255, 255, 0.1);
+    --color-border-lighter: rgba(255, 255, 255, 0.2);
+
+    /* Accent Colors */
+    --color-accent-green: #19c37d;
+    --color-accent-gray: #808080;
+    --color-hover-light: #e5e7eb;
+    --color-hover-dark: #4d4f5e;
+
+    /* Spacing */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 12px;
+    --spacing-lg: 16px;
+    --spacing-xl: 24px;
+    --spacing-2xl: 32px;
+
+    /* Border Radius */
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
+    --radius-xl: 24px;
+    --radius-full: 50%;
+
+    /* Transitions */
+    --transition-fast: 0.2s ease;
+    --transition-medium: 0.3s ease-in-out;
+
+    /* Z-Index Scale */
+    --z-base: 1;
+    --z-content: 10;
+    --z-sidebar-closed: 50;
+    --z-fixed-form: 100;
+    --z-chat-input: 150;
+    --z-sidebar-open: 200;
+    --z-footer: 2000;
+
+    /* Admin Bar Heights */
+    --admin-bar-mobile: 46px;
+    --admin-bar-desktop: 32px;
+
+    /* Component Dimensions */
+    --sidebar-width-mobile: 280px;
+    --sidebar-width-desktop: 377px;
+    --sidebar-width-max: 435px;
+    --content-max-width: 768px;
+    --footer-height: 30px;
+}
+
+/* ============================================================
+   BASE STYLES
+   ============================================================ */
+body {
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================================
+   WORDPRESS ADMIN BAR ADJUSTMENTS
+   ============================================================ */
+body.admin-bar {
+    height: calc(100vh - var(--admin-bar-mobile));
+    margin-top: var(--admin-bar-mobile);
+}
+
+@media screen and (min-width: 782px) {
+    body.admin-bar {
+        height: calc(100vh - var(--admin-bar-desktop));
+        margin-top: var(--admin-bar-desktop);
+    }
+}
+
+/* ============================================================
+   CHAT CONTAINER (MOBILE FIRST)
+   ============================================================ */
+#chat-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+    min-height: 500px;
+    background: var(--color-bg-primary);
+    border: none;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    flex: 1;
+    height: 100vh;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    overflow: hidden;
+}
+
+body.admin-bar #chat-container {
+    height: calc(100vh - var(--admin-bar-mobile));
+    top: var(--admin-bar-mobile);
+}
+
+@media screen and (min-width: 782px) {
+    #chat-container {
+        flex-direction: row;
+    }
+
+    body.admin-bar #chat-container {
+        height: calc(100vh - var(--admin-bar-desktop));
+        top: var(--admin-bar-desktop);
+    }
+}
+
+/* ============================================================
+   SIDEBAR (MOBILE FIRST - OVERLAY SYSTEM)
+   ============================================================ */
+#chat-sidebar {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: var(--sidebar-width-mobile);
+    height: 100vh;
+    background: var(--color-bg-sidebar);
+    border-right: 1px solid var(--color-border-primary);
+    padding: var(--spacing-lg);
+    box-sizing: border-box;
+    color: var(--color-text-secondary);
+    overflow-y: auto;
+    z-index: var(--z-sidebar-closed);
+    transition: left var(--transition-medium);
+}
+
+/* Mobile: Show sidebar when toggled */
+#chat-sidebar.sidebar-visible {
+    left: 0;
+    z-index: var(--z-sidebar-open);
+}
+
+/* Mobile: Account for admin bar */
+body.admin-bar #chat-sidebar {
+    top: var(--admin-bar-mobile);
+    height: calc(100vh - var(--admin-bar-mobile));
+}
+
+/* Desktop: Static positioned sidebar */
+@media screen and (min-width: 782px) {
+    #chat-sidebar {
+        position: static;
+        left: auto;
+        width: var(--sidebar-width-desktop);
+        min-width: var(--sidebar-width-desktop);
+        max-width: var(--sidebar-width-max);
+        height: 100%;
+        z-index: auto;
+        transition: width var(--transition-medium),
+                    min-width var(--transition-medium),
+                    padding-left var(--transition-medium),
+                    padding-right var(--transition-medium);
+    }
+
+    body.admin-bar #chat-sidebar {
+        top: auto;
+        height: 100%;
+    }
+}
+
+/* Sidebar Toggle Animations */
+#chat-sidebar.sidebar-transitioning {
+    transition: width var(--transition-medium),
+                min-width var(--transition-medium),
+                padding-left var(--transition-medium),
+                padding-right var(--transition-medium);
+}
+
+#chat-sidebar.sidebar-hidden {
+    width: 0;
+    min-width: 0;
+    padding-left: 0;
+    padding-right: 0;
+    overflow: hidden;
+    border-right: none;
+}
+
+/* Ensure main content expands when sidebar is hidden */
+#chat-sidebar.sidebar-hidden + #chat-main {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Sidebar Content Styling */
+#chat-sidebar h2 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: var(--spacing-lg);
+    color: var(--color-text-secondary);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 1px solid var(--color-border-primary);
+}
+
+#chat-sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#chat-sidebar li {
+    padding: 0;
+    margin-bottom: var(--spacing-xs);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    color: var(--color-accent-gray);
+}
+
+#chat-sidebar li a {
+    display: block;
+    padding: var(--spacing-sm) var(--spacing-md);
+    color: var(--color-text-muted);
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    transition: background-color var(--transition-fast);
+}
+
+#chat-sidebar li a:hover {
+    background-color: rgba(128, 128, 128, 0.2);
+}
+
+#chat-sidebar li a:active,
+#chat-sidebar li a:focus {
+    background-color: rgba(128, 128, 128, 0.4);
+}
+
+#chat-sidebar li:hover {
+    background-color: transparent;
+}
+
+#chat-sidebar li:not(:has(a)):hover {
+    background-color: var(--color-bg-primary);
+}
+
+/* ============================================================
+   CHAT MAIN AREA (MOBILE FIRST)
+   ============================================================ */
+#chat-main {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    padding-bottom: var(--footer-height);
+    min-width: 0;
+    background: var(--color-bg-secondary);
+    height: 100%;
+    position: relative;
+    align-items: center;
+    overflow-y: visible;
+    z-index: var(--z-base);
+}
+
+@media screen and (min-width: 782px) {
+    #chat-main {
+        flex: 1 1 0;
+        width: auto;
+        transition: width var(--transition-medium),
+                    max-width var(--transition-medium);
+    }
+}
+
+/* ============================================================
+   SCROLLABLE CONTENT AREA (MOBILE FIRST)
+   ============================================================ */
+#scrollable-content {
+    overflow-y: auto;
+    height: calc(100vh - 196px);
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+    padding-bottom: 140px;
+    max-width: 100%;
+    position: relative;
+    z-index: var(--z-content);
+    margin-bottom: 80px;
+}
+
+body.admin-bar #scrollable-content {
+    height: calc(100vh - 196px);
+}
+
+@media screen and (min-width: 782px) {
+    #scrollable-content {
+        height: calc(100vh - 150px);
+    }
+
+    body.admin-bar #scrollable-content {
+        height: calc(100vh - 182px);
+    }
+}
+
+/* ============================================================
+   CHAT MESSAGES
+   ============================================================ */
+#chat-messages {
+    flex: 1 1 auto;
+    padding: var(--spacing-xl) var(--spacing-lg);
+    color: var(--color-text-dark);
+    width: 100%;
+    box-sizing: border-box;
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+    overflow-y: visible;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Message Styling */
+.message {
+    margin-bottom: 28px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* AI Message (Respondent) */
+.respondent-message {
+    width: 100%;
+    background-color: var(--color-bg-message-ai);
+    padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-lg) 20px;
+    border-radius: 0;
+    margin-bottom: var(--spacing-lg);
+    box-sizing: border-box;
+    border: none;
+    position: relative;
+}
+
+.respondent-message:hover {
+    background-color: #2a2a2a;
+}
+
+/* User Message (Interlocutor) */
+.interlocutor-message {
+    width: 70%;
+    max-width: 70%;
+    background-color: var(--color-bg-message-user);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-lg);
+    margin-left: auto;
+    box-sizing: border-box;
+    border: none;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.interlocutor-message:hover {
+    background-color: #3a3a3a;
+}
+
+/* Message Content */
+.message-content {
+    color: var(--color-text-secondary);
+    font-size: 16px;
+    line-height: 1.6;
+    letter-spacing: 0.2px;
+}
+
+/* Message Actions */
+.message-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+}
+
+.respondent-message:hover .message-actions {
+    opacity: 1;
+}
+
+/* Message Animations */
+.message-fade-in {
+    animation: fadeInSlide var(--transition-medium);
+}
+
+.message-fade-out {
+    animation: fadeOutSlide var(--transition-medium) forwards;
+}
+
+@keyframes fadeInSlide {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOutSlide {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}
+
+/* ============================================================
+   WORDPRESS COMMENT FORM (MOBILE FIRST)
+   ============================================================ */
+#fixed-content {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: var(--content-max-width);
+    box-sizing: border-box;
+    padding: var(--spacing-lg);
+    z-index: var(--z-fixed-form);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    border: 1px solid var(--color-border-lighter);
+    border-bottom: none;
+    background: var(--color-bg-message-user);
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Desktop: Position above footer */
+@media screen and (min-width: 782px) {
+    #fixed-content {
+        position: fixed;
+        bottom: var(--footer-height);
+        left: var(--sidebar-width-desktop);
+        right: 0;
+        width: auto;
+        max-width: var(--content-max-width);
+        margin: 0 auto;
+        border-radius: var(--radius-xl);
+        border: 1px solid var(--color-border-lighter);
+    }
+
+    body.admin-bar #fixed-content {
+        bottom: var(--footer-height);
+    }
+}
+
+/* Comment Form Container */
+.comment-respond {
+    margin: 0 auto;
+    width: 100%;
+    max-width: var(--content-max-width);
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    left: 50%;
+    transform: translateX(-50%);
+    position: relative;
+}
+
+#respond {
+    background: var(--color-bg-message-user);
+}
+
+/* Hide elements not in ChatGPT interface */
+.comment-reply-title,
+.logged-in-as,
+.required-field-message,
+.comment-form-comment label {
+    display: none;
+}
+
+/* Comment Form */
+#commentform {
+    background: none;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    padding: 9px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: none;
+    margin: 0;
+    max-width: none;
+    width: 100%;
+    transition: none;
+    box-sizing: border-box;
+    z-index: 1001;
+}
+
+#commentform:focus-within {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.comment-form-comment {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    position: relative;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    flex: 1;
+}
+
+/* Comment Textarea */
+#comment {
+    width: 100%;
+    background-color: transparent;
+    border: none;
+    color: var(--color-text-muted);
+    font-size: 16px;
+    padding: var(--spacing-md) 45px var(--spacing-md) var(--spacing-md);
+    resize: none;
+    min-height: 140px;
+    line-height: 1.5;
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    margin-right: var(--spacing-2xl);
+    outline: none;
+    box-sizing: border-box;
+}
+
+#comment:focus {
+    outline: none;
+}
+
+#comment::placeholder {
+    color: var(--color-text-placeholder);
+    font-size: 16px;
+    font-weight: 400;
+}
+
+/* Submit Button */
+.form-submit {
+    margin: 0;
+    position: absolute;
+    right: var(--spacing-md);
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+}
+
+.form-submit input[type="submit"] {
+    background-color: white;
+    border: none;
+    font-size: 0;
+    color: transparent;
+    width: var(--spacing-2xl);
+    height: var(--spacing-2xl);
+    cursor: pointer;
+    border-radius: var(--radius-full);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23404040'%3E%3Cpath d='M2.01 21L23 12 2.01 3 2 10l15 2-15 2z'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 16px;
+    opacity: 1;
+    transition: background-color var(--transition-fast),
+                transform var(--transition-fast);
+    text-indent: -9999px;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.form-submit input[type="submit"]:hover {
+    background-color: white;
+    transform: scale(1.05);
+}
+
+.form-submit input[type="submit"]:active {
+    transform: scale(0.95);
+}
+
+/* Comment Box Seamless Integration */
+#fixed-content .comment-form-container {
+    background: inherit;
+    border: none;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+    outline: none;
+}
+
+#fixed-content .comment-form-container #commentform {
+    background: inherit;
+    border: none;
+    box-shadow: none;
+    outline: none;
+}
+
+#fixed-content .comment-form-container #commentform #comment {
+    background: transparent;
+    border: none;
+    outline: none;
+    box-shadow: none;
+}
+
+#fixed-content .comment-form-container #commentform #comment:focus {
+    outline: none;
+    border: none;
+    box-shadow: none;
+    background: transparent;
+}
+
+#fixed-content .comment-form-container .form-submit input[type="submit"] {
+    outline: none;
+    border: none;
+}
+
+#fixed-content .comment-form-container .form-submit input[type="submit"]:focus {
+    outline: none;
+    border: none;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+#fixed-content * {
+    box-sizing: border-box;
+}
+
+#fixed-content .comment-form-comment {
+    background: inherit;
+    border: none;
+    outline: none;
+    box-shadow: none;
+}
+
+/* ============================================================
+   ACTION BUTTONS / BUBBLES
+   ============================================================ */
+.action-buttons-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    padding: 6px 0 4px;
+    width: 100%;
+    align-items: center;
+    margin-top: 2px;
+    justify-content: flex-start;
+}
+
+.action-bubble {
+    display: inline-flex;
+    align-items: center;
+    background-color: transparent;
+    border: 1px solid var(--color-border-secondary);
+    border-radius: var(--radius-lg);
+    padding: 5px 10px;
+    color: var(--color-text-secondary);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    margin-right: var(--spacing-xs);
+    margin-bottom: 2px;
+    height: 28px;
+}
+
+.action-bubble:hover {
+    background-color: var(--color-hover-dark);
+    border-color: #6c6d80;
+}
+
+.action-bubble .dashicons {
+    font-size: 15px;
+    width: 15px;
+    height: 15px;
+    margin-right: var(--spacing-xs);
+    color: #acacbe;
+}
+
+.action-bubble:first-child .dashicons {
+    margin-right: 0;
+}
+
+.action-bubble:hover .dashicons {
+    color: var(--color-text-primary);
+}
+
+.action-bubble-text {
+    margin-left: var(--spacing-xs);
+}
+
+/* Mobile adjustments */
+@media (max-width: 700px) {
+    #commentform {
+        padding: 10px var(--spacing-md);
+    }
+
+    #comment {
+        font-size: 14px;
+    }
+
+    .action-bubble {
+        padding: 4px var(--spacing-sm);
+        font-size: 12px;
+    }
+
+    .action-bubble .dashicons {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
+    }
+
+    .action-bubble-text {
+        margin-left: 2px;
+    }
+}
+
+/* ============================================================
+   CHATGPT-STYLE UNIFIED COMMENT BOX
+   ============================================================ */
+.comment-box-inner {
+    background-color: var(--color-bg-input);
+    border-radius: var(--radius-md);
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    margin: 0 auto;
+    max-width: var(--content-max-width);
+    width: 100%;
+    transition: box-shadow var(--transition-fast);
+    box-sizing: border-box;
+}
+
+.comment-input-row {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.comment-tools-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: var(--spacing-sm) var(--spacing-md);
+}
+
+.tools-left {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.tools-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Tool Buttons (Mobile First) */
+.plus-icon,
+.tools-button,
+.microphone-button,
+.submit-arrow {
+    background: none;
+    border: none;
+    color: var(--color-text-placeholder);
+    cursor: pointer;
+    padding: var(--spacing-xs);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.plus-icon:hover,
+.tools-button:hover,
+.microphone-button:hover {
+    background-color: var(--color-hover-light);
+    color: #374151;
+}
+
+.submit-arrow {
+    background-color: var(--color-accent-green);
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-full);
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.submit-arrow:disabled {
+    background-color: #d1d5db;
+    color: #9ca3af;
+    cursor: not-allowed;
+}
+
+/* Desktop tool buttons */
+@media screen and (min-width: 782px) {
+    .tools-left {
+        gap: var(--spacing-md);
+    }
+
+    .tools-right {
+        gap: var(--spacing-sm);
+    }
+
+    .plus-icon,
+    .tools-button,
+    .microphone-button {
+        padding: 6px;
+        font-size: 14px;
+    }
+
+    .submit-arrow {
+        width: var(--spacing-2xl);
+        height: var(--spacing-2xl);
+        font-size: 16px;
+    }
+}
+
+/* ============================================================
+   POST CONTENT
+   ============================================================ */
+.post-content {
+    width: 100%;
+    padding: var(--spacing-lg);
+    margin: 0 0 var(--spacing-xl) 0;
+    box-sizing: border-box;
+    color: var(--color-text-secondary);
+    font-size: 16px;
+    line-height: 1.5;
+    background: none;
+    border: none;
+    overflow-wrap: break-word;
+}
+
+#post-content-1 {
+    width: 100%;
+    box-sizing: border-box;
+    padding: var(--spacing-lg);
+}
+
+/* ============================================================
+   FOOTER (MOBILE FIRST - HIDDEN ON MOBILE)
+   ============================================================ */
+.site-footer {
+    display: none;
+}
+
+@media screen and (min-width: 782px) {
+    .site-footer {
+        display: block;
+        position: absolute;
+        bottom: 0;
+        left: var(--sidebar-width-desktop);
+        right: 0;
+        width: auto;
+        background-color: var(--color-bg-footer);
+        color: var(--color-text-footer);
+        text-align: center;
+        padding: 4px 0;
+        font-size: 12px;
+        border-top: 1px solid var(--color-border-primary);
+        box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1);
+        font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+        letter-spacing: 0.2px;
+        height: var(--footer-height);
+        z-index: var(--z-footer);
+    }
+}
+
+body.admin-bar .site-footer {
+    bottom: 0;
+}
+
+/* ============================================================
+   WORDPRESS ADMIN BAR TOGGLE BUTTONS
+   ============================================================ */
+/* Sidebar Toggle Button */
+#wp-admin-bar-sidebar-toggle .ab-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: 0 var(--spacing-sm);
+    text-decoration: none;
+    color: #a7aaad;
+    font-size: 13px;
+    line-height: var(--spacing-2xl);
+    height: var(--spacing-2xl);
+}
+
+#wp-admin-bar-sidebar-toggle .ab-item:hover {
+    color: #00a0d2;
+    background-color: #32373c;
+}
+
+#wp-admin-bar-sidebar-toggle .ab-item .dashicons {
+    font-family: dashicons;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    line-height: 1;
+    margin-top: 6px;
+    display: inline-block;
+    text-decoration: inherit;
+    font-weight: normal;
+    font-style: normal;
+    vertical-align: top;
+    text-align: center;
+    transition: color .1s ease-in;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+#wp-admin-bar-sidebar-toggle .ab-item .ab-label {
+    font-size: 13px;
+    font-weight: 400;
+    display: inline-block;
+}
+
+#wpadminbar #wp-admin-bar-sidebar-toggle {
+    display: block;
+    visibility: visible;
+}
+
+#wpadminbar #wp-admin-bar-sidebar-toggle .ab-item {
+    display: flex;
+    visibility: visible;
+    opacity: 1;
+}
+
+#wpadminbar #wp-admin-bar-sidebar-toggle .ab-item .dashicons {
+    display: inline-block;
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Mobile Hamburger Icon */
+#wp-admin-bar-mobile-hamburger {
+    display: none;
+}
+
+#wp-admin-bar-mobile-hamburger .ab-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: 0 var(--spacing-sm);
+    text-decoration: none;
+    color: #a7aaad;
+    font-size: 13px;
+    line-height: var(--spacing-2xl);
+    height: var(--spacing-2xl);
+}
+
+#wp-admin-bar-mobile-hamburger .ab-item:hover {
+    color: #00a0d2;
+    background-color: #32373c;
+}
+
+#wp-admin-bar-mobile-hamburger .ab-item .dashicons {
+    font-family: dashicons;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    line-height: 1;
+    margin-top: 6px;
+    display: inline-block;
+    text-decoration: inherit;
+    font-weight: normal;
+    font-style: normal;
+    vertical-align: top;
+    text-align: center;
+    transition: color .1s ease-in;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Mobile responsive behavior */
+@media screen and (max-width: 782px) {
+    #wp-admin-bar-mobile-hamburger {
+        display: block !important;
+        visibility: visible !important;
+    }
+
+    #wp-admin-bar-mobile-hamburger .ab-item {
+        line-height: var(--admin-bar-mobile);
+        height: var(--admin-bar-mobile);
+    }
+
+    #wp-admin-bar-mobile-hamburger .ab-item .dashicons {
+        margin-top: 13px;
+    }
+
+    #wpadminbar #wp-admin-bar-sidebar-toggle {
+        display: none !important;
+        visibility: hidden !important;
+    }
+
+    #wpadminbar #wp-admin-bar-sidebar-toggle .ab-item {
+        display: none !important;
+        visibility: hidden !important;
+    }
+
+    #wpadminbar #wp-admin-bar-sidebar-toggle .ab-item .ab-label {
+        display: none !important;
+    }
+}
+
+/* Desktop responsive behavior */
+@media screen and (min-width: 782px) {
+    #wp-admin-bar-mobile-hamburger {
+        display: none !important;
+    }
+
+    #wpadminbar #wp-admin-bar-sidebar-toggle {
+        display: block !important;
+        visibility: visible !important;
+    }
+
+    #wpadminbar #wp-admin-bar-sidebar-toggle .ab-item {
+        display: flex !important;
+        visibility: visible !important;
+    }
+
+    #wpadminbar #wp-admin-bar-sidebar-toggle .ab-item .ab-label {
+        display: inline-block !important;
+    }
+}
+
+/* ============================================================
+   HIGH ZOOM AND MOBILE PORTRAIT RESPONSIVE STYLES
+   ============================================================ */
+@media screen and (max-width: 480px) and (orientation: portrait) {
+    #chat-sidebar:not(.sidebar-hidden) {
+        width: 85% !important;
+        min-width: 85% !important;
+    }
+}
+
+/* High zoom level styles (250%+) */
+@media screen and (min-resolution: 2.5dppx),
+       screen and (-webkit-min-device-pixel-ratio: 2.5) {
+    #chat-sidebar:not(.sidebar-hidden) {
+        width: 85% !important;
+        min-width: 85% !important;
+    }
+
+    #wp-admin-bar-sidebar-toggle .ab-item .ab-label {
+        display: none !important;
+    }
+}
+
+/* ============================================================
+   BLOG ROLL STYLES (MOBILE FIRST)
+   ============================================================ */
+.blog-roll-container {
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+    padding: var(--spacing-md);
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.blog-roll-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
+    width: 100%;
+}
+
+.blog-roll-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--spacing-sm);
+    overflow: hidden;
+    transition: all var(--transition-medium);
+    border: 1px solid var(--color-border-light);
+}
+
+.blog-roll-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--color-border-lighter);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.blog-roll-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    height: 100%;
+}
+
+.blog-roll-image-container {
+    width: 100%;
+    height: 160px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.03);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.blog-roll-thumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-medium);
+}
+
+.blog-roll-item:hover .blog-roll-thumbnail {
+    transform: scale(1.05);
+}
+
+.blog-roll-placeholder {
+    font-size: 48px;
+    color: rgba(255, 255, 255, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.blog-roll-content {
+    padding: var(--spacing-lg);
+}
+
+.blog-roll-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 var(--spacing-md) 0;
+    color: var(--color-text-secondary);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.blog-roll-meta {
+    margin-bottom: var(--spacing-md);
+}
+
+.blog-roll-date {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 400;
+}
+
+.blog-roll-excerpt {
+    font-size: 13px;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.8);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.blog-roll-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Larger mobile screens */
+@media screen and (min-width: 480px) {
+    .blog-roll-image-container {
+        height: 180px;
+    }
+}
+
+/* Desktop blog roll */
+@media screen and (min-width: 782px) {
+    .blog-roll-container {
+        padding: var(--spacing-lg);
+    }
+
+    .blog-roll-grid {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: var(--spacing-xl);
+    }
+
+    .blog-roll-image-container {
+        height: 200px;
+    }
+
+    .blog-roll-content {
+        padding: 20px;
+    }
+
+    .blog-roll-title {
+        font-size: 18px;
+    }
+
+    .blog-roll-excerpt {
+        font-size: 14px;
+    }
+}
+
+/* ============================================================
+   BLOG ROLL PAGINATION (MOBILE FIRST)
+   ============================================================ */
+.blog-roll-pagination {
+    margin: 20px 0 80px 0;
+    padding: var(--spacing-md) 0;
+    text-align: center;
+    width: 100%;
+    max-width: var(--content-max-width);
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    z-index: var(--z-fixed-form);
+    clear: both;
+}
+
+.pagination-list {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-xs);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex-wrap: wrap;
+}
+
+.pagination-list li {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+}
+
+.pagination-list a {
+    display: inline-block;
+    padding: 6px var(--spacing-sm);
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border-light);
+    transition: all var(--transition-fast);
+    font-size: 12px;
+    font-weight: 500;
+    min-width: 32px;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.pagination-list a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: var(--color-border-lighter);
+    color: var(--color-text-primary);
+    transform: translateY(-1px);
+}
+
+.pagination-list .current-page {
+    display: inline-block;
+    padding: 6px var(--spacing-sm);
+    background-color: #40414f;
+    color: var(--color-text-primary);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border-lighter);
+    font-size: 12px;
+    font-weight: 600;
+    min-width: 32px;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.pagination-list .prev-page a,
+.pagination-list .next-page a {
+    padding: 6px 10px;
+    font-weight: 500;
+}
+
+.pagination-list .prev-page a:hover,
+.pagination-list .next-page a:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Larger mobile screens */
+@media screen and (min-width: 480px) {
+    .pagination-list {
+        gap: 6px;
+    }
+
+    .pagination-list a,
+    .pagination-list .current-page {
+        padding: 6px 10px;
+        font-size: 13px;
+        min-width: 36px;
+    }
+
+    .pagination-list .prev-page a,
+    .pagination-list .next-page a {
+        padding: 6px var(--spacing-md);
+    }
+}
+
+/* Desktop pagination */
+@media screen and (min-width: 782px) {
+    .blog-roll-pagination {
+        margin: var(--spacing-2xl) 0 120px 0;
+        padding: var(--spacing-lg) 0;
+    }
+
+    .pagination-list {
+        gap: var(--spacing-sm);
+    }
+
+    .pagination-list a,
+    .pagination-list .current-page {
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: 14px;
+        min-width: 40px;
+    }
+
+    .pagination-list .prev-page a,
+    .pagination-list .next-page a {
+        padding: var(--spacing-sm) var(--spacing-lg);
+    }
+}
+
+/* ============================================================
+   LEGACY / COMPATIBILITY STYLES
+   ============================================================ */
+#chat-input {
+    flex: 0 0 auto;
+    padding: 0;
+    background: var(--color-bg-secondary);
+    border-top: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: sticky;
+    bottom: 0;
+    z-index: var(--z-chat-input);
+    width: 100%;
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+    left: 0;
+    transform: none;
+    box-sizing: border-box;
+}
+
+@media (max-width: 700px) {
+    #chat-container {
+        flex-direction: column;
+    }
+    #chat-sidebar {
+        width: 100%;
+        max-width: none;
+        border-right: none;
+        border-bottom: 1px solid #ccc;
+        height: 30vh;
+        overflow-y: auto;
+    }
+    #chat-main {
+        width: 100%;
+        height: 70vh;
+        overflow-y: auto;
+    }
+}
+
+#cacbot-archive-button {
+    display: none !important;
+}
